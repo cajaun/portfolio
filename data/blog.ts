@@ -1,5 +1,5 @@
 import fs from "fs";
-import matter from "gray-matter";
+import matter from 'gray-matter';
 import path from "path";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeStringify from "rehype-stringify";
