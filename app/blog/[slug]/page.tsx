@@ -6,21 +6,21 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
 type PageProps = {
-  params: {
-    slug: string;
-  };
+  params: Promise<{ slug: string }>;
 };
 
-// Generate static paths for all blog slugs
+// Static params for SSG
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
 
-// Generate dynamic metadata for each blog post
-export async function generateMetadata({ params }: PageProps): Promise<Metadata | undefined> {
-  const post = await getPost(params.slug);
-
+// Metadata generation using async params
+export async function generateMetadata(
+  props: PageProps
+): Promise<Metadata | undefined> {
+  const { slug } = await props.params;
+  const post = await getPost(slug);
   if (!post) return;
 
   const {
@@ -54,9 +54,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata 
   };
 }
 
-// Render the blog post page
-export default async function Blog({ params }: PageProps) {
-  const post = await getPost(params.slug);
+// Page component using async params
+export default async function Blog(props: PageProps) {
+  const { slug } = await props.params;
+  const post = await getPost(slug);
 
   if (!post) {
     notFound();
