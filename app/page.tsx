@@ -1,4 +1,6 @@
+import Image from "next/image";
 import { ScrollIsland } from "../components/ui/scroll-island";
+import CajaunArt from "@/app/assets/Cajaun_art.png"
 
 const sections = [
   {
@@ -69,15 +71,13 @@ export default function Home() {
       <div className="mb-16 flex animate-slideFromDownAndFade items-center">
         <div>
           <a href="/">
-            <img
-              alt="Photo of Julien Thibeaut or Ibelick"
-              width="400"
-              height="400"
-              decoding="async"
-              className="pointer-events-none h-16 w-16 rounded-full"
-              style={{ color: "transparent" }}
-              src="https://github.com/cajaun.png"
-            />
+          <Image
+  alt="Photo of Cajaun Campbell"
+  width={64}
+  height={64}
+  className="pointer-events-none h-16 w-16 rounded-full"
+  src={CajaunArt}
+/>
           </a>
         </div>
         <div className="ml-4 ">
