@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 
-export const openRunde = localFont({
+const openRunde = localFont({
   variable: "--font-open-runde",
   display: "swap",
   src: [
