@@ -18,7 +18,7 @@ export const openRunde = localFont({
       style: "normal",
     },
     {
-      path: "./fonts/OpenRunde-SemiBold.otf",
+      path: "./fonts/OpenRunde-Semibold.otf",
       weight: "600",
       style: "normal",
     },
