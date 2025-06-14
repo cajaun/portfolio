@@ -5,7 +5,7 @@ import { Suspense } from "react";
 
 // TEMP: Define DATA here — move to /lib/config.ts if reused
 const DATA = {
-  url: "https://yourdomain.com", // Replace with your actual domain
+  url: "https://cajaun.com", // Replace with your actual domain
   name: "Cajaun Campbell",
 };
 
