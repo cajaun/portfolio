@@ -7,7 +7,7 @@ export const metadata = {
   description: "My thoughts on software development, life, and more.",
 };
 
-const BLUR_FADE_DELAY = 0.04;
+// const BLUR_FADE_DELAY = 0.04;
 
 export default async function BlogPage() {
   const posts = await getBlogPosts();
@@ -26,7 +26,7 @@ export default async function BlogPage() {
           }
           return 1;
         })
-        .map((post, id) => (
+        .map((post) => (
          
             <Link
               className="flex flex-col space-y-1 mb-4"

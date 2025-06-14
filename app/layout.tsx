@@ -3,16 +3,33 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
+export const openRunde = localFont({
+  variable: "--font-open-runde",
+  display: "swap",
+  src: [
+    {
+      path: "./fonts/OpenRunde-Regular.otf",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "./fonts/OpenRunde-Medium.otf",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "./fonts/OpenRunde-SemiBold.otf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "./fonts/OpenRunde-Bold.otf",
+      weight: "700",
+      style: "normal",
+    },
+  ],
 });
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+
 
 export const metadata: Metadata = {
   title: "Cajaun Campbell",
@@ -27,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black`}
+         className={`${openRunde.variable} font-sans antialiased bg-white dark:bg-black`}
       >
         <ThemeProvider
           attribute="class"
