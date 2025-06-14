@@ -5,16 +5,20 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+type PageProps = {
+  params: {
+    slug: string;
+  };
+};
+
+// Generate static paths for all blog slugs
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { slug: string };
-}): Promise<Metadata | undefined> {
+// Generate dynamic metadata for each blog post
+export async function generateMetadata({ params }: PageProps): Promise<Metadata | undefined> {
   const post = await getPost(params.slug);
 
   if (!post) return;
@@ -50,11 +54,8 @@ export async function generateMetadata({
   };
 }
 
-export default async function Blog({
-  params,
-}: {
-  params: { slug: string };
-}) {
+// Render the blog post page
+export default async function Blog({ params }: PageProps) {
   const post = await getPost(params.slug);
 
   if (!post) {
