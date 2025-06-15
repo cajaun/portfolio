@@ -1,10 +1,7 @@
 import Header from "@/components/ui/header";
 import { ScrollIsland } from "../components/ui/scroll-island";
-import Link from "next/link";
 import ThemeToggleButton from "@/components/hooks/useTheme";
 import BlogSection from "@/components/blog-section";
-
-
 
 const sections = [
   {
@@ -26,22 +23,22 @@ const sections = [
     content: (
       <div className="">
         <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px]">
-          I'm currently focused on building mobile apps driven by ideas I find
+          I&apos;m currently focused on building mobile apps driven by ideas I find
           fun, curious, or personally meaningful.
         </p>
 
         <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px]">
-          One of the ideas I'm exploring is a "Shazam for movies" a tool that
+          One of the ideas I&apos;m exploring is a &quot;Shazam for movies&quot; a tool that
           can identify films from short clips or scenes.
         </p>
 
         <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px]">
-          I'm also working on a remake of the New York Times'{" "}
+          I&apos;m also working on a remake of the New York Times&apos;{" "}
           <em>Connections</em> puzzle.
         </p>
 
         <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px]">
-          Alongside that, I'm putting together a collection of fluid, reusable
+          Alongside that, I&apos;m putting together a collection of fluid, reusable
           UI components and animations for React Native which is designed to
           help you build smooth, modern interfaces with ease.
         </p>
@@ -69,7 +66,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full"
         >
-         <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white">
             <p className="font-medium">Movers</p>
           </div>
         </a>
@@ -79,7 +76,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full"
         >
-           <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white">
             <p className="font-medium">Auto-Care</p>
           </div>
         </a>
@@ -91,11 +88,9 @@ const sections = [
     id: "blog",
     title: "Blog",
     content: (
-
-        <div>
-<BlogSection />
-        </div>
-     
+      <div>
+        <BlogSection />
+      </div>
     ),
   },
 
@@ -154,7 +149,7 @@ export default function Home() {
           <p className="text-sm text-gray-100 font-semibold">
             © 2025 Cajaun Campbell
           </p>
-         <ThemeToggleButton/>
+          <ThemeToggleButton />
         </div>
       </footer>
     </>
