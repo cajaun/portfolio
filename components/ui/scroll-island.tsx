@@ -72,8 +72,8 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
     }
   });
 
-  const margin = 20; 
-const viewportWidth = window.innerWidth; 
+  const margin = 16; // or whatever padding you want on sides
+const viewportWidth = window.innerWidth; // or 100vw in CSS
 
 const openWidth = viewportWidth - 2 * margin;
 
@@ -122,7 +122,7 @@ const openWidth = viewportWidth - 2 * margin;
           } z-10 overflow-hidden`}
           initial={false}
           style={{ borderRadius: 22 }}
-          animate={{ width: open ? openWidth : 285, height: open ? "auto" : 44 }}
+          animate={{ width: open ? 340 : 280, height: open ? "auto" : 44 }}
         >
           <ol className="px-4 pt-4" style={{ paddingBlockStart: 44 }}>
             {sections.map((item) => (
