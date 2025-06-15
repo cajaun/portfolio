@@ -46,32 +46,17 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
     }
   }, []);
 
-  useMotionValueEvent(scrollYProgress, "change", () => {
-    setPercent(Math.floor(scrollYProgress.get() * 100));
 
-    const els = titleElsRef.current;
-    if (!els.length) return;
-
-    const threshold = 50;
-    let closestIndex = -1;
-    let closestDistance = threshold;
-
-    els.forEach((el, index) => {
-      const top = el.getBoundingClientRect().top;
-      if (top >= 0 && top < closestDistance) {
-        closestDistance = top;
-        closestIndex = index;
-      }
-    });
-
-    if (closestIndex !== -1) {
-      const newTitle = sections[closestIndex]?.title || "";
-      if (newTitle !== currentTitleRef.current) {
-        setCurrentTitle(newTitle);
-      }
-    }
-  });
-
+ 
+	useMotionValueEvent(scrollYProgress, "change", (latest) => {
+		setPercent(Math.floor(latest * 100));
+		titleEls.forEach((el, index) => {
+			const top = el.getBoundingClientRect().top;
+			if (top >= 0 && top < 32) {
+				setCurrentTitle(sections[index].title ?? "");
+			}
+		});
+	});
 
   return (
     <div className="relative w-full max-w-screen-sm mx-auto " ref={setupTitles}>
@@ -94,7 +79,7 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
               >
                 <h2
                   id={item.id}
-                  className="font-bold animate-slide-down-fade"
+                  className="font-medium animate-slide-down-fade"
                   style={{ animationDelay: `${90 * (index + 1)}ms` }}
                 >
                   {item.title}
@@ -125,8 +110,7 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
               <motion.li
                 key={item.id}
                 className={`
-        list-inside list-none transition-[filter] font-medium  $
-      `}
+        list-inside list-none transition-[filter] font-medium `}
               >
                 <a
                   href={`#${item.id}`}
@@ -172,7 +156,9 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
               <span className="truncate font-semibold">{currentTitle}</span>
             </span>
 
-            <span className="font-medium">{percent}%</span>
+            <span className="font-semibold bg-neutral-500 px-2 rounded-full">
+              {percent}%
+            </span>
           </button>
         </motion.div>
       </MotionConfig>

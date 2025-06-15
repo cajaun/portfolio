@@ -9,7 +9,7 @@ const sections = [
     title: "About me",
     content: (
       <div className="">
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px]">
+        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
           I am a Software Engineer focused on going from zero-to-one with
           startups, aligning with my passion for innovation and crafting
           impactful solutions.
@@ -22,22 +22,22 @@ const sections = [
     title: "Now",
     content: (
       <div className="">
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px]">
+        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
           I&apos;m currently focused on building mobile apps driven by ideas I find
           fun, curious, or personally meaningful.
         </p>
 
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px]">
+        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
           One of the ideas I&apos;m exploring is a &quot;Shazam for movies&quot; a tool that
           can identify films from short clips or scenes.
         </p>
 
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px]">
+        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
           I&apos;m also working on a remake of the New York Times&apos;{" "}
           <em>Connections</em> puzzle.
         </p>
 
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px]">
+        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
           Alongside that, I&apos;m putting together a collection of fluid, reusable
           UI components and animations for React Native which is designed to
           help you build smooth, modern interfaces with ease.
@@ -56,8 +56,8 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full "
         >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white">
-            <p className="font-medium">RankedOut</p>
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
+            <p className="font-medium ">RankedOut</p>
           </div>
         </a>
         <a
@@ -66,7 +66,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full"
         >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
             <p className="font-medium">Movers</p>
           </div>
         </a>
@@ -76,7 +76,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full"
         >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
             <p className="font-medium">Auto-Care</p>
           </div>
         </a>
@@ -99,7 +99,7 @@ const sections = [
     title: "Connect",
     content: (
       <div>
-        <p className="paragraph text-gray-200 font-medium mb-2">
+        <p className="paragraph text-gray-200 font-medium mb-2 dark:text-gray-100" >
           Follow me on{" "}
           <a
             href="https://x.com/yourusername"
@@ -114,14 +114,14 @@ const sections = [
             href="https://github.com/yourusername"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-gray-100"
+            className="underline hover:text-gray-100 dark:text-gray-100"
           >
             Github
           </a>
           , or email me directly at{" "}
           <a
             href="mailto:cajaun@yahoo.com"
-            className="underline hover:text-gray-100"
+            className="underline hover:text-gray-100 dark:text-gray-100"
           >
             cajaun@yahoo.com
           </a>
@@ -135,18 +135,20 @@ const sections = [
 export default function Home() {
   return (
     <>
-      <main className="mx-auto mb-14 flex w-full max-w-screen-sm flex-1 flex-col px-4 pb-8 pt-20 dark:text-white">
+      <main className="mx-auto mb-14 flex w-full max-w-screen-sm flex-1 flex-col px-4 pb-8 pt-20 ">
         <Header />
 
         <ScrollIsland sections={sections} />
       </main>
+
+
 
       <footer className="mx-auto mt-auto w-full max-w-screen-sm border-t border-gray-300 dark:border-[#2A2A28] px-4 ">
         <div
           className="flex items-center justify-between px-0 pt-4 md:px-0"
           style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom))" }}
         >
-          <p className="text-sm text-gray-100 font-semibold">
+          <p className="text-sm text-gray-200 dark:text-gray-100 font-medium" >
             © 2025 Cajaun Campbell
           </p>
           <ThemeToggleButton />

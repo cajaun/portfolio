@@ -1,3 +1,4 @@
+import Header from "@/components/ui/header";
 import { getBlogPosts, getPost } from "@/data/blog";
 import { DATA } from "@/data/resume";
 import { formatDate } from "@/lib/utils";
@@ -64,7 +65,7 @@ export default async function Blog(props: PageProps) {
   }
 
   return (
-    <section id="blog">
+    <section id="blog" className="mx-auto mb-14 flex w-full max-w-screen-sm flex-1 flex-col px-4 pb-8 pt-20 dark:text-white">
       <script
         type="application/ld+json"
         suppressHydrationWarning
@@ -87,6 +88,7 @@ export default async function Blog(props: PageProps) {
           }),
         }}
       />
+      <Header/>
       <h1 className="title font-medium text-2xl tracking-tighter w-full max-w-screen-sm ">
         {post.metadata.title}
       </h1>
