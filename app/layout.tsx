@@ -44,7 +44,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-         className={`${openRunde.variable} font-sans antialiased bg-white dark:bg-black`}
+         className={`${openRunde.variable} font-sans antialiased bg-white dark:bg-[#11110F]`}
       >
         <ThemeProvider
           attribute="class"

@@ -9,13 +9,13 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-// Static params for SSG
+
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
   return posts.map((post) => ({ slug: post.slug }));
 }
 
-// Metadata generation using async params
+
 export async function generateMetadata(
   props: PageProps
 ): Promise<Metadata | undefined> {
@@ -54,7 +54,7 @@ export async function generateMetadata(
   };
 }
 
-// Page component using async params
+
 export default async function Blog(props: PageProps) {
   const { slug } = await props.params;
   const post = await getPost(slug);
@@ -87,10 +87,10 @@ export default async function Blog(props: PageProps) {
           }),
         }}
       />
-      <h1 className="title font-medium text-2xl tracking-tighter max-w-[650px]">
+      <h1 className="title font-medium text-2xl tracking-tighter w-full max-w-screen-sm ">
         {post.metadata.title}
       </h1>
-      <div className="flex justify-between items-center mt-2 mb-8 text-sm max-w-[650px]">
+      <div className="flex justify-between items-center mt-2 mb-8 text-sm w-full max-w-screen-sm ">
         <Suspense fallback={<p className="h-5" />}>
           <p className="text-sm text-neutral-600 dark:text-neutral-400">
             {formatDate(post.metadata.publishedAt)}
