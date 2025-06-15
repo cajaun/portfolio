@@ -72,10 +72,6 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
     }
   });
 
-  const margin = 16; // or whatever padding you want on sides
-const viewportWidth = window.innerWidth; // or 100vw in CSS
-
-const openWidth = viewportWidth - 2 * margin;
 
   return (
     <div className="relative w-full max-w-screen-sm mx-auto " ref={setupTitles}>
