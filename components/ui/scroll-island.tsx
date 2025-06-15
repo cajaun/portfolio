@@ -72,6 +72,11 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
     }
   });
 
+  const margin = 20; 
+const viewportWidth = window.innerWidth; 
+
+const openWidth = viewportWidth - 2 * margin;
+
   return (
     <div className="relative w-full max-w-screen-sm mx-auto " ref={setupTitles}>
       <MotionConfig
@@ -117,7 +122,7 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
           } z-10 overflow-hidden`}
           initial={false}
           style={{ borderRadius: 22 }}
-          animate={{ width: open ? 345 : 285, height: open ? "auto" : 44 }}
+          animate={{ width: open ? openWidth : 285, height: open ? "auto" : 44 }}
         >
           <ol className="px-4 pt-4" style={{ paddingBlockStart: 44 }}>
             {sections.map((item) => (
