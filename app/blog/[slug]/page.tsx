@@ -95,9 +95,9 @@ export default async function Blog(props: PageProps) {
         <div className="mb-16">
           <div className="flex justify-between items-center ">
             <h2 className="font-medium ">{post.metadata.title}</h2>
-            <time className="text-sm text-neutral-600 dark:text-neutral-400">
+            {/* <time className="text-sm text-neutral-600 dark:text-neutral-400">
               {formatDate(post.metadata.publishedAt)}
-            </time>
+            </time> */}
           </div>
 
           <div className="mt-4">
