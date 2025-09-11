@@ -23,13 +23,13 @@ const sections = [
     content: (
       <div className="">
         <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
-          I&apos;m currently focused on building mobile apps driven by ideas I find
-          fun, curious, or personally meaningful.
+          I&apos;m currently focused on building mobile apps driven by ideas I
+          find fun, curious, or personally meaningful.
         </p>
 
         <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
-          One of the ideas I&apos;m exploring is a &quot;Shazam for movies&quot; a tool that
-          can identify films from short clips or scenes.
+          One of the ideas I&apos;m exploring is a &quot;Shazam for movies&quot;
+          a tool that can identify films from short clips or scenes.
         </p>
 
         <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
@@ -38,9 +38,9 @@ const sections = [
         </p>
 
         <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
-          Alongside that, I&apos;m putting together a collection of fluid, reusable
-          UI components and animations for React Native which is designed to
-          help you build smooth, modern interfaces with ease.
+          Alongside that, I&apos;m putting together a collection of fluid,
+          reusable UI components and animations for React Native which is
+          designed to help you build smooth, modern interfaces with ease.
         </p>
       </div>
     ),
@@ -56,7 +56,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full "
         >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
             <p className="font-medium ">RankedOut</p>
           </div>
         </a>
@@ -66,7 +66,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full"
         >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
             <p className="font-medium">Movers</p>
           </div>
         </a>
@@ -76,7 +76,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full"
         >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-200 py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
             <p className="font-medium">Auto-Care</p>
           </div>
         </a>
@@ -99,10 +99,10 @@ const sections = [
     title: "Connect",
     content: (
       <div>
-        <p className="paragraph text-gray-200 font-medium mb-2 dark:text-gray-100" >
+        <p className="paragraph text-gray-200 font-medium mb-2 dark:text-gray-100">
           Follow me on{" "}
           <a
-            href="https://x.com/yourusername"
+            href="https://x.com/cajauncampbell"
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-gray-100"
@@ -111,7 +111,7 @@ const sections = [
           </a>
           , view my code and open-source projects on{" "}
           <a
-            href="https://github.com/yourusername"
+            href="https://github.com/cajaun"
             target="_blank"
             rel="noopener noreferrer"
             className="underline hover:text-gray-100 dark:text-gray-100"
@@ -141,14 +141,12 @@ export default function Home() {
         <ScrollIsland sections={sections} />
       </main>
 
-
-
       <footer className="mx-auto mt-auto w-full max-w-screen-sm border-t border-gray-300 dark:border-[#2A2A28] px-4 ">
         <div
           className="flex items-center justify-between px-0 pt-4 md:px-0"
           style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom))" }}
         >
-          <p className="text-sm text-gray-200 dark:text-gray-100 font-medium" >
+          <p className="text-sm text-gray-200 dark:text-gray-100 font-medium">
             © 2025 Cajaun Campbell
           </p>
           <ThemeToggleButton />

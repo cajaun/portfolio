@@ -1,8 +1,10 @@
 "use client";
+
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
-export default function ThemeToggleButton() {
+export default function ThemeToggleButton({ className = "size-9 p-2" }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -12,52 +14,60 @@ export default function ThemeToggleButton() {
 
   if (!mounted) return null;
 
+  const isDark = theme === "dark";
+
   return (
     <button
-      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className={`w-8 h-8 my-auto border flex justify-center items-center group cursor-pointer transform transition-transform duration-300 ease-in-out hover:scale-110 rounded-lg
-        ${theme === "dark" ? "bg-[#11110F] border-[#2A2A28] " : "bg-white  border-gray-300 "}`}
-      
+      type="button"
+      className={`rounded-lg transition-all duration-300 active:scale-95 ${
+        isDark
+          ? " text-white bg-[#11110F] border border-[#2A2A28]"
+          : "  bg-white border border-gray-300 "
+      } ${className ?? ""}`}
+      onClick={() => setTheme(isDark ? "light" : "dark")}
     >
-      {theme === "dark" ? (
-        <svg
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-          height="20"
-          width="20"
-          className={`my-auto text-white ${
-            theme === "dark" ? "group-hover:text-accent" : "text-accent"
-          }`}
-        >
-          <path d="M12 3a6 6 0 009 9 9 9 0 11-9-9z" />
-        </svg>
-      ) : (
-        <svg
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          viewBox="0 0 24 24"
-          height="1em"
-          width="1em"
-        
-        >
-          <circle cx="12" cy="12" r="5" />
-          <line x1="12" y1="1" x2="12" y2="4" />
-          <line x1="12" y1="20" x2="12" y2="23" />
-          <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
-          <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
-          <line x1="1" y1="12" x2="4" y2="12" />
-          <line x1="20" y1="12" x2="23" y2="12" />
-          <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
-          <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
-        </svg>
-      )}
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        fill="currentColor"
+        strokeLinecap="round"
+        viewBox="0 0 32 32"
+      >
+        <clipPath id="skiper-btn-2">
+          <motion.path
+            animate={{ y: isDark ? 10 : 0, x: isDark ? -12 : 0 }}
+            transition={{ ease: "easeInOut", duration: 0.35 }}
+            d="M0-5h30a1 1 0 0 0 9 13v24H0Z"
+          />
+        </clipPath>
+        <g clipPath="url(#skiper-btn-2)">
+          <motion.circle
+            animate={{ r: isDark ? 10 : 8 }}
+            transition={{ ease: "easeInOut", duration: 0.35 }}
+            cx="16"
+            cy="16"
+          />
+          <motion.g
+            animate={{
+              rotate: isDark ? -100 : 0,
+              scale: isDark ? 0.5 : 1,
+              opacity: isDark ? 0 : 1,
+            }}
+            transition={{ ease: "easeInOut", duration: 0.35 }}
+            stroke="currentColor"
+            strokeWidth="1.5"
+          >
+            <path d="M16 5.5v-4" />
+            <path d="M16 30.5v-4" />
+            <path d="M1.5 16h4" />
+            <path d="M26.5 16h4" />
+            <path d="m23.4 8.6 2.8-2.8" />
+            <path d="m5.7 26.3 2.9-2.9" />
+            <path d="m5.8 5.8 2.8 2.8" />
+            <path d="m23.4 23.4 2.9 2.9" />
+          </motion.g>
+        </g>
+      </svg>
     </button>
   );
 }

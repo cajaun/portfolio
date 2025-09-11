@@ -1,6 +1,110 @@
 ---
-title: "iOS Search Bar Animation"
-publishedAt: "2025-06-19"
-summary: "My first post on my new blog."
+title: "Building a Modal Component with Portals"
+publishedAt: "2025-09-11"
+summary: "Rendering modals at the top of the DOM hierarchy ensures they overlay all content. In this article, I’ll walk through building a reusable modal component using portals in React."
 ---
 
+## Why a Modal?
+
+Modals are essential for displaying important content without navigating away from the current page. Unlike drawers, modals often need to overlay all other elements, including navigation bars and side panels.  
+
+Using a portal allows the modal to render outside of its parent DOM hierarchy while still being part of the React tree. This ensures it won’t be affected by CSS overflow or stacking context issues.
+
+
+## Anatomy
+
+The modal consists of a few key parts, a trigger button, an overlay that dims the background, the modal content container and a portal to render at the root of the DOM  
+
+Here’s a basic setup using React:
+
+```ts
+import { FC, ReactNode } from "react";
+import ReactDOM from "react-dom";
+
+interface PortalProps {
+  children: ReactNode;
+}
+
+const Portal: FC<PortalProps> = ({ children }) => {
+  return ReactDOM.createPortal(
+    children,
+    document.getElementById('modal-root') as HTMLElement
+  );
+};
+
+export default Portal;
+
+```
+
+## Rendering the Modal
+
+Using the portal component, we can ensure our modal sits at the top of the DOM:
+
+```ts
+import { FC, ReactNode, useState } from "react";
+import Portal from "./Portal";
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  children: ReactNode;
+}
+
+const Modal: FC<ModalProps> = ({ isOpen, onClose, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <Portal>
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <div
+          className="absolute inset-0 bg-black opacity-50"
+          onClick={onClose}
+        />
+        <div className="relative bg-white p-6 rounded shadow-lg z-10">
+          {children}
+        </div>
+      </div>
+    </Portal>
+  );
+};
+
+export default Modal;
+```
+
+This ensures the modal is always on top, and the overlay intercepts clicks to allow closing.
+
+
+## Triggering the Modal
+
+Here’s a simple example of opening and closing the modal:
+
+```ts
+import { useState } from "react";
+import Modal from "./Modal";
+
+export default function App() {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <button
+        onClick={() => setIsOpen(true)}
+        className="px-4 py-2 bg-blue-500 text-white rounded"
+      >
+        Open Modal
+      </button>
+
+      <Modal isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <h2 className="text-xl font-bold mb-2">Hello Modal!</h2>
+        <p>This modal is rendered through a portal at the top of the DOM.</p>
+        <button
+          onClick={() => setIsOpen(false)}
+          className="mt-4 px-3 py-1 bg-gray-200 rounded"
+        >
+          Close
+        </button>
+      </Modal>
+    </div>
+  );
+}
+```

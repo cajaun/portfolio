@@ -6,6 +6,29 @@ body {
   @apply antialiased transition-all duration-700 ease-in-out bg-white text-black;
 }
 
+
 .dark body {
   @apply bg-black text-white; 
+}
+
+
+.prose pre {
+  @apply my-6 overflow-auto rounded-xl p-4 text-xs  bg-[#fdfdfc] border border-[#EBEBEB] dark:border-[#2C2C2B] 
+}
+
+.dark .prose pre {
+  background-color: #171716;
+}
+
+.prose h2 {
+  @apply font-medium;
+}
+
+.prose a {
+  @apply font-medium mb-16;
+}
+
+
+.prose p {
+  @apply my-4 text-gray-200 dark:text-gray-100 font-medium leading-6 tracking-[-0.1px];
 }

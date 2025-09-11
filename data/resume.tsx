@@ -1,7 +1,7 @@
 export const DATA = {
-  name: "Dillion Verma",
-  initials: "DV",
-  url: "https://dillion.io",
-  location: "San Francisco, CA",
+  name: "Cajaun Campbell",
+  initials: "CC",
+  url: "https://cajaun.com",
+  location: "Kingston, Jamaica",
  
 } as const;

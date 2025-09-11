@@ -46,17 +46,15 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
     }
   }, []);
 
-
- 
-	useMotionValueEvent(scrollYProgress, "change", (latest) => {
-		setPercent(Math.floor(latest * 100));
-		titleEls.forEach((el, index) => {
-			const top = el.getBoundingClientRect().top;
-			if (top >= 0 && top < 32) {
-				setCurrentTitle(sections[index].title ?? "");
-			}
-		});
-	});
+  useMotionValueEvent(scrollYProgress, "change", (latest) => {
+    setPercent(Math.floor(latest * 100));
+    titleEls.forEach((el, index) => {
+      const top = el.getBoundingClientRect().top;
+      if (top >= 0 && top < 32) {
+        setCurrentTitle(sections[index].title ?? "");
+      }
+    });
+  });
 
   return (
     <div className="relative w-full max-w-screen-sm mx-auto " ref={setupTitles}>

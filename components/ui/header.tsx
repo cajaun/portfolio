@@ -16,9 +16,13 @@ const Header = () => {
         />
       </div>
       <div className="ml-4 ">
+        <a href="/">
+
+   
         <h1 className="font-medium mb-0.5">
          Cajaun Campbell
         </h1>
+        </a>
         <p className="paragraph group inline-flex items-center justify-center overflow-hidden transition text-gray-200 font-medium dark:text-gray-100">
           <span>Software Engineer</span>
         </p>
