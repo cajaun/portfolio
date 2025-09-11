@@ -2,7 +2,7 @@ import Footer from "@/components/ui/footer";
 import Header from "@/components/ui/header";
 import { getBlogPosts, getPost } from "@/data/blog";
 import { DATA } from "@/data/resume";
-import { formatDate } from "@/lib/utils";
+// import { formatDate } from "@/lib/utils";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
