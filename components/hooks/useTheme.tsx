@@ -8,9 +8,8 @@ export default function ThemeToggleButton({ className = "size-9 p-2" }) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  useEffect(() => setMounted(true), []);
+
 
   if (!mounted) return null;
 
@@ -21,9 +20,9 @@ export default function ThemeToggleButton({ className = "size-9 p-2" }) {
       type="button"
       className={`rounded-lg transition-all duration-300 active:scale-95 ${
         isDark
-          ? " text-white bg-[#11110F] border border-[#2A2A28]"
-          : "  bg-white border border-gray-300 "
-      } ${className ?? ""}`}
+          ? "text-white bg-[#11110F] border border-[#2A2A28]"
+          : "bg-white border border-gray-300"
+      } ${className}`}
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
       <svg
@@ -35,6 +34,7 @@ export default function ThemeToggleButton({ className = "size-9 p-2" }) {
       >
         <clipPath id="skiper-btn-2">
           <motion.path
+            initial={{ y: 0, x: 0 }}
             animate={{ y: isDark ? 10 : 0, x: isDark ? -12 : 0 }}
             transition={{ ease: "easeInOut", duration: 0.35 }}
             d="M0-5h30a1 1 0 0 0 9 13v24H0Z"
@@ -42,12 +42,14 @@ export default function ThemeToggleButton({ className = "size-9 p-2" }) {
         </clipPath>
         <g clipPath="url(#skiper-btn-2)">
           <motion.circle
-            animate={{ r: isDark ? 10 : 8 }}
-            transition={{ ease: "easeInOut", duration: 0.35 }}
             cx="16"
             cy="16"
+            initial={{ r: 8 }}
+            animate={{ r: isDark ? 10 : 8 }}
+            transition={{ ease: "easeInOut", duration: 0.35 }}
           />
           <motion.g
+            initial={{ rotate: 0, scale: 1, opacity: 1 }}
             animate={{
               rotate: isDark ? -100 : 0,
               scale: isDark ? 0.5 : 1,

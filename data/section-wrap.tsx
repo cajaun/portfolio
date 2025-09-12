@@ -1,22 +1,29 @@
-import type { Root, Element, Content } from "hast";
+import type { Root, Element, RootContent } from "hast";
 
-export function rehypeWrapH2Sections() {
+export function rehypeSections() {
   return (tree: Root) => {
-    const children: Content[] = tree.children;
+    const children: RootContent[] = tree.children;
     const newChildren: Element[] = [];
+    let sectionNodes: RootContent[] = [];
 
-    let sectionNodes: Content[] = [];
+
+    let delay = 180; 
+    const increment = 90;
 
     for (const node of children) {
       if (node.type === "element" && (node as Element).tagName === "h2") {
-        // push previous section if exists
         if (sectionNodes.length > 0) {
           newChildren.push({
             type: "element",
             tagName: "section",
-            properties: { className: ["blog-section", "mb-16"] },
+            properties: {
+              className: ["blog-section", "mb-16", "animate-slide-down-fade", "px-2"],
+              style: `animation-delay: ${delay}ms;`,
+            },
             children: sectionNodes,
           } as Element);
+
+          delay += increment; 
         }
         sectionNodes = [node];
       } else {
@@ -24,12 +31,14 @@ export function rehypeWrapH2Sections() {
       }
     }
 
-    // push last section
     if (sectionNodes.length > 0) {
       newChildren.push({
         type: "element",
         tagName: "section",
-        properties: { className: ["blog-section", "mb-16"] },
+        properties: {
+          className: ["blog-section", "mb-16", "animate-slide-down-fade", "px-2"],
+          style: `animation-delay: ${delay}ms;`,
+        },
         children: sectionNodes,
       } as Element);
     }

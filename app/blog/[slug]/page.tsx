@@ -92,7 +92,7 @@ export default async function Blog(props: PageProps) {
           }}
         />
         <Header />
-        <div className="mb-16">
+        <div className="mb-16 animate-slide-down-fade px-2"   style={{ animationDelay: `${180}ms` }}>
           <div className="flex justify-between items-center ">
             <h2 className="font-medium ">{post.metadata.title}</h2>
             {/* <time className="text-sm text-neutral-600 dark:text-neutral-400">

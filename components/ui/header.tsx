@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const Header = () => {
   return (
-    <div className="mb-16 flex animate-slide-down-fade items-center"  style={{ animationDelay: "90ms" }}>
+    <div className="mb-16 flex animate-slide-down-fade items-center px-2"  style={{ animationDelay: "90ms" }}>
       <div>
         <Image
           alt="Photo of Cajaun Campbell"

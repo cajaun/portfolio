@@ -1,5 +1,4 @@
 "use client";
-
 import {
   MotionConfig,
   AnimatePresence,
@@ -9,6 +8,7 @@ import {
 } from "motion/react";
 import type { HTMLMotionProps } from "motion/react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 import { Fragment, useCallback, useState, useRef, useEffect } from "react";
 
 type SectionData = {
@@ -19,6 +19,7 @@ type SectionData = {
 
 type ScrollIslandProps = {
   sections: SectionData[];
+  blogCount: number;
 };
 
 export function ScrollIsland({ sections }: ScrollIslandProps) {
@@ -56,13 +57,12 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
     });
   });
 
+
   return (
     <div className="relative w-full max-w-screen-sm mx-auto " ref={setupTitles}>
       <MotionConfig
         transition={{
-          type: "spring",
-          damping: 40,
-          stiffness: 400,
+          type: "spring", bounce: 0.2, duration: 0.6 
         }}
       >
         <AnimatePresence>
@@ -77,13 +77,21 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
               >
                 <h2
                   id={item.id}
-                  className="font-medium animate-slide-down-fade"
+                  className={`font-medium animate-slide-down-fade px-2 gap-x-2 ${
+                    item.title.toLowerCase() === "blog"
+                      ? "hover:bg-gray-300 transition-colors duration-500 ease-in-out rounded-md hover:dark:bg-[#191918] hover:text-black hover:dark:text-white w-fit px-2 cursor-pointer"
+                      : ""
+                  }`}
                   style={{ animationDelay: `${90 * (index + 1)}ms` }}
                 >
-                  {item.title}
+                  {item.title.toLowerCase() === "blog" ? (
+                    <Link href="/blog">{item.title}  </Link>
+                  ) : (
+                    item.title
+                  )}
                 </h2>
                 <div
-                  className="my-4 animate-slide-down-fade"
+                  className="my-4 animate-slide-down-fade px-2"
                   style={{ animationDelay: `${90 * (index + 1)}ms` }}
                 >
                   {item.content}

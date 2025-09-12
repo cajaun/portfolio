@@ -1,7 +1,8 @@
 import Header from "@/components/ui/header";
 import { ScrollIsland } from "../components/ui/scroll-island";
-import ThemeToggleButton from "@/components/hooks/useTheme";
 import BlogSection from "@/components/blog-section";
+import { getBlogPostCount } from "@/data/blog";
+import Footer from "@/components/ui/footer";
 
 const sections = [
   {
@@ -133,25 +134,18 @@ const sections = [
 ];
 
 export default function Home() {
+
+  const blogCount = getBlogPostCount();
+
   return (
     <>
       <main className="mx-auto mb-14 flex w-full max-w-screen-sm flex-1 flex-col px-4 pb-8 pt-20 ">
         <Header />
 
-        <ScrollIsland sections={sections} />
+        <ScrollIsland sections={sections} blogCount={blogCount}/>
       </main>
 
-      <footer className="mx-auto mt-auto w-full max-w-screen-sm border-t border-gray-300 dark:border-[#2A2A28] px-4 ">
-        <div
-          className="flex items-center justify-between px-0 pt-4 md:px-0"
-          style={{ paddingBottom: "max(16px, env(safe-area-inset-bottom))" }}
-        >
-          <p className="text-sm text-gray-200 dark:text-gray-100 font-medium">
-            © 2025 Cajaun Campbell
-          </p>
-          <ThemeToggleButton />
-        </div>
-      </footer>
+      <Footer />
     </>
   );
 }

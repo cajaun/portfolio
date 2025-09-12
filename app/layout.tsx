@@ -33,7 +33,7 @@ const openRunde = localFont({
 export const metadata: Metadata = {
   title: "Cajaun Campbell",
   description:
-    "Software Enginner passionate about building functional interfaces and solutions",
+    "Software Engineer passionate about building functional interfaces and solutions",
 };
 
 export default function RootLayout({

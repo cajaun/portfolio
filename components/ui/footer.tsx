@@ -1,5 +1,5 @@
 import React from 'react'
-import ThemeToggleButton from '../hooks/useTheme'
+import ThemeToggleButton from '@/components/hooks/useTheme'
 
 const Footer = () => {
   return (
