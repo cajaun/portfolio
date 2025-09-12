@@ -17,7 +17,7 @@ The modal consists of a few key parts, a trigger button, an overlay that dims th
 
 Here’s a basic setup using React:
 
-```ts
+```jsx
 import { FC, ReactNode } from "react";
 import ReactDOM from "react-dom";
 
@@ -40,7 +40,7 @@ export default Portal;
 
 Using the portal component, we can ensure our modal sits at the top of the DOM:
 
-```ts
+```jsx
 import { FC, ReactNode, useState } from "react";
 import Portal from "./Portal";
 
@@ -78,7 +78,7 @@ This ensures the modal is always on top, and the overlay intercepts clicks to al
 
 Here’s a simple example of opening and closing the modal:
 
-```ts
+```jsx
 import { useState } from "react";
 import Modal from "./Modal";
 

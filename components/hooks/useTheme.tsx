@@ -18,7 +18,7 @@ export default function ThemeToggleButton({ className = "size-9 p-2" }) {
   return (
     <button
       type="button"
-      className={`rounded-lg transition-all duration-300 active:scale-95 ${
+      className={`rounded-lg transition-all duration-300 active:scale-95 hover:dark:bg-[#2A2A2A] ${
         isDark
           ? "text-white bg-[#11110F] border border-[#2A2A28]"
           : "bg-white border border-gray-300"

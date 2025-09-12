@@ -32,8 +32,10 @@ const openRunde = localFont({
 
 export const metadata: Metadata = {
   title: "Cajaun Campbell",
-  description:
-    "Software Engineer passionate about building functional interfaces and solutions",
+  description: "Software Engineer passionate about building functional interfaces and solutions",
+  icons: {
+    icon: "/Cajaun_art.png", 
+  },
 };
 
 export default function RootLayout({
@@ -44,7 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${openRunde.variable} font-sans antialiased bg-white dark:bg-[#11110F]`}
+        className={`${openRunde.variable} font-sans antialiased bg-[#FDFDFC] dark:bg-[#11110F]`}
       >
         <ThemeProvider
           attribute="class"

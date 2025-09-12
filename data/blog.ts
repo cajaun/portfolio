@@ -35,7 +35,7 @@ export async function markdownToHTML(markdown: string) {
     .use(rehypeSections)
     .use(rehypeStringify)
     .process(markdown);
-    console.log(result.value);
+    // console.log(result.value);
   return result.toString();
 }
 

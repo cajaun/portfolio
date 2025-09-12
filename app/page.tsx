@@ -58,7 +58,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full "
         >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white dark:text-gray-100">
             <p className="font-medium ">RankedOut</p>
           </div>
         </a>
@@ -68,7 +68,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full"
         >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white dark:text-gray-100">
             <p className="font-medium">Movers</p>
           </div>
         </a>
@@ -78,7 +78,7 @@ const sections = [
           rel="noopener noreferrer"
           className="flex flex-col w-full"
         >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
+          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white dark:text-gray-100">
             <p className="font-medium">Auto-Care</p>
           </div>
         </a>
@@ -107,7 +107,7 @@ const sections = [
             href="https://x.com/cajauncampbell"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-gray-100"
+            className="underline dark:hover:text-white hover:text-[#2A2A2A]"
           >
             X
           </a>
@@ -116,14 +116,14 @@ const sections = [
             href="https://github.com/cajaun"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-gray-100 dark:text-gray-100"
+            className="underline dark:hover:text-white hover:text-[#2A2A2A]"
           >
             Github
           </a>
           , or email me directly at{" "}
           <a
             href="mailto:cajaun@yahoo.com"
-            className="underline hover:text-gray-100 dark:text-gray-100"
+            className="underline dark:hover:text-white hover:text-[#2A2A2A]"
           >
             cajaun@yahoo.com
           </a>

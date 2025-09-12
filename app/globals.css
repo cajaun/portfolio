@@ -3,18 +3,16 @@
 @tailwind utilities;
 
 body {
-  @apply antialiased transition-all duration-700 ease-in-out bg-white text-black;
+  @apply antialiased transition-all duration-700 ease-in-out bg-[#FDFDFC] text-black;
 }
 
 
-/* Light theme default */
 pre[data-theme*="github-light"],
 pre[data-theme*="github-light"] span {
   color: var(--shiki-light);
   background-color: var(--shiki-light-bg);
 }
 
-/* Dark theme */
 html.dark pre[data-theme*="github-dark"],
 html.dark pre[data-theme*="github-dark"] span {
   color: var(--shiki-dark);
@@ -28,11 +26,11 @@ html.dark pre[data-theme*="github-dark"] span {
 
 
 .prose pre {
-  @apply my-6 overflow-auto rounded-xl p-4 text-xs  bg-white border border-[#EBEBEB] dark:border-[#2C2C2B] 
+  @apply my-6 overflow-auto rounded-xl p-4 text-xs  bg-white  border-[0.5px] border-[#EBEBEB] dark:border-[#2C2C2B] 
 }
 
 .dark .prose pre {
-  background-color: #171716;
+  background-color: #0B0E11;
 }
 
 .prose h2 {

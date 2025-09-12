@@ -1,5 +1,5 @@
 import React from "react";
-import CajaunArt from "@/app/assets/Cajaun_art.png";
+import CajaunArt from "@/public/Cajaun_art.png";
 import Image from "next/image";
 
 const Header = () => {
