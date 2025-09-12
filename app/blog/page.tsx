@@ -52,7 +52,7 @@ export default async function BlogPage() {
                 className="flex flex-col "
                 href={`/blog/${post.slug}`}
               >
-                <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#191918] hover:text-black hover:dark:text-white dark:text-gray-100">
+                <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white dark:text-gray-100">
                   <h2 className="font-medium ">{post.metadata.title}</h2>
                   <p className=" font-medium">
                     {new Date(post.metadata.publishedAt).toLocaleString(

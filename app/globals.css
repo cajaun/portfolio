@@ -7,8 +7,19 @@ body {
 }
 
 
+/* Light theme default */
+pre[data-theme*="github-light"],
+pre[data-theme*="github-light"] span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
 
-
+/* Dark theme */
+html.dark pre[data-theme*="github-dark"],
+html.dark pre[data-theme*="github-dark"] span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
 
 .dark body {
   @apply bg-black text-white; 
@@ -17,7 +28,7 @@ body {
 
 
 .prose pre {
-  @apply my-6 overflow-auto rounded-xl p-4 text-xs  bg-[#fdfdfc] border border-[#EBEBEB] dark:border-[#2C2C2B] 
+  @apply my-6 overflow-auto rounded-xl p-4 text-xs  bg-white border border-[#EBEBEB] dark:border-[#2C2C2B] 
 }
 
 .dark .prose pre {

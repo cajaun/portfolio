@@ -57,12 +57,13 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
     });
   });
 
-
   return (
     <div className="relative w-full max-w-screen-sm mx-auto " ref={setupTitles}>
       <MotionConfig
         transition={{
-          type: "spring", bounce: 0.2, duration: 0.6 
+          type: "spring",
+          bounce: 0.2,
+          duration: 0.6,
         }}
       >
         <AnimatePresence>
@@ -79,19 +80,23 @@ export function ScrollIsland({ sections }: ScrollIslandProps) {
                   id={item.id}
                   className={`font-medium animate-slide-down-fade px-2 gap-x-2 ${
                     item.title.toLowerCase() === "blog"
-                      ? "hover:bg-gray-300 transition-colors duration-500 ease-in-out rounded-md hover:dark:bg-[#191918] hover:text-black hover:dark:text-white w-fit px-2 cursor-pointer"
+                      ? "hover:bg-gray-300 transition-colors duration-500 ease-in-out rounded-md hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white w-fit px-2 cursor-pointer"
                       : ""
                   }`}
                   style={{ animationDelay: `${90 * (index + 1)}ms` }}
                 >
                   {item.title.toLowerCase() === "blog" ? (
-                    <Link href="/blog">{item.title}  </Link>
+                    <Link href="/blog">{item.title} </Link>
                   ) : (
                     item.title
                   )}
                 </h2>
                 <div
-                  className="my-4 animate-slide-down-fade px-2"
+                  className={`my-4 animate-slide-down-fade ${
+                    ["blog", "projects"].includes(item.title.toLowerCase())
+                      ? ""
+                      : "px-2"
+                  }`}
                   style={{ animationDelay: `${90 * (index + 1)}ms` }}
                 >
                   {item.content}

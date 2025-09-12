@@ -26,13 +26,16 @@ export async function markdownToHTML(markdown: string) {
     .use(remarkGfm)
     .use(remarkRehype)
     .use(rehypePrettyCode, {
-      theme: "github-light",
+      theme: {
+        light: "github-light",
+        dark: "github-dark",
+      },
       keepBackground: false,
     })
     .use(rehypeSections)
     .use(rehypeStringify)
     .process(markdown);
-
+    console.log(result.value);
   return result.toString();
 }
 

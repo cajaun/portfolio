@@ -1,8 +1,9 @@
 import Header from "@/components/ui/header";
-import { ScrollIsland } from "../components/ui/scroll-island";
 import BlogSection from "@/components/blog-section";
 import { getBlogPostCount } from "@/data/blog";
 import Footer from "@/components/ui/footer";
+import Link from "next/link";
+import { Fragment } from "react";
 
 const sections = [
   {
@@ -134,15 +135,48 @@ const sections = [
 ];
 
 export default function Home() {
-
   const blogCount = getBlogPostCount();
 
   return (
     <>
-      <main className="mx-auto mb-14 flex w-full max-w-screen-sm flex-1 flex-col px-4 pb-8 pt-20 ">
+      <main className="mx-auto mb-14 flex w-full max-w-screen-sm flex-1 flex-col px-4 pb-8 pt-20">
         <Header />
 
-        <ScrollIsland sections={sections} blogCount={blogCount}/>
+        <div className="text-balance">
+          {sections.map((item, index) => (
+            <Fragment key={item.id}>
+              <div
+                className={`${index !== sections.length - 1 ? "mb-16" : ""} `}
+              >
+                <h2
+                  id={item.id}
+                  className={`font-medium animate-slide-down-fade px-2 gap-x-2 ${
+                    item.title.toLowerCase() === "blog"
+                      ? "hover:bg-gray-300 transition-colors duration-500 ease-in-out rounded-md hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white w-fit px-2 cursor-pointer"
+                      : ""
+                  }`}
+                  style={{ animationDelay: `${90 * (index + 1)}ms` }}
+                >
+                  {item.title.toLowerCase() === "blog" ? (
+                    <Link href="/blog">{item.title}</Link>
+                  ) : (
+                    item.title
+                  )}
+                </h2>
+                <div
+                  className={`my-4 animate-slide-down-fade ${
+                    ["blog", "projects"].includes(item.title.toLowerCase())
+                      ? ""
+                      : "px-2"
+                  }`}
+                  style={{ animationDelay: `${90 * (index + 1)}ms` }}
+                >
+                  {item.content}
+                </div>
+              </div>
+            </Fragment>
+          ))}
+        </div>
       </main>
 
       <Footer />
