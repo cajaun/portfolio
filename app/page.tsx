@@ -1,6 +1,6 @@
 import Header from "@/components/ui/header";
 import BlogSection from "@/components/blog-section";
-import { getBlogPostCount } from "@/data/blog";
+// import { getBlogPostCount } from "@/data/blog";
 import Footer from "@/components/ui/footer";
 import Link from "next/link";
 import { Fragment } from "react";
@@ -135,7 +135,7 @@ const sections = [
 ];
 
 export default function Home() {
-  const blogCount = getBlogPostCount();
+  // const blogCount = getBlogPostCount();
 
   return (
     <>
