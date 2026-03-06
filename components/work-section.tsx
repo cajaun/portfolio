@@ -47,10 +47,13 @@ export default function WorkSection({ posts }: { posts: BlogPost[] }) {
   ];
 
   return (
-    <div className="flex flex-col">
-      <AnimatedTabs tabs={tabs} onChange={(id) => setActiveTab(id)} />
+    <div className="flex flex-col ">
 
-      <div className="flex flex-col gap-2">
+    
+      <AnimatedTabs tabs={tabs} onChange={(id) => setActiveTab(id)} />
+       
+
+      <div className="flex flex-col gap-2 px-6">
         {activeTab === "articles" &&
           posts.map((post) => (
             <Link

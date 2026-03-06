@@ -39,55 +39,59 @@ export function AnimatedTabs({ tabs, onChange }: AnimatedTabsProps) {
     )`;
   }, [activeTab]);
 
-    const handleClick = (id: string) => {
+  const handleClick = (id: string) => {
     setActiveTab(id);
     onChange?.(id);
   };
 
   return (
-   <div className="w-full mb-4">
-  <div className="relative flex w-full flex-col animate-slide-down-fade">
+    <div className="w-full mb-4 ">
+      <div
+        className="relative flex w-full flex-col overflow-x-auto scrollbar-none whitespace-nowrap animate-slide-down-fade px-6" 
+        style={{
+          overflowX: "auto",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
+        <ul className="relative flex gap-2 w-max">
+          {tabs.map((tab) => (
+            <li key={tab.id}>
+              <button
+                className="flex h-9 items-center gap-2 rounded-full px-3 font-medium text-gray-200 dark:text-gray-100 transition duration-200 ease-in-out hover:text-black hover:dark:text-white active:scale-[0.97]"
+                onClick={() => handleClick(tab.id)}
+              >
+                {tab.icon && <span className="size-5">{tab.icon}</span>}
+                <span>{tab.name}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
 
-
-    <ul className="relative flex w-full gap-2">
-      {tabs.map((tab) => (
-        <li key={tab.id}>
-          <button
-
-            className="flex h-9 items-center gap-2 rounded-full px-3 font-medium  text-gray-200 dark:text-gray-100 transition duration-200 ease-in-out hover:text-black hover:dark:text-white active:scale-[0.97]"
-             onClick={() => handleClick(tab.id)}
-          >
-            {tab.icon && <span className="size-5">{tab.icon}</span>}
-            <span className="inline">{tab.name}</span>
-          </button>
-        </li>
-      ))}
-    </ul>
-
-
-    <div
-      ref={containerRef}
-      aria-hidden="true"
-      className="absolute z-10 w-full overflow-hidden transition-[clip-path] duration-200 ease"
-      style={{ clipPath: "inset(0px 80.41% 0px 3.5% round 999px)" }}
-    >
-      <ul className="relative flex w-full gap-2 bg-gray-300 dark:bg-[#2A2A2A] rounded-full">
-        {tabs.map((tab) => (
-          <li key={tab.id}>
-            <button
-              ref={activeTab === tab.id ? activeTabRef : null}
-              tabIndex={-1}
-              className="flex h-9 items-center gap-2 rounded-full px-3 font-medium  text-black dark:text-white"
-            >
-              {tab.icon && <span className="size-5">{tab.icon}</span>}
-              <span className="inline">{tab.name}</span>
-            </button>
-          </li>
-        ))}
-      </ul>
+        <div
+          ref={containerRef}
+          aria-hidden="true"
+          className="absolute z-10 overflow-hidden transition-[clip-path] duration-200 ease"
+          style={{
+            clipPath: "inset(0px 80.41% 0px 3.5% round 999px)",
+          }}
+        >
+          <ul className="relative flex gap-2 bg-gray-300 dark:bg-[#2A2A2A] rounded-full w-max">
+            {tabs.map((tab) => (
+              <li key={tab.id}>
+                <button
+                  ref={activeTab === tab.id ? activeTabRef : null}
+                  tabIndex={-1}
+                  className="flex h-9 items-center gap-2 rounded-full px-3 font-medium text-black dark:text-white"
+                >
+                  {tab.icon && <span className="size-5">{tab.icon}</span>}
+                  <span>{tab.name}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
-
-  </div>
-</div>
   );
 }

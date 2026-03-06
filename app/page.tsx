@@ -5,11 +5,11 @@ import WorkSection from "@/components/work-section";
 import { getBlogPosts } from "@/data/blog";
 
 export default async function Home() {
-const posts = (await getBlogPosts()).map((post) => ({
-  slug: post.slug,
-  title: post.metadata.title,
-  publishedAt: post.metadata.publishedAt,
-}));
+  const posts = (await getBlogPosts()).map((post) => ({
+    slug: post.slug,
+    title: post.metadata.title,
+    publishedAt: post.metadata.publishedAt,
+  }));
 
   const sections = [
     {
@@ -36,8 +36,8 @@ const posts = (await getBlogPosts()).map((post) => ({
           </p>
 
           <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
-            Right now I&apos;m working on Varse, an app that captures short clips
-            from any video and matches them to the exact film and scene in
+            Right now I&apos;m working on Varse, an app that captures short
+            clips from any video and matches them to the exact film and scene in
             seconds.
           </p>
 
@@ -94,23 +94,26 @@ const posts = (await getBlogPosts()).map((post) => ({
 
   return (
     <>
-      <main className="mx-auto mb-14 flex w-full max-w-screen-sm flex-1 flex-col px-4 pb-8 pt-20">
-        <Header />
-
+      <main className="mx-auto mb-14 flex w-full max-w-screen-sm flex-1 flex-col pb-8 pt-20">
+        <div className="px-4">
+          <Header />
+        </div>
         <div className="text-balance">
           {sections.map((item, index) => (
             <Fragment key={item.id}>
               <div className={index !== sections.length - 1 ? "mb-16" : ""}>
                 <h2
                   id={item.id}
-                  className="font-medium animate-slide-down-fade px-2"
+                  className="font-medium animate-slide-down-fade px-6"
                   style={{ animationDelay: `${90 * (index + 1)}ms` }}
                 >
                   {item.title}
                 </h2>
 
                 <div
-                  className="my-4 animate-slide-down-fade px-2"
+                  className={`my-4 animate-slide-down-fade ${
+                    item.id !== "work" ? "px-6" : ""
+                  }`}
                   style={{ animationDelay: `${90 * (index + 1)}ms` }}
                 >
                   {item.content}
