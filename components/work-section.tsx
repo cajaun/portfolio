@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { AnimatedTabs } from "./ui/tabs/tabs";
 import Link from "next/link";
+import { ArticlesIcon } from "./ui/icons/articles";
+import { ComponentsIcon } from "./ui/icons/components";
+import { RocketIcon } from "./ui/icons/rocket";
 
 type BlogPost = {
   slug: string;
@@ -11,9 +14,9 @@ type BlogPost = {
 };
 
 const tabs = [
-  { id: "articles", name: "Articles" },
-  { id: "components", name: "Components" },
-  { id: "projects", name: "Projects" },
+  { id: "articles", name: "Articles", icon: <ArticlesIcon className="size-5" /> },
+  { id: "components", name: "Components", icon: <ComponentsIcon className="size-5" /> },
+  { id: "projects", name: "Projects", icon: <RocketIcon className="size-5" /> },
 ];
 
 export default function WorkSection({ posts }: { posts: BlogPost[] }) {
@@ -23,18 +26,22 @@ export default function WorkSection({ posts }: { posts: BlogPost[] }) {
     {
       title: "Slide to Listen",
       date: "March 14, 2026",
-      href: "/work/slide-to-listen",
+      href: "/",
     },
     {
       title: "Elastic Slider",
       date: "March 20, 2026",
-      href: "/work/elastic-slider",
+      href: "/",
     },
   ];
 
   const projects = [
     { title: "Varse", date: "August 23, 2025", href: "https://varse.app" },
-    { title: "RankedOut", date: "Augugust 20, 2023", href: "https://rankedout.com" },
+    {
+      title: "RankedOut",
+      date: "August 20, 2023",
+      href: "https://rankedout.com",
+    },
     { title: "Movers", date: "February 14, 2025", href: "/" },
     { title: "Auto-Care", date: "May 08, 2025", href: "/" },
   ];
@@ -44,7 +51,6 @@ export default function WorkSection({ posts }: { posts: BlogPost[] }) {
       <AnimatedTabs tabs={tabs} onChange={(id) => setActiveTab(id)} />
 
       <div className="flex flex-col gap-2">
- 
         {activeTab === "articles" &&
           posts.map((post) => (
             <Link
@@ -106,7 +112,7 @@ export default function WorkSection({ posts }: { posts: BlogPost[] }) {
 
         {activeTab === "projects" &&
           projects.map((item) => (
-            <a
+            <Link
               key={item.title}
               href={item.href}
               target="_blank"
@@ -115,21 +121,17 @@ export default function WorkSection({ posts }: { posts: BlogPost[] }) {
             >
               <div className="relative flex h-13 w-11 shrink-0 select-none items-center justify-center overflow-hidden rounded-md shadow-custom bg-[lab(100%_0_0)] dark:bg-[lab(3.04863%_0_0)]">
                 <div className="flex h-full w-full flex-col gap-1 p-1.5">
-                  <div className="flex items-center gap-[2px]">
-                    <span className="h-[3px] w-[6px] rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
-                    <span className="h-[3px] w-[6px] rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
-                    <span className="h-[3px] w-[6px] rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
+                  <span className="mt-0.5 h-[3px] w-4 rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
+
+                  <div className="flex flex-row justify-between items-center gap-x-1">
+                    <div className="h-[11px] w-1/2 rounded-sm bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
+
+                    <div className="h-[11px] w-1/2 rounded-sm bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
                   </div>
 
-                  <div className="h-[6px] w-full rounded-sm bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
-
-                  <span className="h-[3px] w-7 rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
-
-                  <span className="h-[3px] w-4 rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
-
-                  <span className="h-[3px] w-4 rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
-
-                  <span className="h-[3px] w-4 rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
+                  <span className="h-[3px] w-5 rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
+                  <span className="h-[3px] w-8 rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
+                  <span className="h-[3px] w-3 rounded-full bg-[lab(91.996%_-0.0000298023_0.0000119209)] dark:bg-[lab(17.06%_0_0)]" />
                 </div>
               </div>
 
@@ -141,7 +143,7 @@ export default function WorkSection({ posts }: { posts: BlogPost[] }) {
                   </span>
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
       </div>
     </div>
