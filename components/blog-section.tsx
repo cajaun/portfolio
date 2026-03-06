@@ -11,7 +11,6 @@ type PostMetadata = {
 type Post = {
   slug: string;
   metadata: PostMetadata;
-  source: string;
 };
 
 export default async function BlogSection() {

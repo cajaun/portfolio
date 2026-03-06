@@ -61,6 +61,8 @@ export default async function Blog(props: PageProps) {
     notFound();
   }
 
+  const PostContent = post.Component;
+
   return (
     <>
       <section
@@ -92,7 +94,7 @@ export default async function Blog(props: PageProps) {
           }}
         />
         <Header />
-        <div className="mb-16 animate-slide-down-fade px-2"   style={{ animationDelay: `${180}ms` }}>
+        <div className="mb-16 animate-slide-down-fade px-2 "   style={{ animationDelay: `${90}ms` }}>
           <div className="flex justify-between items-center ">
             <h2 className="font-medium ">{post.metadata.title}</h2>
             {/* <time className="text-sm text-neutral-600 dark:text-neutral-400">
@@ -107,11 +109,15 @@ export default async function Blog(props: PageProps) {
           </div>
         </div>
 
-        <article
-          className="prose dark:prose-invert "
-          dangerouslySetInnerHTML={{ __html: post.source }}
-        />
+        <article className="blog-content prose dark:prose-invert ">
+          <PostContent />
+        </article>
       </section>
+            {/* <div
+        className="bottom-scroll-mask pointer-events-none"
+        aria-hidden="true"
+      />
+      <div className="top-scroll-mask pointer-events-none" aria-hidden="true" /> */}
       <Footer />
     </>
   );

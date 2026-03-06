@@ -2,164 +2,92 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const allTabs = [
-  {
-    id: "All",
-    name: "All",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-      >
-        <g fill="none" stroke="currentColor" strokeWidth="1.5">
-          <path d="M19.562 7a2.132 2.132 0 0 0-2.1-2.5H6.538a2.132 2.132 0 0 0-2.1 2.5M17.5 4.5c.028-.26.043-.389.043-.496a2 2 0 0 0-1.787-1.993C15.65 2 15.52 2 15.26 2H8.74c-.26 0-.391 0-.497.011a2 2 0 0 0-1.787 1.993c0 .107.014.237.043.496"></path>
-          <path strokeLinecap="round" d="M15 18H9"></path>
-          <path d="M2.384 13.793c-.447-3.164-.67-4.745.278-5.77C3.61 7 5.298 7 8.672 7h6.656c3.374 0 5.062 0 6.01 1.024s.724 2.605.278 5.769l-.422 3c-.35 2.48-.525 3.721-1.422 4.464s-2.22.743-4.867.743h-5.81c-2.646 0-3.97 0-4.867-.743s-1.072-1.983-1.422-4.464z"></path>
-        </g>
-      </svg>
-    ),
-  },
-  {
-    id: "Animations",
-    name: "Animations",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 512 512"
-        width="1em"
-        height="1em"
-      >
-        <path
-          fill="none"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="32"
-          d="M259.92 262.91L216.4 149.77a9 9 0 0 0-16.8 0l-43.52 113.14a9 9 0 0 1-5.17 5.17L37.77 311.6a9 9 0 0 0 0 16.8l113.14 43.52a9 9 0 0 1 5.17 5.17l43.52 113.14a9 9 0 0 0 16.8 0l43.52-113.14a9 9 0 0 1 5.17-5.17l113.14-43.52a9 9 0 0 0 0-16.8l-113.14-43.52a9 9 0 0 1-5.17-5.17M108 68L88 16L68 68L16 88l52 20l20 52l20-52l52-20zm318.67 49.33L400 48l-26.67 69.33L304 144l69.33 26.67L400 240l26.67-69.33L496 144z"
-        ></path>
-      </svg>
-    ),
-  },
-  {
-    id: "UI Components",
-    name: "UI Components",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-      >
-        <path
-          fill="currentColor"
-          d="M12 3a9 9 0 0 0-9 9c0 5.004 3.715 8.897 8.653 8.897h.003q-.071-.118-.156-.252l-.02-.032c-.4-.637-.71-1.466-.653-2.375c.059-.942.505-1.856 1.414-2.616c1.032-.863 2.263-.884 3.218-.847q.322.014.608.03c.758.041 1.358.074 1.947-.085c1.852-.5 2.881-1.73 2.988-3.323C21.323 6.62 17.115 3 12 3M1 12C1 5.925 5.925 1 12 1c5.931 0 11.418 4.286 10.998 10.53c-.173 2.566-1.908 4.431-4.463 5.12c-.932.252-1.932.193-2.708.148q-.24-.016-.447-.024c-.917-.036-1.45.043-1.855.381c-.527.441-.68.86-.702 1.208c-.024.38.106.796.35 1.185l.027.043c.096.153.236.374.352.605c.12.239.278.604.29 1.013a1.5 1.5 0 0 1-.7 1.338c-.425.275-.959.35-1.49.35C5.546 22.897 1 18.042 1 12m8.75-4.996a2 2 0 1 1 4 0a2 2 0 0 1-4 0m-4.72 3a2 2 0 1 1 4 0a2 2 0 0 1-4 0m9.488 0a2 2 0 1 1 4 0a2 2 0 0 1-4 0"
-        ></path>
-      </svg>
-    ),
-  },
-  {
-    id: "React",
-    name: "React",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 128 128"
-        width="1em"
-        height="1em"
-      >
-        <path
-          fill="currentColor"
-          d="M37.965 6.934c-2.12.072-4.14.588-5.965 1.64c-3.648 2.106-5.826 5.97-6.805 10.543c-.978 4.574-.875 10.013.1 16.1c.376 2.347.926 4.815 1.562 7.338c-2.503.71-4.916 1.47-7.136 2.318c-5.76 2.2-10.52 4.83-13.992 7.965S0 59.788 0 64s2.256 8.03 5.729 11.164C9.2 78.3 13.96 80.93 19.72 83.13c2.22.848 4.633 1.606 7.136 2.317c-.636 2.523-1.186 4.991-1.562 7.337c-.975 6.09-1.076 11.527-.098 16.1c.98 4.575 3.155 8.438 6.803 10.544s8.08 2.06 12.531.62c4.45-1.44 9.11-4.247 13.895-8.136c1.844-1.498 3.707-3.206 5.575-5.02c1.866 1.814 3.73 3.522 5.574 5.02c4.784 3.89 9.442 6.697 13.893 8.137c4.45 1.44 8.885 1.485 12.533-.62c3.648-2.107 5.826-5.97 6.805-10.544c.978-4.574.873-10.012-.102-16.1c-.376-2.347-.924-4.815-1.56-7.338c2.503-.71 4.916-1.47 7.136-2.317c5.76-2.199 10.52-4.83 13.992-7.965S128 68.212 128 64s-2.256-8.028-5.729-11.162c-3.472-3.134-8.232-5.766-13.992-7.965c-2.22-.847-4.631-1.608-7.134-2.318c.636-2.523 1.184-4.992 1.56-7.338c.975-6.087 1.076-11.526.098-16.1S99.649 10.68 96 8.574s-8.08-2.06-12.531-.62c-4.45 1.44-9.11 4.248-13.895 8.136c-1.844 1.5-3.71 3.208-5.577 5.022c-1.867-1.813-3.73-3.523-5.574-5.022c-4.783-3.888-9.439-6.698-13.889-8.138c-2.226-.72-4.448-1.09-6.57-1.02zm.256 5.545c1.33-.038 2.854.207 4.6.77c3.49 1.13 7.675 3.57 12.093 7.16c1.702 1.382 3.443 2.982 5.197 4.69c-3.664 3.96-7.298 8.463-10.814 13.434c-6.063.56-11.78 1.456-17.043 2.65c-.6-2.374-1.116-4.68-1.463-6.847c-.9-5.62-.92-10.465-.152-14.053c.767-3.587 2.202-5.767 4.144-6.888c.971-.56 2.108-.88 3.438-.916m51.559 0c1.33.037 2.467.355 3.438.916c1.942 1.12 3.377 3.3 4.144 6.887s.75 8.433-.15 14.054c-.347 2.165-.862 4.474-1.463 6.846c-5.262-1.193-10.98-2.09-17.045-2.649c-3.516-4.97-7.152-9.474-10.816-13.435c1.754-1.707 3.497-3.308 5.199-4.69c4.418-3.592 8.603-6.028 12.094-7.158c1.745-.564 3.27-.808 4.6-.77zM64 29.102a124 124 0 0 1 7.44 8.926c-2.444-.11-4.917-.184-7.44-.184c-2.522 0-4.995.073-7.44.184A123 123 0 0 1 64 29.102m0 14.308c3.985 0 7.87.157 11.634.44a155 155 0 0 1 6.199 9.853A155 155 0 0 1 87.267 64a155 155 0 0 1-5.434 10.295a155 155 0 0 1-6.2 9.856c-3.763.283-7.648.441-11.632.441a155 155 0 0 1-11.638-.44a155 155 0 0 1-6.197-9.857a155 155 0 0 1-5.434-10.293a155 155 0 0 1 5.436-10.297a155 155 0 0 1 6.2-9.855a155 155 0 0 1 11.633-.44zm-18.773 1.163a164 164 0 0 0-3.88 6.35a164 164 0 0 0-3.56 6.534a124 124 0 0 1-4.012-10.906c3.59-.8 7.412-1.47 11.452-1.978m37.547 0a124 124 0 0 1 11.452 1.978a124 124 0 0 1-4.012 10.908a164 164 0 0 0-3.56-6.537a164 164 0 0 0-3.88-6.35zm-54.409 3.341c1.598 5.154 3.681 10.554 6.23 16.084c-2.55 5.532-4.63 10.934-6.23 16.088c-2.355-.665-4.61-1.374-6.66-2.156c-5.319-2.03-9.524-4.438-12.248-6.898c-2.723-2.458-3.893-4.79-3.893-7.033c0-2.242 1.17-4.572 3.893-7.03c2.724-2.46 6.93-4.867 12.248-6.897c2.05-.783 4.305-1.493 6.66-2.159zm71.27 0c2.356.666 4.612 1.376 6.66 2.16c5.32 2.03 9.525 4.436 12.249 6.895c2.723 2.46 3.893 4.79 3.893 7.031c0 2.243-1.17 4.575-3.893 7.033c-2.724 2.46-6.93 4.866-12.248 6.897c-2.05.782-4.307 1.49-6.662 2.156c-1.598-5.153-3.68-10.553-6.227-16.084c2.549-5.532 4.63-10.933 6.229-16.088zM64 52.592A11.41 11.41 0 0 0 52.592 64a11.41 11.41 0 0 0 11.409 11.408A11.41 11.41 0 0 0 75.409 64A11.41 11.41 0 0 0 64 52.592m26.214 17.951a124 124 0 0 1 4.01 10.908c-3.588.8-7.41 1.471-11.448 1.98a164 164 0 0 0 3.877-6.353a164 164 0 0 0 3.56-6.535zm-52.427.002a164 164 0 0 0 3.56 6.533a166 166 0 0 0 3.88 6.352a123 123 0 0 1-11.452-1.979a124 124 0 0 1 4.012-10.906M32.252 86.82c5.262 1.192 10.98 2.087 17.045 2.646c3.516 4.973 7.152 9.477 10.816 13.44c-1.754 1.705-3.495 3.305-5.197 4.69c-4.418 3.59-8.607 6.03-12.098 7.16c-3.49 1.128-6.095.973-8.037-.148c-1.942-1.122-3.375-3.3-4.142-6.887c-.768-3.588-.749-8.433.152-14.056c.347-2.165.86-4.473 1.461-6.845m63.495 0c.6 2.372 1.116 4.68 1.463 6.845c.9 5.623.92 10.468.152 14.056c-.767 3.588-2.202 5.767-4.144 6.89c-1.942 1.12-4.546 1.273-8.037.143s-7.676-3.57-12.094-7.16c-1.701-1.383-3.444-2.983-5.197-4.69c3.664-3.96 7.298-8.466 10.814-13.438c6.063-.559 11.78-1.454 17.043-2.646M56.56 89.972a164 164 0 0 0 7.441.186a164 164 0 0 0 7.442-.186a123 123 0 0 1-7.442 8.93a123 123 0 0 1-7.44-8.93z"
-        ></path>
-      </svg>
-    ),
-  },
-  {
-    id: "Expo",
-    name: "Expo",
-    icon: (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-      >
-        <path
-          fill="currentColor"
-          d="M0 20.084c.043.53.23 1.063.718 1.778c.58.849 1.576 1.315 2.303.567c.49-.505 5.794-9.776 8.35-13.29a.76.76 0 0 1 1.248 0c2.556 3.514 7.86 12.785 8.35 13.29c.727.748 1.723.282 2.303-.567c.57-.835.728-1.42.728-2.046c0-.426-8.26-15.798-9.092-17.078c-.8-1.23-1.044-1.498-2.397-1.542h-1.032c-1.353.044-1.597.311-2.398 1.542C8.267 3.991.33 18.758 0 19.77Z"
-        ></path>
-      </svg>
-    ),
-  },
-];
+export type Tab = {
+  id: string;
+  name: string;
+  icon?: React.ReactNode;
+};
 
-export const TabBar = () => {
-  const tabsRef = useRef<(HTMLButtonElement | null)[]>([]);
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const [tabUnderlineWidth, setTabUnderlineWidth] = useState(0);
-  const [tabUnderlineLeft, setTabUnderlineLeft] = useState(0);
+type AnimatedTabsProps = {
+  tabs: Tab[];
+  onChange?: (id: string) => void;
+};
+
+export function AnimatedTabs({ tabs, onChange }: AnimatedTabsProps) {
+  const [activeTab, setActiveTab] = useState(tabs[0].id);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const activeTabRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (activeTabIndex === null) {
-      return;
-    }
+    const container = containerRef.current;
+    const activeEl = activeTabRef.current;
 
-    const setTabPosition = () => {
-      const currentTab = tabsRef.current[activeTabIndex] as HTMLElement;
-      setTabUnderlineLeft(currentTab?.offsetLeft ?? 0);
-      setTabUnderlineWidth(currentTab?.clientWidth ?? 0);
-    };
+    if (!container || !activeEl) return;
 
-    setTabPosition();
-  }, [activeTabIndex]);
+    const { offsetLeft, offsetWidth } = activeEl;
+
+    const clipLeft = offsetLeft;
+    const clipRight = offsetLeft + offsetWidth;
+
+    container.style.clipPath = `inset(
+      0
+      ${100 - (clipRight / container.offsetWidth) * 100}%
+      0
+      ${(clipLeft / container.offsetWidth) * 100}%
+      round 999px
+    )`;
+  }, [activeTab]);
+
+    const handleClick = (id: string) => {
+    setActiveTab(id);
+    onChange?.(id);
+  };
 
   return (
-    <div
-      className="relative flex h-12 rounded-3xl mb-16 animate-slide-down-fade overflow-x-auto scrollbar-none whitespace-nowrap px-4"
-      style={{
-        animationDelay: "180ms",
-        overflowX: "auto",
-        scrollbarWidth: "none",
-        msOverflowStyle: "none",
-      }}
-    >
-      <span
-        className="absolute bottom-0 top-0 -z-10 flex overflow-hidden rounded-3xl py-2 transition-all ease-linear duration-200"
-        style={{ left: tabUnderlineLeft, width: tabUnderlineWidth }}
-      >
-        <span className="h-full w-full rounded-3xl bg-gray-300 dark:bg-[#2A2A2A]" />
-      </span>
+   <div className="w-full mb-4">
+  <div className="relative flex w-full flex-col animate-slide-down-fade">
 
-      {allTabs.map((tab, index) => {
-        const isActive = activeTabIndex === index;
-        const isLast = index === allTabs.length - 1;
 
-        return (
+    <ul className="relative flex w-full gap-2">
+      {tabs.map((tab) => (
+        <li key={tab.id}>
           <button
-            key={index}
-            ref={(el) => {
-              tabsRef.current[index] = el;
-            }}
-            className={`${
-              isActive
-                ? "text-black dark:text-white"
-                : "dark:text-gray-100 text-gray-200"
-            } my-auto cursor-pointer select-none rounded-full px-4 text-center font-medium flex items-center ${
-              !isLast ? "mr-1" : ""
-            }`}
-            onClick={() => setActiveTabIndex(index)}
+
+            className="flex h-9 items-center gap-2 rounded-full px-3 font-medium  text-gray-200 dark:text-gray-100 transition duration-200 ease-in-out hover:text-black hover:dark:text-white active:scale-[0.97]"
+             onClick={() => handleClick(tab.id)}
           >
-            {tab.icon && (
-              <span className="mr-2 flex-shrink-0 text-lg" aria-hidden="true">
-                {tab.icon}
-              </span>
-            )}
-            {tab.name}
+            {tab.icon && <span className="size-5">{tab.icon}</span>}
+            <span className="inline">{tab.name}</span>
           </button>
-        );
-      })}
+        </li>
+      ))}
+    </ul>
+
+
+    <div
+      ref={containerRef}
+      aria-hidden="true"
+      className="absolute z-10 w-full overflow-hidden transition-[clip-path] duration-200 ease"
+      style={{ clipPath: "inset(0px 80.41% 0px 3.5% round 999px)" }}
+    >
+      <ul className="relative flex w-full gap-2 bg-gray-300 dark:bg-[#2A2A2A] rounded-full">
+        {tabs.map((tab) => (
+          <li key={tab.id}>
+            <button
+              ref={activeTab === tab.id ? activeTabRef : null}
+              tabIndex={-1}
+              className="flex h-9 items-center gap-2 rounded-full px-3 font-medium  text-black dark:text-white"
+            >
+              {tab.icon && <span className="size-5">{tab.icon}</span>}
+              <span className="inline">{tab.name}</span>
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
+
+  </div>
+</div>
   );
-};
+}

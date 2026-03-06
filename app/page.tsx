@@ -1,141 +1,97 @@
 import Header from "@/components/ui/header";
-import BlogSection from "@/components/blog-section";
-// import { getBlogPostCount } from "@/data/blog";
 import Footer from "@/components/ui/footer";
 import Link from "next/link";
 import { Fragment } from "react";
+import WorkSection from "@/components/work-section";
+import { getBlogPosts } from "@/data/blog";
 
-const sections = [
-  {
-    id: "about-me",
-    title: "About me",
-    content: (
-      <div className="">
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
-          I am a Software Engineer focused on going from zero-to-one with
-          startups, aligning with my passion for innovation and crafting
-          impactful solutions.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: "now",
-    title: "Now",
-    content: (
-      <div className="">
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
-          I&apos;m currently focused on building mobile apps driven by ideas I
-          find fun, curious, or personally meaningful.
-        </p>
+export default async function Home() {
+const posts = (await getBlogPosts()).map((post) => ({
+  slug: post.slug,
+  title: post.metadata.title,
+  publishedAt: post.metadata.publishedAt,
+}));
 
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
-          One of the ideas I&apos;m exploring is a &quot;Shazam for movies&quot;
-          a tool that can identify films from short clips or scenes.
-        </p>
+  const sections = [
+    {
+      id: "about-me",
+      title: "About me",
+      content: (
+        <div>
+          <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
+            I am a Software Engineer focused on going from zero-to-one with
+            startups, aligning with my passion for innovation and crafting
+            impactful solutions.
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: "now",
+      title: "Now",
+      content: (
+        <div>
+          <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
+            I&apos;m interested in building consumer apps driven by ideas I find
+            fun, curious, or personally meaningful.
+          </p>
 
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
-          I&apos;m also working on a remake of the New York Times&apos;{" "}
-          <em>Connections</em> puzzle.
-        </p>
+          <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
+            Right now I&apos;m working on Varse, an app that captures short clips
+            from any video and matches them to the exact film and scene in
+            seconds.
+          </p>
 
-        <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
-          Alongside that, I&apos;m putting together a collection of fluid,
-          reusable UI components and animations for React Native which is
-          designed to help you build smooth, modern interfaces with ease.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: "projects",
-    title: "Projects",
-    content: (
-      <>
-        <a
-          href="https://rankedout.com"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex flex-col w-full "
-        >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white dark:text-gray-100">
-            <p className="font-medium ">RankedOut</p>
-          </div>
-        </a>
-        <a
-          href="/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex flex-col w-full"
-        >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white dark:text-gray-100">
-            <p className="font-medium">Movers</p>
-          </div>
-        </a>
-        <a
-          href="/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex flex-col w-full"
-        >
-          <div className="w-full flex justify-between items-center hover:bg-gray-300 transition-colors duration-500 ease-in-out py-4 rounded-xl px-4 text-gray-200 hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white dark:text-gray-100">
-            <p className="font-medium">Auto-Care</p>
-          </div>
-        </a>
-      </>
-    ),
-  },
-
-  {
-    id: "blog",
-    title: "Blog",
-    content: (
-      <div>
-        <BlogSection />
-      </div>
-    ),
-  },
-
-  {
-    id: "connect",
-    title: "Connect",
-    content: (
-      <div>
-        <p className="paragraph text-gray-200 font-medium mb-2 dark:text-gray-100">
-          Follow me on{" "}
-          <a
-            href="https://x.com/cajauncampbell"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline dark:hover:text-white hover:text-[#2A2A2A]"
-          >
-            X
-          </a>
-          , view my code and open-source projects on{" "}
-          <a
-            href="https://github.com/cajaun"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline dark:hover:text-white hover:text-[#2A2A2A]"
-          >
-            Github
-          </a>
-          , or email me directly at{" "}
-          <a
-            href="mailto:cajaun@yahoo.com"
-            className="underline dark:hover:text-white hover:text-[#2A2A2A]"
-          >
-            cajaun@yahoo.com
-          </a>
-          .
-        </p>
-      </div>
-    ),
-  },
-];
-
-export default function Home() {
-  // const blogCount = getBlogPostCount();
+          <p className="mb-2 text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
+            I also spend some time doing design engineering, focusing on
+            interaction, motion and the small details that make apps feel smooth
+            and enjoyable to use.
+          </p>
+        </div>
+      ),
+    },
+    {
+      id: "work",
+      title: "Work",
+      content: <WorkSection posts={posts} />,
+    },
+    {
+      id: "connect",
+      title: "Connect",
+      content: (
+        <div>
+          <p className="paragraph text-gray-200 font-medium mb-2 dark:text-gray-100">
+            Follow me on{" "}
+            <a
+              href="https://x.com/cajauncampbell"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline dark:hover:text-white hover:text-[#2A2A2A]"
+            >
+              X
+            </a>
+            , view my code and open-source projects on{" "}
+            <a
+              href="https://github.com/cajaun"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline dark:hover:text-white hover:text-[#2A2A2A]"
+            >
+              Github
+            </a>
+            , or email me directly at{" "}
+            <a
+              href="mailto:cajaun@yahoo.com"
+              className="underline dark:hover:text-white hover:text-[#2A2A2A]"
+            >
+              cajaun@yahoo.com
+            </a>
+            .
+          </p>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <>
@@ -145,30 +101,17 @@ export default function Home() {
         <div className="text-balance">
           {sections.map((item, index) => (
             <Fragment key={item.id}>
-              <div
-                className={`${index !== sections.length - 1 ? "mb-16" : ""} `}
-              >
+              <div className={index !== sections.length - 1 ? "mb-16" : ""}>
                 <h2
                   id={item.id}
-                  className={`font-medium animate-slide-down-fade px-2 gap-x-2 ${
-                    item.title.toLowerCase() === "blog"
-                      ? "hover:bg-gray-300 transition-colors duration-500 ease-in-out rounded-md hover:dark:bg-[#2A2A2A] hover:text-black hover:dark:text-white w-fit px-2 cursor-pointer"
-                      : ""
-                  }`}
+                  className="font-medium animate-slide-down-fade px-2"
                   style={{ animationDelay: `${90 * (index + 1)}ms` }}
                 >
-                  {item.title.toLowerCase() === "blog" ? (
-                    <Link href="/blog">{item.title}</Link>
-                  ) : (
-                    item.title
-                  )}
+                  {item.title}
                 </h2>
+
                 <div
-                  className={`my-4 animate-slide-down-fade ${
-                    ["blog", "projects"].includes(item.title.toLowerCase())
-                      ? ""
-                      : "px-2"
-                  }`}
+                  className="my-4 animate-slide-down-fade px-2"
                   style={{ animationDelay: `${90 * (index + 1)}ms` }}
                 >
                   {item.content}
@@ -178,6 +121,9 @@ export default function Home() {
           ))}
         </div>
       </main>
+
+      {/* <div className="bottom-scroll-mask pointer-events-none" aria-hidden="true" />
+      <div className="top-scroll-mask pointer-events-none" aria-hidden="true" /> */}
 
       <Footer />
     </>
