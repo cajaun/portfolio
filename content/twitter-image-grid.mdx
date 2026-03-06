@@ -17,7 +17,7 @@ Twitter's image layout adapts depending on how many images are attached to a twe
 
 A single image fills the full frame. Two images sit side by side. Three images create a layout where one large image anchors the left side with two smaller companions stacked on the right. Four images resolve into a two by two grid.
 
-Rather than building a separate component for each case, the entire structure is derived from one value: `totalImages`. From it, we determine the grid columns, which images span more space, which corners get rounded, and what aspect ratio each cell should use.
+Rather than building a separate component for each case, the entire structure is derived from one value: `totalImages`. From it, we determine the grid columns, which images span more space, which corners get rounded, and what aspect ratio each cell should use. The result is a mosaic-style grid that shifts shape based on how much content it holds.
 
 </section>
 

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ReactNode } from "react";
 
 type ImageItem = {
   url: string;
@@ -111,25 +112,31 @@ export default function TwitterImageGridPreview({
 }: {
   totalImages: 1 | 2 | 3 | 4;
 }) {
-  const images = demoImages.slice(0, totalImages);
+  const cells = Array.from({ length: totalImages });
 
   return (
-    <div className={`grid  ${gridClasses(totalImages)}`}>
-      {images.map((image, index) => (
+    <div className={`grid ${gridClasses(totalImages)}`}>
+      {cells.map((_, index) => (
         <div
-          key={image.url}
-          className={`relative w-full  ${imageSpan(index, totalImages)}`}
-          style={getImageStyle(index, totalImages, image.height, image.width)}
+          key={index}
+          className={`relative w-full ${imageSpan(index, totalImages)}`}
+          style={getImageStyle(index, totalImages, 1, 1)}
         >
           <div className="absolute inset-0 p-[1px]">
-            <div className="relative h-full w-full">
-              <Image
-                fill
-                src={image.url}
-                alt={`Preview image ${index + 1}`}
-                sizes="(max-width: 768px) 100vw, 600px"
-                className={`object-cover transition-opacity duration-300 ease-in-out ${imageGrid(index, totalImages)}`}
-              />
+            <div
+              className={`relative flex items-center justify-center h-full w-full
+                bg-[lab(96.752%_0_0)]
+                border border-[lab(91.996%_-.0000298023_.0000119209)]
+                dark:bg-[lab(8.708%_0_-.00000298023)]
+]
+                dark:border-[lab(17.06%_0_0)]
+                ${imageGrid(index, totalImages)}
+              `}
+            >
+              {/* Center badge */}
+              <div className="flex h-6 w-12 select-none items-center justify-center rounded-full font-medium text-xs shadow-custom bg-[lab(100%_0_0)] dark:bg-[lab(3.04863%_0_0)]">
+                {index + 1}
+              </div>
             </div>
           </div>
         </div>

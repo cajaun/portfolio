@@ -8,7 +8,7 @@ type PreviewProps = {
 export default function PreviewCard({ children, full = false }: PreviewProps) {
   return (
     <div className="preview-card ">
-      <div className={full ? "preview-card-inner-full px-6 py-16" : "preview-card-inner"}>
+      <div className={full ? "preview-card-inner-full px-4 py-16" : "preview-card-inner"}>
         {children}
       </div>
     </div>
