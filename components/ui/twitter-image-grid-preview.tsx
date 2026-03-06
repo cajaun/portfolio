@@ -1,20 +1,3 @@
-import Image from "next/image";
-import { ReactNode } from "react";
-
-type ImageItem = {
-  url: string;
-  width: number;
-  height: number;
-};
-
-const demoImages: ImageItem[] = [
-  { url: "/ac.jpeg", width: 3024, height: 4032 },
-  { url: "/cafe.jpeg", width: 3024, height: 4032 },
-  { url: "/george.jpeg", width: 3024, height: 4032 },
-  { url: "/highway.jpeg", width: 3024, height: 4032 },
-  { url: "/plane.jpeg", width: 3024, height: 4032 },
-];
-
 export const getAspectRatio = (height: number, width: number): string => {
   const aspectRatio = width / height;
 
@@ -133,7 +116,7 @@ export default function TwitterImageGridPreview({
                 ${imageGrid(index, totalImages)}
               `}
             >
-              {/* Center badge */}
+      
               <div className="flex h-6 w-12 select-none items-center justify-center rounded-full font-medium text-xs shadow-custom bg-[lab(100%_0_0)] dark:bg-[lab(3.04863%_0_0)]">
                 {index + 1}
               </div>
