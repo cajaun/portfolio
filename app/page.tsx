@@ -1,6 +1,5 @@
 import Header from "@/components/ui/header";
 import Footer from "@/components/ui/footer";
-import Link from "next/link";
 import { Fragment } from "react";
 import WorkSection from "@/components/work-section";
 import { getBlogPosts } from "@/data/blog";
