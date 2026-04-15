@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
+import { SITE } from "@/data/site";
 
 const openRunde = localFont({
   variable: "--font-open-runde",
@@ -31,8 +32,8 @@ const openRunde = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Cajaun Campbell",
-  description: "Software Engineer passionate about building functional interfaces and solutions",
+  title: SITE.name,
+  description: SITE.description,
 };
 
 export default function RootLayout({

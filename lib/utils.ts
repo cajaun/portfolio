@@ -9,18 +9,25 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatDate(date: string) {
   const currentDate = new Date().getTime();
-  if (!date.includes("T")) {
-    date = `${date}T00:00:00`;
-  }
-  const targetDate = new Date(date).getTime();
-  const timeDifference = Math.abs(currentDate - targetDate);
-  const daysAgo = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+  const normalizedDate = date.includes("T") ? date : `${date}T00:00:00`;
+  const targetDate = new Date(normalizedDate).getTime();
 
-  const fullDate = new Date(date).toLocaleString("en-us", {
+  if (Number.isNaN(targetDate)) {
+    return date;
+  }
+
+  const fullDate = new Date(normalizedDate).toLocaleString("en-US", {
     month: "long",
     day: "numeric",
     year: "numeric",
   });
+  const timeDifference = currentDate - targetDate;
+
+  if (timeDifference < 0) {
+    return fullDate;
+  }
+
+  const daysAgo = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
 
   if (daysAgo < 1) {
     return "Today";

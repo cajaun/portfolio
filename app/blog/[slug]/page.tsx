@@ -1,8 +1,7 @@
 import Footer from "@/components/ui/footer";
 import Header from "@/components/ui/header";
 import { getBlogPosts, getPost } from "@/data/blog";
-import { DATA } from "@/data/resume";
-// import { formatDate } from "@/lib/utils";
+import { SITE } from "@/data/site";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -30,8 +29,8 @@ export async function generateMetadata(
   } = post.metadata;
 
   const ogImage = image
-    ? `${DATA.url}${image}`
-    : `${DATA.url}/og?title=${encodeURIComponent(title)}`;
+    ? `${SITE.url}${image}`
+    : `${SITE.url}/og?title=${encodeURIComponent(title)}`;
 
   return {
     title,
@@ -41,7 +40,7 @@ export async function generateMetadata(
       description,
       type: "article",
       publishedTime,
-      url: `${DATA.url}/blog/${post.slug}`,
+      url: `${SITE.url}/blog/${post.slug}`,
       images: [{ url: ogImage }],
     },
     twitter: {
@@ -81,29 +80,29 @@ export default async function Blog(props: PageProps) {
               dateModified: post.metadata.publishedAt,
               description: post.metadata.summary,
               image: post.metadata.image
-                ? `${DATA.url}${post.metadata.image}`
-                : `${DATA.url}/og?title=${encodeURIComponent(
+                ? `${SITE.url}${post.metadata.image}`
+                : `${SITE.url}/og?title=${encodeURIComponent(
                     post.metadata.title
                   )}`,
-              url: `${DATA.url}/blog/${post.slug}`,
+              url: `${SITE.url}/blog/${post.slug}`,
               author: {
                 "@type": "Person",
-                name: DATA.name,
+                name: SITE.name,
               },
             }),
           }}
         />
         <Header />
-        <div className="mb-16 animate-slide-down-fade px-2 "   style={{ animationDelay: `${180}ms` }}>
-          <div className="flex justify-between items-center ">
-            <h2 className="font-medium ">{post.metadata.title}</h2>
-            {/* <time className="text-sm text-neutral-600 dark:text-neutral-400">
-              {formatDate(post.metadata.publishedAt)}
-            </time> */}
+        <div
+          className="mb-16 animate-slide-down-fade px-2"
+          style={{ animationDelay: "180ms" }}
+        >
+          <div className="flex items-center justify-between">
+            <h2 className="font-medium">{post.metadata.title}</h2>
           </div>
 
           <div className="mt-4">
-            <p className=" text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
+            <p className="text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
               {post.metadata.summary}
             </p>
           </div>
@@ -113,11 +112,6 @@ export default async function Blog(props: PageProps) {
           <PostContent />
         </article>
       </section>
-            {/* <div
-        className="bottom-scroll-mask pointer-events-none"
-        aria-hidden="true"
-      />
-      <div className="top-scroll-mask pointer-events-none" aria-hidden="true" /> */}
       <Footer />
     </>
   );

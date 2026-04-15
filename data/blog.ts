@@ -20,6 +20,14 @@ export type Post = {
   Component: PostModule["default"];
 };
 
+export type PostSummary = {
+  slug: string;
+  title: string;
+  publishedAt: string;
+  summary: string;
+  image?: string;
+};
+
 function getMDXFiles(dir: string) {
   return fs.readdirSync(dir).filter((file) => path.extname(file) === ".mdx");
 }
@@ -45,6 +53,23 @@ export async function getBlogPosts(): Promise<Post[]> {
 
   const posts = await Promise.all(slugs.map((slug) => getPost(slug)));
   return posts.filter((post): post is Post => post !== null);
+}
+
+export async function getBlogPostSummaries(): Promise<PostSummary[]> {
+  const posts = await getBlogPosts();
+
+  return posts
+    .map((post) => ({
+      slug: post.slug,
+      title: String(post.metadata.title),
+      publishedAt: String(post.metadata.publishedAt),
+      summary: String(post.metadata.summary),
+      image: post.metadata.image ? String(post.metadata.image) : undefined,
+    }))
+    .sort(
+      (a, b) =>
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
 }
 
 export function getBlogPostCount() {

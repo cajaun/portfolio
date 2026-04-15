@@ -4,14 +4,19 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
-export default function ThemeToggleButton({ className = "size-9 p-2" }) {
+export default function ThemeToggleButton({
+  className = "size-9 p-2",
+}: {
+  className?: string;
+}) {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
-
-  if (!mounted) return null;
+  if (!mounted) {
+    return null;
+  }
 
   const isDark = theme === "dark";
 
@@ -20,8 +25,8 @@ export default function ThemeToggleButton({ className = "size-9 p-2" }) {
       type="button"
       className={`rounded-lg transition-all duration-300 active:scale-95 hover:dark:bg-[#2A2A2A] ${
         isDark
-          ? "text-white bg-[#11110F] border border-[#2A2A28]"
-          : "bg-white border border-gray-300"
+          ? "border border-[#2A2A28] bg-[#11110F] text-white"
+          : "border border-gray-300 bg-white"
       } ${className}`}
       onClick={() => setTheme(isDark ? "light" : "dark")}
     >
@@ -32,7 +37,7 @@ export default function ThemeToggleButton({ className = "size-9 p-2" }) {
         strokeLinecap="round"
         viewBox="0 0 32 32"
       >
-        <clipPath id="skiper-btn-2">
+        <clipPath id="theme-toggle-clip">
           <motion.path
             initial={{ y: 0, x: 0 }}
             animate={{ y: isDark ? 10 : 0, x: isDark ? -12 : 0 }}
@@ -40,7 +45,7 @@ export default function ThemeToggleButton({ className = "size-9 p-2" }) {
             d="M0-5h30a1 1 0 0 0 9 13v24H0Z"
           />
         </clipPath>
-        <g clipPath="url(#skiper-btn-2)">
+        <g clipPath="url(#theme-toggle-clip)">
           <motion.circle
             cx="16"
             cy="16"
