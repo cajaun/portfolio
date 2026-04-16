@@ -1,0 +1,332 @@
+export const metadata = {
+  title: "Building Modals with Portals",
+  publishedAt: "April 15, 2026",
+  summary:
+    "A walkthrough of how to build modal dialogs that escape layout traps, keep focus, and render through portals.",
+};
+
+import PreviewCard from "@/components/ui/previews";
+import ModalPreview from "@/components/ui/modal-preview";
+
+
+<section className="mb-16 px-2">
+
+## Anatomy
+
+A modal interrupts the page. That means it has to win a few fights.
+
+It needs its own layer. It needs clear entry and exit points. It needs to stop the page from scrolling behind it. It needs focus to stay inside the dialog while the dialog is open.
+
+Start from those constraints. Do not start from the box in the middle of the screen.
+
+The layer comes first. A modal should render through a portal so it can leave the layout tree that opened it. That is what keeps it out of clipped containers, stacked transforms, and local `z-index` traps.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Trigger and state
+
+The first primitive is state. One boolean decides whether the dialog exists.
+
+  <ModalPreview />
+
+
+Keep that state near the UI that owns the action.
+
+```tsx
+"use client";
+
+import { motion } from "framer-motion";
+import { Link2 } from "lucide-react";
+import { useState } from "react";
+
+export function ShareTrigger() {
+  const [open, setOpen] = useState(false);
+  const isVisible = true;
+
+  return (
+    <>
+      <motion.button
+        animate={{
+          opacity: isVisible ? 1 : 0,
+          scale: isVisible ? 1 : 0.5,
+        }}
+        type="button"
+        initial={{ opacity: 0, scale: 0.5 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
+        onClick={() => setOpen(true)}
+        className="flex h-12 select-none items-center justify-center gap-2 rounded-full bg-black pl-5 pr-6 text-[15px] font-medium tracking-[-0.015em] text-white transition-[scale,background-color] duration-200 ease-out active:scale-[0.97] dark:bg-white dark:text-black"
+      >
+        <Link2 className="size-5" aria-hidden="true" />
+        Share file
+      </motion.button>
+      <ShareModal open={open} onClose={() => setOpen(false)} />
+    </>
+  );
+}
+```
+
+The trigger should fit the rest of the page. In this case, the button follows the site theme. Light mode gets a black surface. Dark mode gets a white surface.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The portal
+
+The dialog needs a root that sits above the page.
+
+```tsx
+import { createPortal } from "react-dom";
+
+function ShareModal({
+  open,
+  onClose,
+  children,
+}: {
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  if (!open) {
+    return null;
+  }
+
+  return createPortal(children, document.body);
+}
+```
+
+That line changes the whole behavior of the modal:
+
+```tsx
+return createPortal(children, document.body);
+```
+
+Without it, the dialog inherits the layout problems of its parent. With it, the modal gets a clean root at the page level.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Backdrop and escape routes
+
+A modal needs two common exit paths. Users click the backdrop or press `Escape`.
+
+Start with the shell.
+
+```tsx
+<div
+  className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 px-3 py-8 dark:bg-black/55"
+  onClick={onClose}
+>
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby={titleId}
+    aria-describedby={descriptionId}
+    className="w-full max-w-[32rem] rounded-[1.5rem]"
+    onClick={(event) => event.stopPropagation()}
+  >
+    {children}
+  </div>
+</div>
+```
+
+The outer layer closes the modal. The inner surface stops that click from leaking upward.
+
+Then add the keyboard path.
+
+```tsx
+useEffect(() => {
+  if (!open) {
+    return;
+  }
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      onClose();
+    }
+  };
+
+  window.addEventListener("keydown", onKeyDown);
+
+  return () => {
+    window.removeEventListener("keydown", onKeyDown);
+  };
+}, [open, onClose]);
+```
+
+Now the modal has two exits that match user expectations.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Focus and body scroll
+
+The page behind the dialog should stop moving while the modal is open.
+
+```tsx
+useEffect(() => {
+  if (!open) {
+    return;
+  }
+
+  const previousOverflow = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+
+  return () => {
+    document.body.style.overflow = previousOverflow;
+  };
+}, [open]);
+```
+
+That solves scroll. Focus needs the same level of care. Move focus into the modal when it opens. Return focus to the trigger when it closes. The browser will not do that work for you.
+
+The semantic contract is small.
+
+```tsx
+<div
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby={titleId}
+  aria-describedby={descriptionId}
+>
+  <h2 id={titleId}>Share this file</h2>
+  <p id={descriptionId}>Invite your team to review and collaborate.</p>
+</div>
+```
+
+Those attributes name the dialog and tell assistive tech that it owns the interaction while it is open.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Rendering the modal
+
+The share sheet in the preview breaks into a few small pieces. That is the part that keeps the component readable.
+
+The first piece is a surface button that matches the site palette.
+
+```tsx
+function ChromeButton({
+  children,
+  className,
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  className?: string;
+}) {
+  return (
+    <button
+      type="button"
+      className={`flex items-center justify-center rounded-xl border border-[#EBEBEB] bg-[#FCFCFC] text-black dark:border-[#2C2C2B] dark:bg-[lab(8.708%_0_0)] dark:text-white ${className ?? ""}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+```
+
+That helper removes a lot of repeated surface classes from the modal body.
+
+The second piece is the link-permission row.
+
+```tsx
+function ShareRow() {
+  return (
+    <div className="mt-5 rounded-xl border border-[#EBEBEB] bg-[#FCFCFC] p-4 dark:border-[#2C2C2B] dark:bg-[lab(8.708%_0_0)]">
+      <div className="flex items-start gap-3">
+        <Link2 className="mt-0.5 size-4 text-gray-200 dark:text-gray-100" />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1 text-[15px] font-medium tracking-[-0.01em]">
+            <span>Anyone with the link can view</span>
+            <ChevronDown className="size-4" />
+          </div>
+          <p className="mt-1 text-[14px] text-gray-200 dark:text-gray-100">
+            cajaun.com/project/valmiera
+          </p>
+        </div>
+        <ChromeButton className="h-9 px-3 text-[13px] font-medium">
+          Copy link
+        </ChromeButton>
+      </div>
+    </div>
+  );
+}
+```
+
+The third piece is the access panel. Use real words here. The structure stays clear, and the typography stays closer to the rest of the page.
+
+```tsx
+function CollaboratorRow({
+  initials,
+  name,
+  email,
+}: {
+  initials: string;
+  name: string;
+  email: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 rounded-xl px-1 py-2">
+      <Avatar initials={initials} />
+      <div className="flex-1">
+        <p className="text-[15px] font-medium tracking-[-0.01em]">
+          {name}
+        </p>
+        <p className="mt-0.5 text-[14px] text-gray-200 dark:text-gray-100">
+          {email}
+        </p>
+      </div>
+      <button className="text-[14px] font-medium text-gray-200 dark:text-gray-100">
+        Viewer
+      </button>
+    </div>
+  );
+}
+```
+
+The modal stays easier to scan when each row uses the same text rhythm as the rest of the site: medium weight for labels, muted copy for secondary details, and tight spacing.
+
+The final step is composition.
+
+```tsx
+<div className="mt-5">
+  <h2 className="text-[1.45rem] font-medium tracking-[-0.03em]">
+    Share this file
+  </h2>
+  <p className="mt-2 text-[15px] font-medium leading-6 tracking-[-0.01em] text-gray-200 dark:text-gray-100">
+    Invite your team to review and collaborate.
+  </p>
+</div>
+
+<ShareRow />
+<CollaboratorPanel />
+
+<div className="mt-5 flex items-center justify-between gap-3">
+  <ChromeButton className="h-10 gap-2 px-3.5 text-[14px] font-medium">
+    <Code2 className="size-4" />
+    Get embed code
+  </ChromeButton>
+  <button className="h-10 rounded-xl bg-black px-4 text-[14px] font-semibold text-white dark:bg-white dark:text-black">
+    Done
+  </button>
+</div>
+```
+
+Small pieces make the modal easy to adjust. You can change the share row, the collaborator list, or the footer actions without digging through one large render function.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Closing thoughts
+
+Build the modal from constraints.
+
+Start with layer, exit paths, scroll, and focus. Then shape the interface inside that frame. Portals solve the layering problem. Small components solve the maintenance problem. Good typography and spacing solve the reading problem.
+
+</section>

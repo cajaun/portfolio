@@ -23,7 +23,7 @@ html.dark pre[data-theme*="github-dark"] span {
 }
 
 .prose pre {
-  @apply overflow-auto rounded-xl p-4 text-[13px] bg-white;
+  @apply my-4 overflow-auto rounded-xl bg-white p-4 text-[13px];
 
   box-shadow:
     0px 0px 0px 1px #0000000f,
@@ -137,4 +137,3 @@ html.dark pre[data-theme*="github-dark"] span {
 .dark .top-scroll-mask {
   background: linear-gradient(0deg, transparent 0%, #101010 80%);
 }
-

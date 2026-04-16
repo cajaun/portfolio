@@ -5,11 +5,13 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mx-auto mt-auto w-full max-w-screen-sm border-t border-[#EBEBEB] px-4 dark:border-[#2C2C2B] animate-slide-down-fade" style={{ animationDelay: "450ms",}}>
+    <footer
+      className="mx-auto mt-auto w-full max-w-screen-sm border-t border-[#EBEBEB] px-4 dark:border-[#2C2C2B] animate-slide-down-fade"
+      style={{ animationDelay: "450ms" }}
+    >
       <div
         className=" flex items-center justify-between px-0 pt-4 md:px-0"
         style={{
-     
           paddingBottom: "max(16px, env(safe-area-inset-bottom))",
         }}
       >
@@ -22,4 +24,4 @@ const Footer = () => {
   );
 };
 
-export default Footer
+export default Footer;

@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Building a Twitter‑Style Image Grid",
+  title: "Building a Twitter-Style Image Grid",
   publishedAt: "March 5, 2026",
   summary:
     "A walkthrough of how to recreate Twitter's adaptive image layout using a few layout rules and helper functions.",
@@ -13,11 +13,11 @@ import TwitterImageGridPreview from "@/components/ui/twitter-image-grid-preview"
 
 ## Anatomy
 
-Twitter's image layout adapts depending on how many images are attached to a tweet.
+Twitter's image layout adapts to the number of images attached to a tweet.
 
-A single image fills the full frame. Two images sit side by side. Three images create a layout where one large image anchors the left side with two smaller companions stacked on the right. Four images resolve into a two by two grid.
+One image fills the frame. Two images sit side by side. Three images place one large image on the left with two stacked images on the right. Four images form a two by two grid.
 
-Rather than building a separate component for each case, the entire structure is derived from one value: `totalImages`. From it, we determine the grid columns, which images span more space, which corners get rounded, and what aspect ratio each cell should use. The result is a mosaic-style grid that shifts shape based on how much content it holds.
+One value drives the layout: `totalImages`. It sets the grid columns, cell spans, rounded corners, and aspect ratios. That keeps the component small and the output consistent across each image count.
 
 </section>
 
@@ -25,15 +25,13 @@ Rather than building a separate component for each case, the entire structure is
 
 ## One image
 
-When there is only one image, the layout is straightforward. The image fills the container and keeps its natural proportions.
+One image fills the container and keeps its own shape.
 
-The tricky part is that raw images can have extreme dimensions. Some are very wide panoramas, others are tall portrait shots.
+Source images can have wide or tall dimensions, so the component maps them to a small set of common aspect ratios.
 
 <PreviewCard full>
   <TwitterImageGridPreview totalImages={1} />
 </PreviewCard>
-
-To keep things predictable, we map real dimensions to a small set of common aspect ratios.
 
 ```ts
 export const getAspectRatio = (height: number, width: number): string => {
@@ -47,7 +45,7 @@ export const getAspectRatio = (height: number, width: number): string => {
 };
 ```
 
-`aspectRatio` is computed by dividing `width` by `height`. That single number is compared against thresholds to pick the closest standard ratio. The single-image case is the only one where we call this function at all. Every other layout uses fixed ratios, which we will get to shortly.
+`aspectRatio` comes from `width / height`. The helper compares that value to a few thresholds and returns the nearest standard ratio. This path runs for the one-image case. The other layouts use fixed ratios.
 
 </section>
 
@@ -55,13 +53,13 @@ export const getAspectRatio = (height: number, width: number): string => {
 
 ## Two images
 
-With two images, the layout shifts into a simple two column grid.
+Two images use a two-column grid.
 
 <PreviewCard full>
   <TwitterImageGridPreview totalImages={2} />
 </PreviewCard>
 
-The grid should feel like a single card, not two images sitting next to each other. To achieve this, only the outer edges get rounded corners. The internal edges where the images meet stay square so they appear to merge into one container.
+The grid should read as one card. The outer edges get rounded corners. The inner edge stays square, so the pair reads as one surface.
 
 ```ts
 export const imageGrid = (index: number, totalImages: number) => {
@@ -96,7 +94,7 @@ export const imageGrid = (index: number, totalImages: number) => {
 };
 ```
 
-`index` is the image's position in the array, starting at zero. `totalImages` determines the grid shape. Together they tell us which corners sit on the outer edge of the grid and should be rounded. You will also notice that for three images, `imageGrid` handles the span classes directly on the first image rather than relying on a separate helper. This keeps all the position-aware logic in one place.
+`index` is the image position in the array. `totalImages` picks the grid shape. Together they decide which corners sit on the outer edge and need rounding. For three images, `imageGrid` also carries the span classes for the first cell, which keeps the position rules in one place.
 
 </section>
 
@@ -104,13 +102,13 @@ export const imageGrid = (index: number, totalImages: number) => {
 
 ## Three images
 
-Three images introduce hierarchy. If every cell were the same size, the layout would feel cramped. The first image becomes the visual anchor, spanning the full height of the grid while the other two stack on the right.
+Three images need hierarchy. The first image spans the full height of the grid while the other two stack on the right.
 
 <PreviewCard full>
   <TwitterImageGridPreview totalImages={3} />
 </PreviewCard>
 
-For cases other than three images, `imageSpan` handles grid placement independently.
+`imageSpan` handles cell placement.
 
 ```ts
 export const imageSpan = (index: number, totalImages: number) => {
@@ -130,7 +128,7 @@ export const imageSpan = (index: number, totalImages: number) => {
 };
 ```
 
-`col-span-1 row-span-2` stretches the first cell across both row tracks, making it twice the height of its neighbors. For three images the span is already embedded inside `imageGrid`, so `imageSpan` mainly does work for the single and four-image cases.
+`col-span-1 row-span-2` stretches the first cell across both row tracks, so it becomes the anchor. In the three-image layout, that span already lives in `imageGrid`, so `imageSpan` does more work in the one and four-image cases.
 
 </section>
 
@@ -138,13 +136,13 @@ export const imageSpan = (index: number, totalImages: number) => {
 
 ## Four images
 
-When four images are present, the layout becomes symmetrical. A two by two grid distributes visual weight evenly and removes any ambiguity about which image should stand out.
+Four images use a two by two grid. Each cell carries the same weight, so no image takes priority.
 
 <PreviewCard full>
   <TwitterImageGridPreview totalImages={4} />
 </PreviewCard>
 
-`gridClasses` maps the image count to the appropriate Tailwind grid classes.
+`gridClasses` maps the image count to the right Tailwind grid classes.
 
 ```ts
 export const gridClasses = (totalImages: number) => {
@@ -163,7 +161,7 @@ export const gridClasses = (totalImages: number) => {
 };
 ```
 
-Three and four images share the same grid definition. The visual difference between them comes entirely from `imageSpan` and `imageGrid`. The grid lays down the tracks; the span values decide how cells fill them.
+Three and four images share the same grid definition. `imageSpan` and `imageGrid` create the visual difference by changing cell size and corner treatment.
 
 </section>
 
@@ -171,7 +169,7 @@ Three and four images share the same grid definition. The visual difference betw
 
 ## Aspect ratios per layout
 
-For multi-image layouts, we do not use the image's real dimensions. Instead, `getImageStyle` assigns a fixed aspect ratio to each cell based on the layout.
+Multi-image layouts ignore the source image dimensions. `getImageStyle` assigns a fixed aspect ratio to each cell based on the layout.
 
 ```ts
 export const getImageStyle = (
@@ -195,7 +193,7 @@ export const getImageStyle = (
 };
 ```
 
-A single image is the only case where the real `height` and `width` matter. For everything else, fixed ratios keep the grid predictable regardless of the source images. Two images each get `7 / 8`, a slightly portrait ratio that gives the pair enough visual height. Three images use `7 / 8` for the large anchor and `7 / 4` for the two smaller cells on the right, which are landscape since they only occupy half the height. Four images each get `2 / 1` to keep the grid compact.
+One image uses `height` and `width`. Fixed ratios keep the other layouts consistent across mixed source images. Two images use `7 / 8`. Three images use `7 / 8` for the anchor and `7 / 4` for the stacked cells. Four images use `2 / 1` to keep the grid compact.
 
 </section>
 
@@ -203,7 +201,7 @@ A single image is the only case where the real `height` and `width` matter. For 
 
 ## Rendering the grid
 
-With the helpers in place, the rendering code stays compact.
+The helpers keep the render function small.
 
 ```tsx
 <div className={`grid ${gridClasses(totalImages)}`}>
@@ -229,7 +227,7 @@ With the helpers in place, the rendering code stays compact.
 </div>
 ```
 
-Rather than using `gap` on the grid, each inner wrapper uses `p-[1px]` to create the thin separation between images. This keeps the gap inside each cell rather than on the grid track, which plays better with the rounded corners. `object-cover` ensures every image fills its cell without distorting. The `overflow: clip` and `overflowClipMargin: "content-box"` pair prevents content from bleeding outside the rounded corners in certain browsers.
+Each inner wrapper uses `p-[1px]` instead of grid `gap`. That keeps the separator inside each cell, which works better with rounded corners. `object-cover` fills each cell without distortion. `overflow: clip` and `overflowClipMargin: "content-box"` keep pixels inside the rounded edges.
 
 </section>
 
@@ -237,8 +235,8 @@ Rather than using `gap` on the grid, each inner wrapper uses `p-[1px]` to create
 
 ## Closing thoughts
 
-Twitter's image grid is a good example of interface design driven by simple rules.
+Twitter's image grid shows how far a few layout rules can go.
 
-The behavior emerges from `totalImages`. Once that value is known, a small set of helpers translates it into grid structure, spans, corner rounding, and aspect ratios. None of the helpers are complicated on their own, but together they produce a layout that feels intentional at every image count.
+`totalImages` sets the structure. The helpers turn that value into grid tracks, spans, corner rounding, and aspect ratios. Each helper stays small, and the full layout stays easy to reason about.
 
 </section>
