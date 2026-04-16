@@ -16,7 +16,7 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata(
-  props: PageProps
+  props: PageProps,
 ): Promise<Metadata | undefined> {
   const { slug } = await props.params;
   const post = await getPost(slug);
@@ -55,7 +55,10 @@ export async function generateMetadata(
 
 export default async function Blog(props: PageProps) {
   const { slug } = await props.params;
-  const [post, posts] = await Promise.all([getPost(slug), getBlogPostSummaries()]);
+  const [post, posts] = await Promise.all([
+    getPost(slug),
+    getBlogPostSummaries(),
+  ]);
 
   if (!post) {
     notFound();
@@ -65,7 +68,9 @@ export default async function Blog(props: PageProps) {
   const postIndex = posts.findIndex((entry) => entry.slug === slug);
   const nextPost = postIndex > 0 ? posts[postIndex - 1] : null;
   const previousPost =
-    postIndex >= 0 && postIndex < posts.length - 1 ? posts[postIndex + 1] : null;
+    postIndex >= 0 && postIndex < posts.length - 1
+      ? posts[postIndex + 1]
+      : null;
   const hasAdjacentPosts = Boolean(previousPost || nextPost);
 
   return (
@@ -88,7 +93,7 @@ export default async function Blog(props: PageProps) {
               image: post.metadata.image
                 ? `${SITE.url}${post.metadata.image}`
                 : `${SITE.url}/og?title=${encodeURIComponent(
-                    post.metadata.title
+                    post.metadata.title,
                   )}`,
               url: `${SITE.url}/blog/${post.slug}`,
               author: {
@@ -121,12 +126,12 @@ export default async function Blog(props: PageProps) {
       {hasAdjacentPosts ? (
         <section className="mx-auto  w-full max-w-screen-sm px-4">
           <div
-            className="animate-slide-down-fade  px-2 pt-8 dark:border-[#2C2C2B]"
+            className="animate-slide-down-fade px-2  dark:border-[#2C2C2B]"
             style={{ animationDelay: "360ms" }}
           >
-            <div className="grid gap-6 md:grid-cols-2 md:gap-10">
-              <div className="min-h-[3.5rem]">
-                {previousPost ? (
+            <div className="flex flex-col pb-4 gap-6 md:flex-row md:justify-between md:gap-10">
+              {previousPost && (
+                <div className="md:min-h-[3.5rem]">
                   <Link
                     href={`/blog/${previousPost.slug}`}
                     className="group block rounded-xl transition-opacity duration-300 hover:opacity-70"
@@ -138,24 +143,24 @@ export default async function Blog(props: PageProps) {
                       {previousPost.title}
                     </p>
                   </Link>
-                ) : null}
-              </div>
+                </div>
+              )}
 
-              <div className="min-h-[3.5rem] md:text-right">
-                {nextPost ? (
+              {nextPost && (
+                <div className="md:min-h-[3.5rem] ml-auto text-right">
                   <Link
                     href={`/blog/${nextPost.slug}`}
                     className="group block rounded-xl transition-opacity duration-300 hover:opacity-70"
                   >
-                     <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
+                    <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
                       Next
                     </p>
                     <p className="text-sm font-medium text-black dark:text-white">
                       {nextPost.title}
                     </p>
                   </Link>
-                ) : null}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
