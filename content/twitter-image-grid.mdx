@@ -13,11 +13,15 @@ import TwitterImageGridPreview from "@/components/ui/twitter-image-grid-preview"
 
 ## Anatomy
 
-Twitter's image layout adapts to the number of images attached to a tweet.
+Twitter's image layout changes with the number of images attached to a post.
 
 One image fills the frame. Two images sit side by side. Three images place one large image on the left with two stacked images on the right. Four images form a two by two grid.
 
-One value drives the layout: `totalImages`. It sets the grid columns, cell spans, rounded corners, and aspect ratios. That keeps the component small and the output consistent across each image count.
+I like this pattern because the component does not need many moving parts. One value, `totalImages`, drives the layout. It decides the grid columns, cell spans, rounded corners, and aspect ratios, which keeps the output consistent across each image count.
+
+That is what makes this component interesting. The end result looks adaptive, but the rules behind it are small enough to hold in your head. You do not need a large layout engine. You need a few decisions that stay consistent across each image count.
+
+The challenge is not raw complexity. It is making the grid feel intentional in every case. A single image should feel spacious. Two images should feel balanced. Three images need hierarchy. Four images should feel compact without becoming cramped. Those are different layouts, but they still need to feel like they belong to the same system.
 
 </section>
 
@@ -25,9 +29,9 @@ One value drives the layout: `totalImages`. It sets the grid columns, cell spans
 
 ## One image
 
-One image fills the container and keeps its own shape.
+With one image, the layout is simple. The image fills the container and keeps its own shape.
 
-Source images can have wide or tall dimensions, so the component maps them to a small set of common aspect ratios.
+Source images can be wide, square, or tall, so the component maps them to a small set of common aspect ratios.
 
 <PreviewCard full>
   <TwitterImageGridPreview totalImages={1} />
@@ -45,7 +49,11 @@ export const getAspectRatio = (height: number, width: number): string => {
 };
 ```
 
-`aspectRatio` comes from `width / height`. The helper compares that value to a few thresholds and returns the nearest standard ratio. This path runs for the one-image case. The other layouts use fixed ratios.
+`aspectRatio` comes from `width / height`. The helper compares that value to a few thresholds and returns the nearest standard ratio. This path only runs for the one-image case. The other layouts use fixed ratios so the grid stays predictable.
+
+I prefer snapping the image to a small set of ratios instead of using the exact source dimensions. If you follow every uploaded size too closely, the layout starts to feel unstable from post to post. Standard ratios keep the card recognizable while still respecting the general shape of the image.
+
+The one-image case gets more freedom because there is no neighboring image to line up with. Once you add a second cell, consistency matters more than fidelity to the original file.
 
 </section>
 
@@ -59,7 +67,9 @@ Two images use a two-column grid.
   <TwitterImageGridPreview totalImages={2} />
 </PreviewCard>
 
-The grid should read as one card. The outer edges get rounded corners. The inner edge stays square, so the pair reads as one surface.
+The grid should still read as one card. The outer edges get rounded corners. The inner edge stays square, so the pair feels like one surface instead of two separate images.
+
+That outer-versus-inner corner treatment does a lot of work. Without it, the layout starts to read like two cards placed next to each other. Twitter's grid works because it treats the whole attachment set as one object.
 
 ```ts
 export const imageGrid = (index: number, totalImages: number) => {
@@ -96,13 +106,15 @@ export const imageGrid = (index: number, totalImages: number) => {
 
 `index` is the image position in the array. `totalImages` picks the grid shape. Together they decide which corners sit on the outer edge and need rounding. For three images, `imageGrid` also carries the span classes for the first cell, which keeps the position rules in one place.
 
+I like tying corner logic to `index` and `totalImages` because it keeps the render function dumb. The JSX does not need to know why a cell gets a certain shape. It only needs to ask for the right classes.
+
 </section>
 
 <section className="mb-16 px-2">
 
 ## Three images
 
-Three images need hierarchy. The first image spans the full height of the grid while the other two stack on the right.
+Three images need a clear anchor. The first image spans the full height of the grid while the other two stack on the right.
 
 <PreviewCard full>
   <TwitterImageGridPreview totalImages={3} />
@@ -128,7 +140,11 @@ export const imageSpan = (index: number, totalImages: number) => {
 };
 ```
 
-`col-span-1 row-span-2` stretches the first cell across both row tracks, so it becomes the anchor. In the three-image layout, that span already lives in `imageGrid`, so `imageSpan` does more work in the one and four-image cases.
+`col-span-1 row-span-2` stretches the first cell across both row tracks, so it becomes the anchor. In the three-image layout, that span already lives in `imageGrid`, so `imageSpan` ends up doing more work in the one and four-image cases.
+
+This layout is the one that gives the component its character. A plain three-column or stacked layout would work, but it would not create the same sense of priority. The large image on the left gives the grid a focal point, which helps the whole card feel composed instead of auto-generated.
+
+It also solves a practical problem. Three equal cells tend to create awkward cropping because there is no obvious dominant frame. Giving one image more space makes the result feel less cramped.
 
 </section>
 
@@ -163,6 +179,8 @@ export const gridClasses = (totalImages: number) => {
 
 Three and four images share the same grid definition. `imageSpan` and `imageGrid` create the visual difference by changing cell size and corner treatment.
 
+I like this reuse because it keeps the system small. The grid template does not need to change every time the layout changes. A shared base grid, plus a few helpers that adjust spans and corners, is enough to cover both cases.
+
 </section>
 
 <section className="mb-16 px-2">
@@ -195,13 +213,17 @@ export const getImageStyle = (
 
 One image uses `height` and `width`. Fixed ratios keep the other layouts consistent across mixed source images. Two images use `7 / 8`. Three images use `7 / 8` for the anchor and `7 / 4` for the stacked cells. Four images use `2 / 1` to keep the grid compact.
 
+This is one of the tradeoffs that makes the component work. Exact source dimensions sound more correct, but they make shared layouts harder to control. If one image is tall and the next one is wide, the grid can end up fighting itself.
+
+Fixed ratios shift the goal from preserving every original proportion to preserving a stable composition. In a feed, that tradeoff is usually worth it. The images still read well, and the card stays coherent.
+
 </section>
 
 <section className="mb-16 px-2">
 
 ## Rendering the grid
 
-The helpers keep the render function small.
+The helpers keep the render function small, which is the main reason I like splitting the logic this way.
 
 ```tsx
 <div className={`grid ${gridClasses(totalImages)}`}>
@@ -229,14 +251,22 @@ The helpers keep the render function small.
 
 Each inner wrapper uses `p-[1px]` instead of grid `gap`. That keeps the separator inside each cell, which works better with rounded corners. `object-cover` fills each cell without distortion. `overflow: clip` and `overflowClipMargin: "content-box"` keep pixels inside the rounded edges.
 
+I like this part because the render function ends up feeling declarative. It loops through the images, asks a few helpers for layout decisions, and renders the result. Most of the thinking already happened elsewhere.
+
+Using `p-[1px]` instead of `gap` is a good example of a small implementation detail that changes the finish of the component. Grid gaps live between cells, which can make rounded corners feel less clean. Internal padding keeps the separator effect while preserving the outer shape of the card.
+
 </section>
 
 <section className="mb-16 px-2">
 
 ## Closing thoughts
 
-Twitter's image grid shows how far a few layout rules can go.
+Twitter's image grid is a good example of how far a few layout rules can go.
 
 `totalImages` sets the structure. The helpers turn that value into grid tracks, spans, corner rounding, and aspect ratios. Each helper stays small, and the full layout stays easy to reason about.
+
+That is the part worth keeping. Once the rules are clear, the component stops feeling clever and starts feeling dependable.
+
+That is usually a good sign in UI work. The user does not need to notice the rules. They only need the layout to feel consistent each time they see it. When the system is small and the outputs are predictable, you can get that result without making the component hard to maintain.
 
 </section>

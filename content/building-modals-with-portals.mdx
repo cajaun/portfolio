@@ -6,20 +6,27 @@ export const metadata = {
 };
 
 import PreviewCard from "@/components/ui/previews";
-import ModalPreview from "@/components/ui/modal-preview";
+import ModalPreview, {
+  ModalClosePreview,
+  PortalLayerPreview,
+} from "@/components/ui/modal-preview";
 
 
 <section className="mb-16 px-2">
 
 ## Anatomy
 
-A modal interrupts the page. That means it has to win a few fights.
+A modal interrupts the page, so it has a few jobs to handle from the start.
 
-It needs its own layer. It needs clear entry and exit points. It needs to stop the page from scrolling behind it. It needs focus to stay inside the dialog while the dialog is open.
+It needs its own layer, clear ways to open and close, a way to stop the page from scrolling behind it, and focus that stays inside the dialog while it is open.
 
-Start from those constraints. Do not start from the box in the middle of the screen.
+That is the part I like to solve first. The centered panel is the easy part.
 
-The layer comes first. A modal should render through a portal so it can leave the layout tree that opened it. That is what keeps it out of clipped containers, stacked transforms, and local `z-index` traps.
+The layer comes first. A modal should render through a `portal` so it can leave the layout tree that opened it. That keeps it out of clipped containers, stacked transforms, and local `z-index` traps.
+
+This is where simple modal demos can be misleading. A dialog often looks finished once you see a box centered on the screen with a dark backdrop behind it. Then you drop the same component into a real page and it gets clipped by `overflow: hidden`, sits under a sticky header, or loses focus the moment someone tabs through it. The visual part is small. The surrounding behavior is where the component earns its keep.
+
+I like thinking about modals as infrastructure, not decoration. The content inside can change from page to page, but the rules around layering, focus, scrolling, and dismissal stay almost the same. Once those rules are stable, the rest of the component becomes much easier to trust.
 
 </section>
 
@@ -32,7 +39,11 @@ The first primitive is state. One boolean decides whether the dialog exists.
   <ModalPreview />
 
 
-Keep that state near the UI that owns the action.
+I like to keep that state close to the UI that owns the action. The trigger opens the modal, and the same component decides when to close it.
+
+That sounds small, but it saves a lot of friction later. If the `open` state lives too far away, the component starts depending on props that travel through unrelated layers of the tree. At that point, a straightforward interaction starts feeling heavier than it should.
+
+Keeping the state near the trigger also makes intent easier to read. You can scan the component and see the whole interaction at once: button click, `open` state, modal render, `onClose` callback. That is a good default unless you have a real reason to coordinate the modal from somewhere higher up.
 
 ```tsx
 "use client";
@@ -67,7 +78,9 @@ export function ShareTrigger() {
 }
 ```
 
-The trigger should fit the rest of the page. In this case, the button follows the site theme. Light mode gets a black surface. Dark mode gets a white surface.
+The trigger should feel like it belongs to the rest of the page. In this case, the button follows the site theme. `light` mode gets a black surface. `dark` mode gets a white surface.
+
+I think this matters more than it gets credit for. The trigger is the first promise the interaction makes. If the button feels out of place, the modal tends to feel bolted on even when the implementation is solid.
 
 </section>
 
@@ -97,13 +110,19 @@ function ShareModal({
 }
 ```
 
-That line changes the whole behavior of the modal:
+This line changes the whole behavior of the modal:
 
 ```tsx
 return createPortal(children, document.body);
 ```
 
-Without it, the dialog inherits the layout problems of its parent. With it, the modal gets a clean root at the page level.
+Without it, the dialog inherits the layout problems of its parent. With it, the modal gets a clean root at the page level, which makes the rest of the component easier to reason about.
+
+That separation is the whole point. A page section might have transforms for animation, local stacking contexts for sticky UI, or clipping rules that make sense for the layout it owns. None of those concerns should control whether a modal can appear correctly. A `portal` gives the dialog a stable place to live, no matter where the trigger sits in the tree.
+
+It also changes how I think about the component boundary. The trigger belongs to the local UI. The modal surface belongs to the document level. That split lines up with how the interaction behaves, so the code ends up matching the mental model.
+
+<PortalLayerPreview />
 
 </section>
 
@@ -111,9 +130,9 @@ Without it, the dialog inherits the layout problems of its parent. With it, the 
 
 ## Backdrop and escape routes
 
-A modal needs two common exit paths. Users click the backdrop or press `Escape`.
+A modal usually needs two exit paths. People click the backdrop or press `Escape`, so the component should support both.
 
-Start with the shell.
+I start with the shell.
 
 ```tsx
 <div
@@ -135,7 +154,9 @@ Start with the shell.
 
 The outer layer closes the modal. The inner surface stops that click from leaking upward.
 
-Then add the keyboard path.
+This shell does more than darken the page. It defines the area that belongs to the modal and the area that closes it. That distinction needs to be clear in the code because it affects how safe the component feels to use. People should be able to click outside the `dialog` and leave without thinking about it.
+
+Then I add the keyboard path with `useEffect`.
 
 ```tsx
 useEffect(() => {
@@ -157,7 +178,11 @@ useEffect(() => {
 }, [open, onClose]);
 ```
 
-Now the modal has two exits that match user expectations.
+That gives the modal the two exits most people expect without adding much code.
+
+I try to think about dismissal early because it shapes the whole interaction. If closing the modal feels awkward, the rest of the component feels heavier than it is. People notice friction on the way out faster than they notice polish on the way in.
+
+<ModalClosePreview />
 
 </section>
 
@@ -182,7 +207,11 @@ useEffect(() => {
 }, [open]);
 ```
 
-That solves scroll. Focus needs the same level of care. Move focus into the modal when it opens. Return focus to the trigger when it closes. The browser will not do that work for you.
+That handles scroll. Focus needs the same care. When the modal opens, move focus into it. When it closes, send focus back to the trigger. The browser will not do all of that work for you.
+
+Scroll locking is one of those details that seems optional until you skip it. Once the background keeps moving behind an open dialog, the modal stops feeling like a complete layer and starts feeling like a panel floating over a live page. That weakens the interaction right away.
+
+Focus works the same way. A modal is a temporary context. If `tab` order can wander behind it, the interface stops making sense for keyboard users and screen reader users. Even for sighted users, small focus bugs make a component feel unreliable fast.
 
 The semantic contract is small.
 
@@ -198,7 +227,9 @@ The semantic contract is small.
 </div>
 ```
 
-Those attributes name the dialog and tell assistive tech that it owns the interaction while it is open.
+Those attributes name the dialog and tell assistive tech that it owns the interaction while it is open. It is a small detail, but it changes how complete the component feels.
+
+This is one of the reasons I like accessibility work. The markup is not large, but it forces the component to describe itself with some precision. Once you add `role="dialog"`, `aria-modal="true"`, `aria-labelledby`, and `aria-describedby`, the structure tends to get better for everyone.
 
 </section>
 
@@ -206,7 +237,9 @@ Those attributes name the dialog and tell assistive tech that it owns the intera
 
 ## Rendering the modal
 
-The share sheet in the preview breaks into a few small pieces. That is the part that keeps the component readable.
+The share sheet in the preview breaks into a few small pieces. That keeps the component readable and makes it easier to adjust later.
+
+This is where I stop thinking about modal behavior and start thinking about composition. The mechanics should already be handled by this point. What is left is the surface, and I want that surface to be easy to edit without dragging the low-level interaction code back into the conversation.
 
 The first piece is a surface button that matches the site palette.
 
@@ -231,6 +264,8 @@ function ChromeButton({
 ```
 
 That helper removes a lot of repeated surface classes from the modal body.
+
+I like pulling this sort of thing into a helper when the styles carry meaning, not just repetition. In this case, `ChromeButton` is part of the modal's visual language. It defines the neutral surface color, border treatment, and radius that other actions can share.
 
 The second piece is the link-permission row.
 
@@ -258,7 +293,11 @@ function ShareRow() {
 }
 ```
 
-The third piece is the access panel. Use real words here. The structure stays clear, and the typography stays closer to the rest of the page.
+This is the part where small helpers pay off. The modal body stays focused on structure, while the repeated surface styles live in one place.
+
+The row itself is simple, but it does a lot of visual work. It groups the link state, the permission label, and the main action into one compact unit. That makes the share sheet easier to scan because the user can read the current state and the next action in the same glance.
+
+The third piece is the access panel. I like using plain labels here so the hierarchy stays easy to scan.
 
 ```tsx
 function CollaboratorRow({
@@ -289,9 +328,11 @@ function CollaboratorRow({
 }
 ```
 
-The modal stays easier to scan when each row uses the same text rhythm as the rest of the site: medium weight for labels, muted copy for secondary details, and tight spacing.
+The modal stays easier to scan when each row follows the same text rhythm as the rest of the page: medium weight for labels, muted copy for secondary details, and tight spacing.
 
-The final step is composition.
+That consistency matters in a component like this because the content can grow. Once you have several collaborators, different permission states, and more actions, the modal needs typography to do some of the organizational work. Clear text rhythm keeps the surface calm even when the amount of information increases.
+
+The last step is composition.
 
 ```tsx
 <div className="mt-5">
@@ -317,7 +358,9 @@ The final step is composition.
 </div>
 ```
 
-Small pieces make the modal easy to adjust. You can change the share row, the collaborator list, or the footer actions without digging through one large render function.
+Small pieces make the modal easier to adjust. You can change `ShareRow`, `CollaboratorPanel`, or the footer actions without digging through one large render function.
+
+That is usually the point where the component starts paying you back. If design changes later, you are not rebuilding the modal from scratch. You are adjusting one row, one helper, or one footer action while the structure stays intact.
 
 </section>
 
@@ -325,8 +368,12 @@ Small pieces make the modal easy to adjust. You can change the share row, the co
 
 ## Closing thoughts
 
-Build the modal from constraints.
+`portals` solve the part of modals that tends to go wrong first: layering. Once the dialog can escape the layout tree, the rest becomes a series of smaller problems you can handle one by one.
 
-Start with layer, exit paths, scroll, and focus. Then shape the interface inside that frame. Portals solve the layering problem. Small components solve the maintenance problem. Good typography and spacing solve the reading problem.
+The main pieces are simple. Keep state near the trigger. Render the dialog through a `portal`. Give people clear ways to close it. Lock the page scroll. Treat focus as part of the component, not as a nice extra.
+
+That combination gets you a modal that feels solid before you spend time polishing the visuals.
+
+The part I keep coming back to is that modals need restraint. They should not be clever. They should feel stable, predictable, and easy to leave. If the component does those jobs well, the design has a much stronger foundation to sit on.
 
 </section>

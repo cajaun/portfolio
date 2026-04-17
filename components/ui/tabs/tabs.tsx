@@ -11,15 +11,22 @@ export type Tab = {
 type AnimatedTabsProps = {
   tabs: readonly Tab[];
   defaultTabId?: string;
+  activeTabId?: string;
+  withBottomMargin?: boolean;
   onChange?: (id: string) => void;
 };
 
 export function AnimatedTabs({
   tabs,
   defaultTabId,
+  activeTabId,
+  withBottomMargin = true,
   onChange,
 }: AnimatedTabsProps) {
-  const [activeTab, setActiveTab] = useState(defaultTabId ?? tabs[0].id);
+  const [internalActiveTab, setInternalActiveTab] = useState(
+    defaultTabId ?? tabs[0].id,
+  );
+  const activeTab = activeTabId ?? internalActiveTab;
 
   const containerRef = useRef<HTMLDivElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
@@ -45,12 +52,14 @@ export function AnimatedTabs({
   }, [activeTab]);
 
   const handleClick = (id: string) => {
-    setActiveTab(id);
+    if (activeTabId === undefined) {
+      setInternalActiveTab(id);
+    }
     onChange?.(id);
   };
 
   return (
-    <div className="mb-4 w-full">
+    <div className={withBottomMargin ? "mb-4 w-full" : "w-full"}>
       <div
         className="relative flex w-full flex-col overflow-x-auto whitespace-nowrap px-6 scrollbar-none animate-slide-down-fade"
         style={{
@@ -64,7 +73,7 @@ export function AnimatedTabs({
             <li key={tab.id}>
               <button
                 type="button"
-                className="flex h-9 items-center gap-2 rounded-full px-3 font-medium text-gray-200 transition duration-200 ease-in-out hover:text-black active:scale-[0.97] dark:text-gray-100 hover:dark:text-white"
+                className={`flex h-9 items-center gap-2 rounded-full px-3 font-medium text-gray-200 transition duration-200 ease-in-out hover:text-black active:scale-[0.97] dark:text-gray-100 hover:dark:text-white`}
                 onClick={() => handleClick(tab.id)}
               >
                 {tab.icon && <span className="size-5">{tab.icon}</span>}
@@ -89,7 +98,7 @@ export function AnimatedTabs({
                   ref={activeTab === tab.id ? activeTabRef : null}
                   tabIndex={-1}
                   type="button"
-                  className="flex h-9 items-center gap-2 rounded-full px-3 font-medium text-black dark:text-white"
+                  className={`flex h-9 items-center gap-2 rounded-full px-3 font-medium text-black dark:text-white `}
                 >
                   {tab.icon && <span className="size-5">{tab.icon}</span>}
                   <span>{tab.name}</span>

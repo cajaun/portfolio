@@ -1,0 +1,188 @@
+export const metadata = {
+  title: "Using Intersection Observers",
+  publishedAt: "April 17, 2026",
+  summary:
+    "A walkthrough of how to use Intersection Observer for reveal-on-scroll effects, active section tracking, and other viewport-aware UI.",
+};
+
+import {
+  ActivePostPreview,
+  InfiniteFeedPreview,
+} from "@/components/ui/intersection-observer-preview";
+
+
+<section className="mb-16 px-2">
+
+## Why use it
+
+`IntersectionObserver` tells you when an element enters or leaves a visible area.
+
+That visible area is usually the browser viewport, but it can also be a scrollable container. That is what makes the API useful. You do not need to attach a `scroll` listener, measure rectangles on every frame, and write your own visibility math for common cases.
+
+I reach for it when the interface needs to react to presence. A card fades in when it enters the viewport. A nav item highlights when its section becomes current. A video pauses once it leaves the screen. Those are all visibility problems, and `IntersectionObserver` is built for them.
+
+It is also one of those browser APIs that can replace a surprising amount of custom code. If the question is "is this thing on screen yet?" there is a good chance the observer is the cleaner answer.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Anatomy
+
+The API has four pieces that matter most: `observer`, `target`, `root`, and `threshold`.
+
+The `observer` watches one or more `target` elements. The `root` defines the box you care about. If you leave `root` as `null`, the browser uses the viewport. The `threshold` decides how much of a target needs to be visible before the callback runs.
+
+That last one is the part worth paying attention to. `threshold: 0` means the callback can fire as soon as even a sliver of the element becomes visible. `threshold: 0.5` waits until half of it is on screen. `threshold: 1` waits until the whole thing fits inside the root.
+
+`rootMargin` matters too. It lets you expand or shrink the root box before the intersection check happens. A negative bottom margin can delay activation. A positive bottom margin can start work early, which is useful for image loading or prefetching.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The observer
+
+The smallest version looks like this.
+
+```ts
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      console.log("visible");
+    }
+  });
+});
+
+observer.observe(element);
+```
+
+The callback receives `entries`, not a single item, because one observer can watch many elements at once. Each `entry` tells you what changed for that target.
+
+The fields I use most are `entry.isIntersecting`, `entry.intersectionRatio`, and `entry.target`. `isIntersecting` gives you the simple answer. `intersectionRatio` tells you how much of the element is visible. `target` tells you which node the update belongs to.
+
+That is enough for a lot of interfaces. In many cases you do not need the raw scroll position at all. You only need to know when a target crosses a boundary, and the observer already gives you that.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Loading more posts
+
+One common use is loading more posts at the end of a feed. Instead of checking `scrollTop` on every movement, you observe a sentinel near the bottom of the list.
+
+<InfiniteFeedPreview />
+
+This pattern works well because the observer only cares about one boundary. Once the sentinel enters the `root`, fetch the next batch and append it to the timeline.
+
+```ts
+const observer = new IntersectionObserver(
+  ([entry]) => {
+    if (entry.isIntersecting) {
+      loadNextPage();
+    }
+  },
+  {
+    root: feedContainer,
+    threshold: 0.2,
+    rootMargin: "0px 0px 20% 0px",
+  },
+);
+```
+
+The `rootMargin` here starts the fetch before the user fully hits the end. That gives the next posts a little time to arrive, which makes the feed feel smoother.
+
+This is one of the clearest observer use cases because the rule is simple: when the loading boundary becomes visible, the feed grows.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Custom roots
+
+The viewport is not the only root you can observe against. If the content lives inside a scrollable container, you can pass that container as `root`.
+
+```ts
+const observer = new IntersectionObserver(callback, {
+  root: scrollContainer,
+  threshold: 0.5,
+  rootMargin: "0px 0px -10% 0px",
+});
+```
+
+That changes the whole meaning of visibility. Now the target is not being measured against the browser window. It is being measured against the scroll box you passed in.
+
+This is useful for carousels, drawers, side panels, and preview cards where the scrolling happens inside a nested region. It is one of the reasons the API scales well beyond page-level effects.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Active posts
+
+Another good fit is deciding which post counts as active inside a media feed.
+
+<ActivePostPreview />
+
+This is the pattern behind autoplay rules in short-form video feeds. The browser does not need to know the full scroll position. It only needs to know which post owns the strongest intersection inside the feed window.
+
+```ts
+const observer = new IntersectionObserver(
+  (entries) => {
+    const nextPost = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+    if (nextPost) {
+      setActivePost((nextPost.target as HTMLElement).dataset.postId!);
+    }
+  },
+  {
+    root: feedContainer,
+    threshold: [0.4, 0.7, 0.9],
+    rootMargin: "0px 0px -15% 0px",
+  },
+);
+```
+
+There are a few things going on here. The observer watches several posts at once. More than one can intersect at the same time, so the code picks the one with the highest `intersectionRatio`. That gives you one clear winner for autoplay, highlighting, or engagement tracking.
+
+I like this approach more than checking offsets by hand. It adapts better when cards have different heights, and it keeps the logic tied to the posts themselves instead of a set of cached measurements.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Cleanup and reuse
+
+The API is simple, but it still needs cleanup.
+
+```tsx
+useEffect(() => {
+  const observer = new IntersectionObserver(callback, options);
+
+  nodes.forEach((node) => observer.observe(node));
+
+  return () => observer.disconnect();
+}, [callback, options]);
+```
+
+`disconnect()` matters. Once the component unmounts, you do not want an observer hanging onto old nodes or firing updates into state that no longer exists.
+
+If several targets share the same `root`, `threshold`, and callback shape, I prefer using one observer instance for all of them. That keeps setup simpler and usually matches how the UI behaves anyway.
+
+I also try to avoid turning every animation into an observer problem. If the effect only needs to run once on page load, plain CSS is enough. The API is most useful when visibility is the actual trigger.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Closing thoughts
+
+`IntersectionObserver` is a good example of a browser API that removes work instead of adding it.
+
+It gives you a clean answer to a common UI question: when does this element count as visible? Once you have that answer, a lot of patterns get easier to build. Infinite feeds, autoplay rules, sticky navigation, reading progress, and impression tracking all start from the same idea.
+
+The part worth keeping in mind is that the API is about boundaries. Pick the right `root`, the right `threshold`, and the right `rootMargin`, and the behavior tends to fall into place.
+
+</section>

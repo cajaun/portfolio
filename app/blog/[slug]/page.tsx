@@ -131,15 +131,15 @@ export default async function Blog(props: PageProps) {
           >
             <div className="flex flex-col pb-4 gap-6 md:flex-row md:justify-between md:gap-10">
               {previousPost && (
-                <div className="md:min-h-[3.5rem]">
+                <div className="md:min-h-[3.5rem] min-w-0 flex-1">
                   <Link
                     href={`/blog/${previousPost.slug}`}
-                    className="group block rounded-xl transition-opacity duration-300 hover:opacity-70"
+                    className="group block w-full  rounded-xl transition-opacity duration-300 hover:opacity-70"
                   >
                     <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
                       Previous
                     </p>
-                    <p className="text-sm font-medium text-black dark:text-white">
+                    <p className="text-sm font-medium text-black dark:text-white truncate">
                       {previousPost.title}
                     </p>
                   </Link>
@@ -147,15 +147,15 @@ export default async function Blog(props: PageProps) {
               )}
 
               {nextPost && (
-                <div className="md:min-h-[3.5rem] ml-auto text-right">
+                <div className="md:min-h-[3.5rem] ml-auto text-right min-w-0 flex-1">
                   <Link
                     href={`/blog/${nextPost.slug}`}
-                    className="group block rounded-xl transition-opacity duration-300 hover:opacity-70"
+                    className="group block w-full rounded-xl transition-opacity duration-300 hover:opacity-70"
                   >
                     <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
                       Next
                     </p>
-                    <p className="text-sm font-medium text-black dark:text-white">
+                    <p className="text-sm font-medium text-black dark:text-white truncate">
                       {nextPost.title}
                     </p>
                   </Link>

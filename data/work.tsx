@@ -44,6 +44,18 @@ export const COMPONENT_ITEMS: WorkItem[] = [
 
 export const PROJECT_ITEMS: WorkItem[] = [
   {
+    title: "Laminar",
+    date: "April 03, 2026",
+    href: "/",
+    external: true,
+  },
+  {
+    title: "Morpheus",
+    date: "February 27, 2026",
+    href: "/",
+    external: true,
+  },
+  {
     title: "Varse",
     date: "August 23, 2025",
     href: "https://varse.app",
@@ -53,18 +65,6 @@ export const PROJECT_ITEMS: WorkItem[] = [
     title: "RankedOut",
     date: "August 20, 2023",
     href: "https://rankedout.com",
-    external: true,
-  },
-  {
-    title: "Movers",
-    date: "February 14, 2025",
-    href: "/",
-    external: true,
-  },
-  {
-    title: "Auto-Care",
-    date: "May 08, 2025",
-    href: "/",
     external: true,
   },
 ];

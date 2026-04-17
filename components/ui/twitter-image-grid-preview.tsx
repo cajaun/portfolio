@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type SupportedImageCount = 1 | 2 | 3 | 4;
+type SupportedImageCount = number;
 
 type GridCellConfig = {
   roundedClass: string;
@@ -122,8 +122,10 @@ export const getImageStyle = (
 
 export default function TwitterImageGridPreview({
   totalImages,
+  showLabels = true,
 }: {
   totalImages: SupportedImageCount;
+  showLabels?: boolean;
 }) {
   const cells = Array.from({ length: totalImages });
 
@@ -144,9 +146,11 @@ export default function TwitterImageGridPreview({
                 imageGrid(index, totalImages),
               )}
             >
-              <div className="flex h-6 w-12 select-none items-center justify-center rounded-full bg-[lab(100%_0_0)] text-xs font-medium shadow-custom dark:bg-[lab(3.04863%_0_0)]">
-                {index + 1}
-              </div>
+              {showLabels ? (
+                <div className="flex h-6 w-12 select-none items-center justify-center rounded-full bg-[lab(100%_0_0)] text-xs font-medium shadow-custom dark:bg-[lab(3.04863%_0_0)]">
+                  {index + 1}
+                </div>
+              ) : null}
             </div>
           </div>
         </div>
