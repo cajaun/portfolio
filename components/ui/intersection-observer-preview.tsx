@@ -43,21 +43,21 @@ const mediaPosts = [
   {
     id: "studio-tour",
     author: "Design Camera",
-    handle: "@designcamera",
+    handle: "@design",
     body: "The active post switches once most of the card is inside the feed window.",
     gridSize: 2,
   },
   {
     id: "prototype-loop",
     author: "Motion Notes",
-    handle: "@motionnotes",
+    handle: "@motion",
     body: "This is the same pattern behind autoplay and pause rules in media feeds.",
     gridSize: 3,
   },
   {
     id: "ui-breakdown",
     author: "Product Clips",
-    handle: "@productclips",
+    handle: "@product",
     body: "Only one post needs to feel primary at a time, so the observer picks a winner.",
     gridSize: 4,
   },
@@ -154,7 +154,7 @@ function FeedPost({
           <p className="text-sm  text-black dark:text-white">
             {body}
           </p>
-          <div className="">
+          <div className="hidden sm:block">
             <PostGrid gridSize={gridSize} />
           </div>
           
