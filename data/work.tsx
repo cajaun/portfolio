@@ -46,13 +46,13 @@ export const PROJECT_ITEMS: WorkItem[] = [
   {
     title: "Laminar",
     date: "April 03, 2026",
-    href: "/",
+    href: "https://github.com/cajaun/laminar",
     external: true,
   },
   {
     title: "Morpheus",
     date: "February 27, 2026",
-    href: "/",
+    href: "https://github.com/cajaun/morpheus",
     external: true,
   },
   {
