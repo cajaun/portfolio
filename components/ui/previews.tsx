@@ -10,6 +10,7 @@ type PreviewProps = {
   full?: boolean;
   scrollable?: boolean;
   scrollContainerRef?: RefObject<HTMLDivElement>;
+  video?: boolean;
 };
 
 export default function PreviewCard({
@@ -21,6 +22,7 @@ export default function PreviewCard({
   full = false,
   scrollable = false,
   scrollContainerRef,
+  video = false,
 }: PreviewProps) {
   return (
     <>
@@ -39,7 +41,7 @@ export default function PreviewCard({
           ref={scrollContainerRef}
           className={`
     ${full ? "preview-card-inner-full" : "preview-card-inner"}
-    ${full && !footer && !header ? "px-4 py-16" : ""}
+    ${full && !footer && !header ? (video ? "px-4 py-8" : "px-4 py-16") : ""}
     ${scrollable ? "h-[28rem] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" : ""}
   `}
           style={

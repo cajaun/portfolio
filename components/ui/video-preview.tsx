@@ -1,9 +1,24 @@
 "use client";
 
-import { useState, useRef, useCallback, ReactNode } from "react";
+import { useState, useRef, useCallback, ReactNode, memo } from "react";
 import Image from "next/image";
 import PreviewCard from "@/components/ui/previews";
 import { cn } from "@/lib/utils";
+
+// Memoized phone frame to prevent re-renders
+const PhoneFrame = memo(function PhoneFrame() {
+  return (
+    <Image
+      src="/phone-frame.png"
+      alt="Phone"
+      width={227}
+      height={450}
+      className="pointer-events-none relative z-10 select-none"
+      priority
+      unoptimized
+    />
+  );
+});
 
 interface VideoPreviewProps {
   src: string;
@@ -43,21 +58,13 @@ export function VideoPreview({
       footer={footer}
       footnote={footnote}
       full={full}
+      video
     >
       <div className="relative">
-        <div className="flex items-center justify-center pt-10">
+        <div className="flex items-center justify-center">
         <div className="relative inline-block">
-          {/* Phone Frame */}
-          <Image
-            src="/phone-frame.png"
-            alt="Phone"
-            width={227}
-            height={450}
-            className="pointer-events-none relative z-10 select-none"
-            priority
-          />
+          <PhoneFrame />
 
-  
           <div
             className="absolute inset-[1.25%_3.3%] z-[1] overflow-hidden rounded-[7.5%]"
           >
