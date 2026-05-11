@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "../components/theme-provider";
 import { SITE } from "@/data/site";
+import { Analytics } from '@vercel/analytics/next';
 
 const openRunde = localFont({
   variable: "--font-open-runde",
@@ -54,6 +55,7 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
