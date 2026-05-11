@@ -134,7 +134,7 @@ export default async function Blog(props: PageProps) {
                 <div className="md:min-h-[3.5rem] min-w-0 flex-1">
                   <Link
                     href={`/blog/${previousPost.slug}`}
-                    className="group block w-full  rounded-xl transition-opacity duration-300 hover:opacity-70"
+                    className="group block w-full overflow-hidden  rounded-xl transition-opacity duration-300 hover:opacity-70"
                   >
                     <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
                       Previous
@@ -150,7 +150,7 @@ export default async function Blog(props: PageProps) {
                 <div className="md:min-h-[3.5rem] ml-auto text-right min-w-0 flex-1">
                   <Link
                     href={`/blog/${nextPost.slug}`}
-                    className="group block w-full rounded-xl transition-opacity duration-300 hover:opacity-70"
+                    className="group block w-full  overflow-hidden rounded-xl transition-opacity duration-300 hover:opacity-70"
                   >
                     <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
                       Next
