@@ -366,89 +366,84 @@ export function PortalLayerPreview() {
   );
 }
 
-export function ModalClosePreview() {
-  const [open, setOpen] = useState(true);
-  const [lastAction, setLastAction] = useState("Done button");
-
-  const closeWith = (action: string) => {
-    setLastAction(action);
-    setOpen(false);
-  };
+export function ModalFocusPreview() {
+  const [locked, setLocked] = useState(true);
 
   return (
     <PreviewCard
       full
       header={
         <CenteredPreviewHeader
-          title="Exit paths"
-          detail={open ? "Modal open" : `Closed with ${lastAction}`}
+          title="Focus and scroll"
+          detail={locked ? "Modal owns focus" : "Background still active"}
         />
       }
       footer={
         <div className="flex w-full flex-wrap items-center justify-center gap-2">
-          {open ? (
-            <>
-              <SurfaceButton onClick={() => closeWith("Backdrop click")}>
-                Backdrop
-              </SurfaceButton>
-              <SurfaceButton onClick={() => closeWith("Escape key")}>
-                Escape
-              </SurfaceButton>
-              <SurfaceButton active onClick={() => closeWith("Done button")}>
-                Done
-              </SurfaceButton>
-            </>
-          ) : (
-            <div className="flex w-full items-center justify-center">
-              <SurfaceButton active onClick={() => setOpen(true)}>
-                Reopen modal
-              </SurfaceButton>
-            </div>
-          )}
+          <SurfaceButton active={!locked} onClick={() => setLocked(false)}>
+            Unlocked page
+          </SurfaceButton>
+          <SurfaceButton active={locked} onClick={() => setLocked(true)}>
+            Locked modal
+          </SurfaceButton>
         </div>
       }
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
           <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">
-            A modal should be easy to leave by click, key, or button.
+            The page behind the dialog should stop competing for focus and scroll.
           </p>
         </div>
       }
     >
-      <div className="bg-[lab(94.78%_0_0)] px-4 py-10 sm:px-12 dark:bg-[lab(17.06%_0_0)]">
-        <div className="relative mx-auto max-w-xl rounded-[1.4rem] border border-[#EBEBEB] bg-white dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]">
-          <div className="h-[19rem] rounded-[1.4rem] bg-[#FCFCFC] p-4 dark:bg-[lab(8.708%_0_0)]">
-            <div className="space-y-3">
-              <div className="h-10 rounded-lg border border-[#EBEBEB] bg-white dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]" />
-              <div className="grid grid-cols-2 gap-3">
-                <div className="h-24 rounded-xl border border-[#EBEBEB] bg-white dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]" />
-                <div className="h-24 rounded-xl border border-[#EBEBEB] bg-white dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]" />
+      <div className="bg-[lab(94.78%_0_0)] px-3 py-5 sm:px-12 sm:py-10 dark:bg-[lab(17.06%_0_0)]">
+        <div className="relative mx-auto max-w-xl overflow-hidden rounded-[1.4rem] border border-[#EBEBEB] bg-white dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]">
+          <div
+            className={cn(
+              "h-[18rem] rounded-[1.4rem] bg-[#FCFCFC] p-3 transition-transform duration-300 sm:h-[20rem] sm:p-4 dark:bg-[lab(8.708%_0_0)]",
+              locked ? "translate-y-0" : "-translate-y-10",
+            )}
+          >
+            <div className="flex h-10 items-center justify-between rounded-lg border border-[#EBEBEB] bg-white px-3 dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]">
+              <SkeletonLine className="h-3 w-24" />
+              <SkeletonLine className="h-3 w-12" />
+            </div>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div className="h-24 rounded-xl border border-[#EBEBEB] bg-white p-3 dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]">
+                <SkeletonLine className="h-3 w-20" />
+                <SkeletonLine className="mt-2 h-3 w-28" />
               </div>
+              <div className="h-24 rounded-xl border border-[#EBEBEB] bg-white p-3 dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]">
+                <SkeletonLine className="h-3 w-16" />
+                <SkeletonLine className="mt-2 h-3 w-24" />
+              </div>
+            </div>
+            <div className="mt-3 space-y-2 pb-10">
+              {[0, 1, 2, 3].map((item) => (
+                <div
+                  key={item}
+                  className="flex h-12 items-center rounded-xl border border-[#EBEBEB] bg-white px-3 dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]"
+                >
+                  <SkeletonLine className="h-3 w-36" />
+                </div>
+              ))}
             </div>
           </div>
 
-          {open ? (
-            <div
-              className="absolute inset-0 flex items-center justify-center bg-black/15 px-4 py-8 dark:bg-black/35"
-              onClick={() => closeWith("Backdrop click")}
-            >
-              <div
-                className="w-full max-w-[22rem]"
-                onClick={(event) => event.stopPropagation()}
-              >
-                <PreviewModalShell
-                  title="Share this file"
-                  description="The same component can support several clear exits."
-                />
-              </div>
+          <div
+            className={cn(
+              "absolute inset-0 flex items-center justify-center bg-black/15 px-3 py-5 transition-colors duration-300 sm:px-4 sm:py-8 dark:bg-black/35",
+              locked ? "backdrop-blur-[1px]" : "bg-black/5 dark:bg-black/15",
+            )}
+          >
+            <div className="w-full max-w-[22rem]">
+              <PreviewModalShell
+                title="Share this file"
+                description="Rendered above the page through a portal."
+                compact
+              />
             </div>
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center px-4 py-8">
-              <div className="rounded-full border border-[#EBEBEB] bg-white px-3 py-2 text-[13px] font-medium tracking-[-0.01em] text-black shadow-custom dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)] dark:text-white">
-                Closed with {lastAction}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </PreviewCard>

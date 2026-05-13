@@ -7,7 +7,7 @@ export const metadata = {
 
 import PreviewCard from "@/components/ui/previews";
 import ModalPreview, {
-  ModalClosePreview,
+  ModalFocusPreview,
   PortalLayerPreview,
 } from "@/components/ui/modal-preview";
 
@@ -128,35 +128,30 @@ It also changes how I think about the component boundary. The trigger belongs to
 
 <section className="mb-16 px-2">
 
-## Backdrop and escape routes
+## Focus and scroll lock
 
-A modal usually needs two exit paths. People click the backdrop or press `Escape`, so the component should support both.
+A modal should own the interaction while it is open. The page behind it can stay visible, but it should stop competing for scroll and focus.
 
-I start with the shell.
+I start by locking the page scroll.
 
 ```tsx
-<div
-  className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 px-3 py-8 dark:bg-black/55"
-  onClick={onClose}
->
-  <div
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby={titleId}
-    aria-describedby={descriptionId}
-    className="w-full max-w-[32rem] rounded-[1.5rem]"
-    onClick={(event) => event.stopPropagation()}
-  >
-    {children}
-  </div>
-</div>
+useEffect(() => {
+  if (!open) {
+    return;
+  }
+
+  const previousOverflow = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+
+  return () => {
+    document.body.style.overflow = previousOverflow;
+  };
+}, [open]);
 ```
 
-The outer layer closes the modal. The inner surface stops that click from leaking upward.
+That small effect changes the feel of the whole layer. The background no longer drifts while someone is trying to read or act inside the dialog.
 
-This shell does more than darken the page. It defines the area that belongs to the modal and the area that closes it. That distinction needs to be clear in the code because it affects how safe the component feels to use. People should be able to click outside the `dialog` and leave without thinking about it.
-
-Then I add the keyboard path with `useEffect`.
+Focus needs the same care. When the modal opens, move focus into it. When it closes, send focus back to the trigger. The browser will not do all of that work for you.
 
 ```tsx
 useEffect(() => {
@@ -178,40 +173,15 @@ useEffect(() => {
 }, [open, onClose]);
 ```
 
-That gives the modal the two exits most people expect without adding much code.
+`Escape` is still part of the behavior, but it sits inside a bigger contract: the modal is a temporary context. While that context is active, keyboard movement should stay inside it and page scroll should wait.
 
-I try to think about dismissal early because it shapes the whole interaction. If closing the modal feels awkward, the rest of the component feels heavier than it is. People notice friction on the way out faster than they notice polish on the way in.
-
-<ModalClosePreview />
+<ModalFocusPreview />
 
 </section>
 
 <section className="mb-16 px-2">
 
-## Focus and body scroll
-
-The page behind the dialog should stop moving while the modal is open.
-
-```tsx
-useEffect(() => {
-  if (!open) {
-    return;
-  }
-
-  const previousOverflow = document.body.style.overflow;
-  document.body.style.overflow = "hidden";
-
-  return () => {
-    document.body.style.overflow = previousOverflow;
-  };
-}, [open]);
-```
-
-That handles scroll. Focus needs the same care. When the modal opens, move focus into it. When it closes, send focus back to the trigger. The browser will not do all of that work for you.
-
-Scroll locking is one of those details that seems optional until you skip it. Once the background keeps moving behind an open dialog, the modal stops feeling like a complete layer and starts feeling like a panel floating over a live page. That weakens the interaction right away.
-
-Focus works the same way. A modal is a temporary context. If `tab` order can wander behind it, the interface stops making sense for keyboard users and screen reader users. Even for sighted users, small focus bugs make a component feel unreliable fast.
+## Dialog semantics
 
 The semantic contract is small.
 

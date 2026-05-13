@@ -1,6 +1,13 @@
 "use client";
 
-import { useState, useRef, useCallback, ReactNode, memo } from "react";
+import {
+  useState,
+  useRef,
+  useCallback,
+  useEffect,
+  ReactNode,
+  memo,
+} from "react";
 import Image from "next/image";
 import PreviewCard from "@/components/ui/previews";
 import { cn } from "@/lib/utils";
@@ -14,8 +21,7 @@ const PhoneFrame = memo(function PhoneFrame() {
       width={227}
       height={450}
       className="pointer-events-none relative z-10 select-none"
-      priority
-      unoptimized
+      sizes="227px"
     />
   );
 });
@@ -38,7 +44,49 @@ export function VideoPreview({
   full = true,
 }: VideoPreviewProps) {
   const [isPlaying, setIsPlaying] = useState(true);
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const isVisible = entry.isIntersecting;
+
+        setIsInView(isVisible);
+
+        if (isVisible) {
+          setShouldLoadVideo(true);
+        }
+      },
+      { rootMargin: "300px 0px", threshold: 0.2 },
+    );
+
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const video = videoRef.current;
+
+    if (!video || !shouldLoadVideo) {
+      return;
+    }
+
+    if (isPlaying && isInView) {
+      video.play().catch(() => undefined);
+    } else {
+      video.pause();
+    }
+  }, [isInView, isPlaying, shouldLoadVideo]);
 
   const togglePlay = useCallback(() => {
     if (!videoRef.current) return;
@@ -62,23 +110,21 @@ export function VideoPreview({
     >
       <div className="relative">
         <div className="flex items-center justify-center">
-        <div className="relative inline-block">
-          <PhoneFrame />
+          <div ref={containerRef} className="relative inline-block">
+            <PhoneFrame />
 
-          <div
-            className="absolute inset-[1.25%_3.3%] z-[1] overflow-hidden rounded-[7.5%]"
-          >
-            <div className="group relative h-full w-full overflow-hidden bg-black">
-              <video
-                ref={videoRef}
-                src={src}
-                loop
-                playsInline
-                autoPlay
-                muted
-                preload="auto"
-                className="h-full w-full"
-              />
+            <div className="absolute inset-[1.25%_3.3%] z-[1] overflow-hidden rounded-[7.5%]">
+              <div className="group relative h-full w-full overflow-hidden bg-black">
+                <video
+                  ref={videoRef}
+                  src={shouldLoadVideo ? src : undefined}
+                  loop
+                  playsInline
+                  autoPlay={shouldLoadVideo}
+                  muted
+                  preload={shouldLoadVideo ? "metadata" : "none"}
+                  className="h-full w-full"
+                />
 
                 <button
                   type="button"

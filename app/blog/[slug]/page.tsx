@@ -129,9 +129,9 @@ export default async function Blog(props: PageProps) {
             className="animate-slide-down-fade px-2  dark:border-[#2C2C2B]"
             style={{ animationDelay: "360ms" }}
           >
-            <div className="flex flex-col pb-4 gap-6 md:flex-row md:justify-between md:gap-10">
+            <div className="relative flex min-h-[5.5rem] pb-4 md:min-h-0 md:flex-row md:justify-between md:gap-10">
               {previousPost && (
-                <div className="md:min-h-[3.5rem] min-w-0 flex-1">
+                <div className="absolute bottom-4 left-0 w-full max-w-[10rem] min-w-0 md:static md:max-w-none md:flex-1 md:min-h-[3.5rem]">
                   <Link
                     href={`/blog/${previousPost.slug}`}
                     className="group block w-full overflow-hidden  rounded-xl transition-opacity duration-300 hover:opacity-70"
@@ -147,7 +147,7 @@ export default async function Blog(props: PageProps) {
               )}
 
               {nextPost && (
-                <div className="md:min-h-[3.5rem] ml-auto text-right min-w-0 flex-1">
+                <div className="absolute bottom-4 right-0 w-full max-w-[10rem] min-w-0 text-right md:static md:ml-auto md:max-w-none md:flex-1 md:min-h-[3.5rem]">
                   <Link
                     href={`/blog/${nextPost.slug}`}
                     className="group block w-full  overflow-hidden rounded-xl transition-opacity duration-300 hover:opacity-70"

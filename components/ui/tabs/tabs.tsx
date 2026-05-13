@@ -29,7 +29,25 @@ export function AnimatedTabs({
   const activeTab = activeTabId ?? internalActiveTab;
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const activeScrollTabRef = useRef<HTMLButtonElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const activeEl = activeScrollTabRef.current;
+    const scroller = activeEl?.parentElement?.parentElement;
+
+    if (!activeEl || !scroller) {
+      return;
+    }
+
+    const nextScrollLeft =
+      activeEl.offsetLeft - scroller.clientWidth / 2 + activeEl.offsetWidth / 2;
+
+    scroller.scrollTo({
+      left: Math.max(nextScrollLeft, 0),
+      behavior: "smooth",
+    });
+  }, [activeTab]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -72,6 +90,7 @@ export function AnimatedTabs({
           {tabs.map((tab) => (
             <li key={tab.id}>
               <button
+                ref={activeTab === tab.id ? activeScrollTabRef : null}
                 type="button"
                 className={`flex h-9 items-center gap-2 rounded-full px-3 font-medium text-gray-200 transition duration-200 ease-in-out hover:text-black active:scale-[0.97] dark:text-gray-100 hover:dark:text-white`}
                 onClick={() => handleClick(tab.id)}

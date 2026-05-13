@@ -48,11 +48,43 @@ const mediaPosts = [
     gridSize: 2,
   },
   {
+    id: "filler-1",
+    author: "System",
+    handle: "@system",
+    body: "Scroll down to reach the next active post in the feed.",
+    gridSize: 3,
+    filler: true,
+  },
+  {
+    id: "filler-2",
+    author: "System",
+    handle: "@system",
+    body: "Keep scrolling, the next main post is coming up soon.",
+    gridSize: 4,
+    filler: true,
+  },
+  {
     id: "prototype-loop",
     author: "Motion Notes",
     handle: "@motion",
     body: "This is the same pattern behind autoplay and pause rules in media feeds.",
     gridSize: 3,
+  },
+  {
+    id: "filler-3",
+    author: "System",
+    handle: "@system",
+    body: "Another scroll boundary before the final active post appears.",
+    gridSize: 2,
+    filler: true,
+  },
+  {
+    id: "filler-4",
+    author: "System",
+    handle: "@system",
+    body: "Almost there, the last main post is just below.",
+    gridSize: 3,
+    filler: true,
   },
   {
     id: "ui-breakdown",
@@ -94,11 +126,12 @@ function ActivePostHeader({
   activePost: string;
   onChange: (id: string) => void;
 }) {
+  const mainPosts = mediaPosts.filter((post) => !post.filler);
   return (
     <div className="flex w-full items-center justify-center">
       <div className="w-full sm:w-auto sm:max-w-max">
         <AnimatedTabs
-          tabs={mediaPosts.map((post) => ({
+          tabs={mainPosts.map((post) => ({
             id: post.id,
             name: post.author,
           }))}
@@ -186,6 +219,8 @@ function PostGrid({
 export function InfiniteFeedPreview() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const canLoadMoreRef = useRef(false);
+  const isResettingRef = useRef(false);
   const [posts, setPosts] = useState(() => buildFeedBatch(0, 4));
   const [loading, setLoading] = useState(false);
   const [hasLoadedMore, setHasLoadedMore] = useState(false);
@@ -198,11 +233,30 @@ export function InfiniteFeedPreview() {
       return;
     }
 
+    const handleScroll = () => {
+      if (isResettingRef.current) {
+        if (root.scrollTop <= 1) {
+          isResettingRef.current = false;
+        }
+
+        return;
+      }
+
+      if (root.scrollTop > 24) {
+        canLoadMoreRef.current = true;
+      }
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
 
-        if (!entry?.isIntersecting || loading || hasLoadedMore) {
+        if (
+          !entry?.isIntersecting ||
+          !canLoadMoreRef.current ||
+          loading ||
+          hasLoadedMore
+        ) {
           return;
         }
 
@@ -221,9 +275,13 @@ export function InfiniteFeedPreview() {
       },
     );
 
+    root.addEventListener("scroll", handleScroll, { passive: true });
     observer.observe(sentinel);
 
-    return () => observer.disconnect();
+    return () => {
+      root.removeEventListener("scroll", handleScroll);
+      observer.disconnect();
+    };
   }, [hasLoadedMore, loading]);
 
   return (
@@ -239,6 +297,8 @@ export function InfiniteFeedPreview() {
           <button
             type="button"
             onClick={() => {
+              isResettingRef.current = true;
+              canLoadMoreRef.current = false;
               setLoading(false);
               setHasLoadedMore(false);
               setPosts(buildFeedBatch(0, 4));
@@ -253,6 +313,7 @@ export function InfiniteFeedPreview() {
             onClick={() => {
               const node = rootRef.current;
               if (node) {
+                canLoadMoreRef.current = true;
                 node.scrollTo({ top: node.scrollHeight, behavior: "smooth" });
               }
             }}
@@ -301,6 +362,9 @@ export function ActivePostPreview() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const postRefs = useRef<(HTMLElement | null)[]>([]);
   const [activePost, setActivePost] = useState(mediaPosts[0].id);
+  const mainPostIds = useRef(
+    new Set(mediaPosts.filter((post) => !post.filler).map((post) => post.id)),
+  );
 
   const scrollToPost = (postId: string) => {
     const postIndex = mediaPosts.findIndex((post) => post.id === postId);
@@ -309,8 +373,13 @@ export function ActivePostPreview() {
     if (nextNode && rootRef.current) {
       const rootRect = rootRef.current.getBoundingClientRect();
       const nodeRect = nextNode.getBoundingClientRect();
-      const nextTop =
-        rootRef.current.scrollTop + (nodeRect.top - rootRect.top) - 12;
+      const isMobile = window.innerWidth < 640;
+      const nodeTop = rootRef.current.scrollTop + (nodeRect.top - rootRect.top);
+      
+      // On mobile, center the post in the viewport; on desktop, just add small padding
+      const nextTop = isMobile
+        ? nodeTop - (rootRect.height / 2) + (nodeRect.height / 2)
+        : nodeTop - 12;
 
       rootRef.current.scrollTo({
         top: Math.max(nextTop, 0),
@@ -325,20 +394,67 @@ export function ActivePostPreview() {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const nextActive = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    const isMobile = window.matchMedia("(max-width: 640px)").matches;
+    let frame = 0;
 
-        if (nextActive) {
-          setActivePost((nextActive.target as HTMLElement).dataset.postId!);
-        }
-      },
+    const updateActivePost = () => {
+      const rootRect = root.getBoundingClientRect();
+      const mainNodes = postRefs.current.filter(
+        (node): node is HTMLElement =>
+          Boolean(node?.dataset.postId && mainPostIds.current.has(node.dataset.postId)),
+      );
+
+      if (mainNodes.length === 0) {
+        return;
+      }
+
+      const isAtBottom =
+        root.scrollTop + root.clientHeight >= root.scrollHeight - 2;
+
+      if (isAtBottom) {
+        setActivePost(mainNodes[mainNodes.length - 1].dataset.postId!);
+        return;
+      }
+
+      const rootCenter = rootRect.top + rootRect.height / 2;
+      const nextActive = mainNodes
+        .map((node) => {
+          const rect = node.getBoundingClientRect();
+          const visibleTop = Math.max(rect.top, rootRect.top);
+          const visibleBottom = Math.min(rect.bottom, rootRect.bottom);
+          const visibleHeight = Math.max(0, visibleBottom - visibleTop);
+
+          return {
+            node,
+            visibleHeight,
+            centerDistance: Math.abs(rect.top + rect.height / 2 - rootCenter),
+          };
+        })
+        .filter((entry) => entry.visibleHeight > 0)
+        .sort((a, b) => {
+          if (b.visibleHeight !== a.visibleHeight) {
+            return b.visibleHeight - a.visibleHeight;
+          }
+
+          return a.centerDistance - b.centerDistance;
+        })[0];
+
+      if (nextActive) {
+        setActivePost(nextActive.node.dataset.postId!);
+      }
+    };
+
+    const scheduleActivePostUpdate = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(updateActivePost);
+    };
+
+    const observer = new IntersectionObserver(
+      () => scheduleActivePostUpdate(),
       {
         root,
-        threshold: [0.4, 0.7, 0.9],
-        rootMargin: "0px 0px -15% 0px",
+        threshold: isMobile ? [0, 0.05, 0.1] : [0.1, 0.25, 0.5, 0.75, 0.9],
+        rootMargin: isMobile ? "-5% 0px -40% 0px" : "-10% 0px -20% 0px",
       },
     );
 
@@ -348,7 +464,16 @@ export function ActivePostPreview() {
       }
     });
 
-    return () => observer.disconnect();
+    root.addEventListener("scroll", scheduleActivePostUpdate, {
+      passive: true,
+    });
+    scheduleActivePostUpdate();
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      root.removeEventListener("scroll", scheduleActivePostUpdate);
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -377,14 +502,15 @@ export function ActivePostPreview() {
           <button
             type="button"
             onClick={() => {
-              const currentIndex = mediaPosts.findIndex(
+              const mainPosts = mediaPosts.filter((p) => !p.filler);
+              const currentMainIndex = mainPosts.findIndex(
                 (post) => post.id === activePost,
               );
-              const nextIndex = Math.min(
-                currentIndex + 1,
-                mediaPosts.length - 1,
+              const nextMainIndex = Math.min(
+                currentMainIndex + 1,
+                mainPosts.length - 1,
               );
-              scrollToPost(mediaPosts[nextIndex].id);
+              scrollToPost(mainPosts[nextMainIndex].id);
             }}
             className="flex h-9 items-center justify-center rounded-lg bg-[lab(12.304%_-0.00000745058_0)] px-3 text-sm font-medium tracking-[-0.01em] text-white transition-transform duration-200 active:scale-[0.98] dark:bg-white dark:text-black"
           >
