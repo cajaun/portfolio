@@ -126,7 +126,7 @@ export default async function Blog(props: PageProps) {
       {hasAdjacentPosts ? (
         <section className="mx-auto  w-full max-w-screen-sm px-4">
           <div
-            className="animate-slide-down-fade px-2  dark:border-[#2C2C2B]"
+            className="animate-slide-down-fade px-2 dark:border-preview-dark-border"
             style={{ animationDelay: "360ms" }}
           >
             <div className="relative flex min-h-[5.5rem] pb-4 md:min-h-0 md:flex-row md:justify-between md:gap-10">

@@ -95,6 +95,29 @@ const mediaPosts = [
   },
 ];
 
+const carouselItems = [
+  {
+    id: "brief",
+    title: "Brief",
+    body: "The card enters the carousel root before it is centered.",
+  },
+  {
+    id: "frames",
+    title: "Frames",
+    body: "The observer starts work before the user lands here.",
+  },
+  {
+    id: "clips",
+    title: "Clips",
+    body: "Nearby media prepares without scroll-position math.",
+  },
+  {
+    id: "publish",
+    title: "Publish",
+    body: "The active card updates from the carousel center.",
+  },
+];
+
 function buildFeedBatch(start: number, count: number) {
   return Array.from({ length: count }, (_, index) => {
     const seed = feedSeed[(start + index) % feedSeed.length];
@@ -152,8 +175,8 @@ function FeedPost({
           : "",
       )}
     >
-      <div className="flex gap-3 rounded-[0.9rem] border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-preview-border bg-preview-surface-muted text-[12px] font-medium tracking-[-0.01em] text-preview-text dark:border-preview-dark-border dark:bg-preview-dark-surface-muted dark:text-white mt-2">
+      <div className="flex gap-3 rounded-[0.9rem] border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-stage">
+        <div className="mt-2 flex size-10 shrink-0 items-center justify-center rounded-full border border-preview-border bg-preview-surface-muted text-[12px] font-medium tracking-[-0.01em] text-[lab(12.304%_-0.00000745058_0)] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-preview-dark-text">
           {author
             .split(" ")
             .map((part) => part[0])
@@ -162,17 +185,17 @@ function FeedPost({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start gap-1 ">
-            <p className="truncate text-sm font-medium text-preview-text dark:text-white">
+            <p className="truncate text-sm font-medium text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
               {author}
             </p>
-            <p className="truncate text-sm text-preview-text-muted dark:text-gray-100">
+            <p className="truncate text-sm text-preview-text-muted dark:text-preview-dark-text-muted">
               {handle}
             </p>
-            <p className="text-sm text-preview-text-muted dark:text-gray-100">
+            <p className="text-sm text-preview-text-muted dark:text-preview-dark-text-muted">
               · 1h
             </p>
           </div>
-          <p className="text-sm text-preview-text dark:text-white">
+          <p className="text-sm text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
             {body}
           </p>
           <div className="hidden sm:block">
@@ -293,7 +316,7 @@ export function InfiniteFeedPreview() {
                 root?.scrollTo({ top: 0, behavior: "smooth" });
               });
             }}
-            className="flex h-9 items-center justify-center rounded-lg  bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-white"
+            className="flex h-9 items-center justify-center rounded-lg  bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-preview-dark-text"
           >
             Reset feed
           </button>
@@ -306,7 +329,7 @@ export function InfiniteFeedPreview() {
                 node.scrollTo({ top: node.scrollHeight, behavior: "smooth" });
               }
             }}
-            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-white"
+            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
           >
             Trigger load
           </button>
@@ -314,7 +337,7 @@ export function InfiniteFeedPreview() {
       }
       footnote={
         <div className="mt-4 flex w-full  select-none items-center justify-center text-center">
-          <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">
+          <p className="text-center text-[13px] text-preview-text-muted dark:text-preview-dark-text-muted">
             Scroll down to see posts enter the viewport
           </p>
         </div>
@@ -332,8 +355,8 @@ export function InfiniteFeedPreview() {
             />
           ))}
 
-          <div ref={sentinelRef} className="flex justify-center">
-            <div className="flex h-7 select-none items-center justify-center whitespace-nowrap rounded-md border border-preview-border bg-preview-surface-muted px-2 text-sm font-medium shadow-custom dark:border-preview-dark-border dark:bg-preview-dark-surface">
+          <div ref={sentinelRef} className="flex justify-center px-4 sm:px-0">
+            <div className="flex min-h-7 max-w-full select-none items-center justify-center rounded-md bg-preview-surface-muted px-3 py-1 text-center text-sm font-medium text-preview-text-muted shadow-custom dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-preview-dark-text-muted sm:whitespace-nowrap">
               {loading
                 ? "Loading next posts..."
                 : hasLoadedMore
@@ -484,7 +507,7 @@ export function ActivePostPreview() {
             onClick={() =>
               rootRef.current?.scrollTo({ top: 0, behavior: "smooth" })
             }
-            className="flex h-9 items-center justify-center rounded-lg  bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-white"
+            className="flex h-9 items-center justify-center rounded-lg  bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-preview-dark-text"
           >
             Restart feed
           </button>
@@ -501,7 +524,7 @@ export function ActivePostPreview() {
               );
               scrollToPost(mainPosts[nextMainIndex].id);
             }}
-            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-white"
+            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
           >
             Next active post
           </button>
@@ -509,7 +532,7 @@ export function ActivePostPreview() {
       }
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
-          <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">
+          <p className="text-center text-[13px] text-preview-text-muted dark:text-preview-dark-text-muted">
             Scroll down to watch the active post update
           </p>
         </div>
@@ -539,6 +562,190 @@ export function ActivePostPreview() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      </div>
+    </PreviewCard>
+  );
+}
+
+export function CarouselPrefetchPreview() {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeCard, setActiveCard] = useState(carouselItems[0].id);
+  const [preloadedCards, setPreloadedCards] = useState(() =>
+    new Set([carouselItems[0].id]),
+  );
+
+  useEffect(() => {
+    const root = rootRef.current;
+
+    if (!root) {
+      return;
+    }
+
+    const updateActiveCard = () => {
+      const rootRect = root.getBoundingClientRect();
+      const rootCenter = rootRect.left + rootRect.width / 2;
+      const nextCard = cardRefs.current
+        .filter((node): node is HTMLDivElement => Boolean(node))
+        .map((node) => {
+          const rect = node.getBoundingClientRect();
+
+          return {
+            id: node.dataset.cardId!,
+            centerDistance: Math.abs(rect.left + rect.width / 2 - rootCenter),
+          };
+        })
+        .sort((a, b) => a.centerDistance - b.centerDistance)[0];
+
+      if (!nextCard) {
+        return;
+      }
+
+      setActiveCard(nextCard.id);
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = (entry.target as HTMLElement).dataset.cardId;
+
+          if (!id) {
+            return;
+          }
+
+          if (entry.isIntersecting) {
+            setPreloadedCards((current) => new Set(current).add(id));
+          }
+        });
+
+        updateActiveCard();
+      },
+      {
+        root,
+        threshold: [0, 0.25, 0.5, 0.75, 0.95],
+        rootMargin: "0px 32% 0px 32%",
+      },
+    );
+
+    cardRefs.current.forEach((node) => {
+      if (node) {
+        observer.observe(node);
+      }
+    });
+
+    root.addEventListener("scroll", updateActiveCard, { passive: true });
+    updateActiveCard();
+
+    return () => {
+      root.removeEventListener("scroll", updateActiveCard);
+      observer.disconnect();
+    };
+  }, []);
+
+  const activeIndex = carouselItems.findIndex(
+    (item) => item.id === activeCard,
+  );
+  const scrollToCard = (index: number) => {
+    cardRefs.current[index]?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  };
+
+  return (
+    <PreviewCard
+      full
+      footer={
+        <div className="flex w-full flex-wrap items-center justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => scrollToCard(Math.max(activeIndex - 1, 0))}
+            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
+          >
+            Previous
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              scrollToCard(Math.min(activeIndex + 1, carouselItems.length - 1))
+            }
+            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
+          >
+            Next card
+          </button>
+        </div>
+      }
+      footnote={
+        <div className="mt-4 flex w-full select-none items-center justify-center text-center">
+          <p className="text-center text-[13px] text-preview-text-muted dark:text-preview-dark-text-muted">
+            Scroll sideways to preload nearby cards
+          </p>
+        </div>
+      }
+    >
+      <div className="w-full bg-preview-surface px-4 py-4 sm:px-12 dark:bg-preview-dark-stage">
+        <div className="rounded-[1.1rem] bg-preview-surface p-1 shadow-custom dark:bg-preview-dark-surface">
+          <div className="rounded-[0.9rem] border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-stage">
+            <div className="mb-3 flex items-center justify-between gap-3 px-3">
+              <div>
+                <p className="text-sm font-medium text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
+                  {carouselItems[activeIndex]?.title ?? "Brief"}
+                </p>
+                <p className="text-sm text-preview-text-muted dark:text-preview-dark-text-muted">
+                  Nearby cards prepare before they land
+                </p>
+              </div>
+              <p className="shrink-0 text-sm font-medium text-preview-text-muted dark:text-preview-dark-text-muted">
+                {activeIndex + 1} / {carouselItems.length}
+              </p>
+            </div>
+
+            <div
+              ref={rootRef}
+              className="-mx-3 flex snap-x gap-3 overflow-x-auto overscroll-x-contain px-3 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {carouselItems.map((item, index) => {
+                const isActive = item.id === activeCard;
+                const isPreloaded = preloadedCards.has(item.id);
+
+                return (
+                  <div
+                    key={item.id}
+                    ref={(node) => {
+                      cardRefs.current[index] = node;
+                    }}
+                    data-card-id={item.id}
+                    className={cn(
+                      "min-w-[14rem] snap-center rounded-[0.9rem] border p-3 transition-colors sm:min-w-[16rem]",
+                      isActive
+                        ? "border-preview-border bg-preview-surface dark:border-preview-dark-border dark:bg-preview-dark-surface"
+                        : "border-preview-border bg-preview-surface-muted dark:border-preview-dark-border dark:bg-preview-dark-stage",
+                    )}
+                  >
+                    <p className="text-sm font-medium text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
+                      {item.title}
+                    </p>
+                    <p className="mt-3 line-clamp-2 min-h-12 text-sm leading-6 text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
+                      {item.body}
+                    </p>
+                    <div className="mt-6 flex items-center gap-3">
+                      <div className="h-8 flex-1 rounded-lg bg-preview-surface shadow-custom dark:bg-preview-dark-surface" />
+                      <div
+                        className={cn(
+                          "h-8 w-14 rounded-lg transition-colors",
+                          isPreloaded
+                            ? "bg-preview-surface-active shadow-custom dark:bg-preview-dark-active"
+                            : "bg-preview-border dark:bg-preview-dark-border",
+                        )}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

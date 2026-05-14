@@ -12,34 +12,34 @@ function SkeletonLine({
 }) {
   return (
     <div
-      className={`rounded-full bg-black/[0.06] dark:bg-preview-surface/[0.08] ${className}`}
+      className={`rounded-full bg-black/[0.06] dark:bg-preview-dark-skeleton ${className}`}
     />
   );
 }
 
 function MiniModalSkeleton() {
   return (
-    <div className="flex min-h-[19rem] items-center justify-center px-4 py-10">
+    <div className="flex min-h-[19rem] w-full items-center justify-center bg-preview-surface px-4 py-10 dark:bg-preview-dark-stage">
       <div className="w-full max-w-[18rem] rounded-[1.25rem] bg-preview-surface p-4 shadow-custom dark:bg-preview-dark-surface">
         <SkeletonLine className="h-5 w-32" />
         <SkeletonLine className="mt-3 h-3 w-44" />
         <SkeletonLine className="mt-1.5 h-3 w-36" />
 
-        <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+        <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
           <SkeletonLine className="h-4 w-28" />
           <SkeletonLine className="mt-2.5 h-3 w-40" />
         </div>
 
-        <div className="my-4 border-t border-dashed border-preview-border dark:border-preview-dark-border" />
+        <div className="my-4 border-t border-dashed border-preview-border dark:border-preview-dark-border-strong" />
 
         <SkeletonLine className="h-4 w-24" />
         <SkeletonLine className="mt-2 h-3 w-40" />
-        <div className="mt-4 h-10 rounded-xl border border-preview-border bg-preview-surface dark:border-preview-dark-border dark:bg-preview-dark-surface" />
-        <div className="mt-3 h-10 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border dark:bg-preview-dark-surface-muted" />
+        <div className="mt-4 h-10 rounded-xl border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
+        <div className="mt-3 h-10 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
 
-        <div className="mt-4 flex items-center justify-between border-t border-preview-border pt-4 dark:border-preview-dark-border">
-          <div className="h-9 w-24 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border dark:bg-preview-dark-surface-muted" />
-          <div className="h-9 w-16 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border dark:bg-preview-dark-surface-muted" />
+        <div className="mt-4 flex items-center justify-between border-t border-preview-border pt-4 dark:border-preview-dark-border-strong">
+          <div className="h-9 w-24 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
+          <div className="h-9 w-16 rounded-xl bg-preview-text dark:bg-preview-dark-active" />
         </div>
       </div>
     </div>
@@ -52,7 +52,7 @@ function Avatar({
   initials: string;
 }) {
   return (
-    <div className="flex size-10 items-center justify-center rounded-full border border-preview-border bg-preview-surface-muted text-[12px] font-medium tracking-[-0.01em] text-black dark:border-preview-dark-border dark:bg-preview-dark-surface-muted dark:text-white">
+    <div className="flex size-10 items-center justify-center rounded-full border border-preview-border bg-preview-surface-muted text-[12px] font-medium tracking-[-0.01em] text-preview-text dark:border-preview-dark-border-strong dark:bg-preview-dark-stage dark:text-preview-dark-text">
       {initials}
     </div>
   );
@@ -74,8 +74,8 @@ function SurfaceButton({
       className={cn(
         "flex h-9 items-center justify-center rounded-lg px-3 text-[13px] font-medium tracking-[-0.01em] transition-transform duration-200 active:scale-[0.98]",
         active
-          ? "bg-preview-surface-active text-preview-text shadow-custom dark:bg-preview-dark-active dark:text-white"
-          : "bg-preview-surface text-black shadow-custom dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-white",
+          ? "bg-preview-surface-active text-preview-text shadow-custom dark:bg-preview-dark-active dark:text-preview-dark-text"
+          : "bg-preview-surface text-preview-text shadow-custom dark:border-preview-dark-border-strong dark:bg-preview-dark-surface dark:text-preview-dark-text",
       )}
     >
       {children}
@@ -93,21 +93,21 @@ function PreviewModalShell({
   compact?: boolean;
 }) {
   return (
-    <div className="w-full max-w-[22rem] rounded-[1.25rem] bg-preview-surface p-4 text-black shadow-custom dark:bg-preview-dark-surface dark:text-white dark:shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+    <div className="w-full max-w-[22rem] rounded-[1.25rem] bg-preview-surface p-4 text-preview-text shadow-custom dark:bg-preview-dark-surface-muted dark:text-preview-dark-text dark:shadow-[0_20px_60px_rgba(0,0,0,0.42)]">
       <p className="text-[15px] font-medium tracking-[-0.02em]">{title}</p>
-      <p className="mt-1 text-[13px] leading-[1.4] text-gray-200 dark:text-gray-100">
+      <p className="mt-1 text-[13px] leading-[1.4] text-gray-200 dark:text-preview-dark-paragraph">
         {description}
       </p>
-      <div className="mt-4 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+      <div className="mt-4 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
         <SkeletonLine className="h-3.5 w-24" />
         <SkeletonLine className="mt-2 h-3 w-36" />
         <SkeletonLine className="mt-1.5 h-3 w-28" />
       </div>
-      <div className="mt-4 flex items-center justify-between gap-3 border-t border-preview-border pt-4 dark:border-preview-dark-border">
-        <div className="h-9 w-24 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border dark:bg-preview-dark-surface-muted" />
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-preview-border pt-4 dark:border-preview-dark-border-strong">
+        <div className="h-9 w-24 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised" />
         <div
           className={cn(
-            "h-9 rounded-xl bg-black dark:bg-preview-surface",
+            "h-9 rounded-xl bg-preview-text dark:bg-preview-dark-active",
             compact ? "w-16" : "w-20",
           )}
         />
@@ -180,78 +180,78 @@ function ShareModal({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        className="w-full max-w-[30rem] rounded-[1.5rem] border border-preview-border bg-preview-surface p-5 text-black shadow-[0_30px_80px_rgba(0,0,0,0.12)] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-white dark:shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
+        className="w-full max-w-[30rem] rounded-[1.5rem] border border-preview-border bg-preview-surface p-5 text-preview-text shadow-[0_30px_80px_rgba(0,0,0,0.12)] dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted dark:text-preview-dark-text dark:shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
         onClick={(event) => event.stopPropagation()}
       >
         <h2
           id={titleId}
-          className="text-[1.45rem] font-medium tracking-[-0.03em] text-black dark:text-white"
+          className="text-[1.45rem] font-medium tracking-[-0.03em] text-preview-text dark:text-preview-dark-text"
         >
           Share this file
         </h2>
         <p
           id={descriptionId}
-          className="mt-2 text-[15px] font-medium leading-6 tracking-[-0.01em] text-gray-200 dark:text-gray-100"
+          className="mt-2 text-[15px] font-medium leading-6 tracking-[-0.01em] text-gray-200 dark:text-preview-dark-paragraph"
         >
           Invite your team to review and collaborate.
         </p>
 
-        <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-4 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
-          <p className="text-[15px] font-medium tracking-[-0.01em] text-black dark:text-white">
+        <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
+          <p className="text-[15px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
             Anyone with the link can view
           </p>
-          <p className="mt-1 text-[14px] leading-6 text-gray-200 dark:text-gray-100">
+          <p className="mt-1 text-[14px] leading-6 text-gray-200 dark:text-preview-dark-paragraph">
             cajaun.com/project/valmiera
           </p>
         </div>
 
-        <div className="my-5 border-t border-dashed border-preview-border dark:border-preview-dark-border" />
+        <div className="my-5 border-t border-dashed border-preview-border dark:border-preview-dark-border-strong" />
 
         <div>
-          <h3 className="text-[15px] font-medium tracking-[-0.01em] text-black dark:text-white">
+          <h3 className="text-[15px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
             People with access
           </h3>
-          <p className="mt-1 text-[14px] leading-6 text-gray-200 dark:text-gray-100">
+          <p className="mt-1 text-[14px] leading-6 text-gray-200 dark:text-preview-dark-paragraph">
             Email addresses at these domains are allowed.
           </p>
-          <div className="mt-4 rounded-xl border border-preview-border bg-preview-surface px-3 py-3 dark:border-preview-dark-border dark:bg-preview-dark-surface">
-            <p className="text-[14px] text-gray-200 dark:text-gray-100">
+          <div className="mt-4 rounded-xl border border-preview-border bg-preview-surface px-3 py-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
+            <p className="text-[14px] text-gray-200 dark:text-preview-dark-paragraph">
               Search by name, email or group
             </p>
           </div>
           <div className="mt-4 flex items-center gap-3">
             <Avatar initials="JB" />
             <div className="flex-1">
-              <p className="text-[15px] font-medium tracking-[-0.01em] text-black dark:text-white">
+              <p className="text-[15px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
                 Justin Brown
               </p>
-              <p className=" text-[14px]  text-gray-200 dark:text-gray-100">
+              <p className=" text-[14px]  text-gray-200 dark:text-preview-dark-paragraph">
                 justin@gmail.com
               </p>
             </div>
-            <p className="text-[14px] font-medium tracking-[-0.01em] text-gray-200 dark:text-gray-100">
+            <p className="text-[14px] font-medium tracking-[-0.01em] text-gray-200 dark:text-preview-dark-paragraph">
               Viewer
             </p>
           </div>
-          <div className="mt-4 rounded-xl border border-preview-border bg-preview-surface-muted px-4 py-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
-            <p className="text-[15px] font-medium tracking-[-0.01em] text-black dark:text-white">
+          <div className="mt-4 rounded-xl border border-preview-border bg-preview-surface-muted px-4 py-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
+            <p className="text-[15px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
               Create a group
             </p>
           </div>
         </div>
 
-        <div className="mt-5 flex items-center justify-between gap-3 border-t border-preview-border pt-5 dark:border-preview-dark-border">
-          <div className="rounded-xl border border-preview-border bg-preview-surface-muted px-4 py-2.5 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
-            <p className="text-[14px] font-medium tracking-[-0.01em] text-black dark:text-white">
+        <div className="mt-5 flex items-center justify-between gap-3 border-t border-preview-border pt-5 dark:border-preview-dark-border-strong">
+          <div className="rounded-xl border border-preview-border bg-preview-surface-muted px-4 py-2.5 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
+            <p className="text-[14px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
               Get embed code
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-black px-4 py-2.5 dark:bg-preview-surface"
+            className="rounded-xl bg-preview-text px-4 py-2.5 dark:bg-preview-dark-active"
           >
-            <p className="text-[14px] font-semibold tracking-[-0.01em] text-white dark:text-black">
+            <p className="text-[14px] font-semibold tracking-[-0.01em] text-white dark:text-preview-dark-text">
               Done
             </p>
           </button>
@@ -286,7 +286,7 @@ export function PortalLayerPreview() {
       }
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
-          <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">
+          <p className="text-center text-[13px] text-gray-200 dark:text-preview-dark-paragraph">
             The trigger stays in the page. The dialog moves to a cleaner layer.
           </p>
         </div>
@@ -294,18 +294,18 @@ export function PortalLayerPreview() {
     >
       <div className="bg-preview-surface px-4 py-10 sm:px-12 dark:bg-preview-dark-stage">
         <div className="relative mx-auto max-w-xl overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface">
-          <div className="flex h-12 items-center justify-between border-b border-preview-border px-4 dark:border-preview-dark-border">
+          <div className="flex h-12 items-center justify-between border-b border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
             <SkeletonLine className="h-4 w-28" />
-            <div className="h-8 w-20 rounded-full bg-black dark:bg-preview-surface" />
+            <div className="h-8 w-20 rounded-full bg-preview-text dark:bg-preview-dark-active" />
           </div>
           <div className="grid gap-4 p-4 md:grid-cols-[minmax(0,1fr)_15rem]">
             <div className="space-y-3">
-              <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+              <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
                 <SkeletonLine className="h-4 w-40" />
                 <SkeletonLine className="mt-2 h-3 w-44" />
               </div>
-              <div className="relative h-[12rem] overflow-hidden rounded-xl border border-dashed border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
-                <div className="mb-3 flex h-9 items-center rounded-lg border border-preview-border bg-preview-surface px-3 dark:border-preview-dark-border dark:bg-preview-dark-surface">
+              <div className="relative h-[12rem] overflow-hidden rounded-xl border border-dashed border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
+                <div className="mb-3 flex h-9 items-center rounded-lg border border-preview-border bg-preview-surface px-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface">
                   <SkeletonLine className="h-3 w-24" />
                 </div>
                 <div className="space-y-2">
@@ -326,12 +326,12 @@ export function PortalLayerPreview() {
               </div>
             </div>
 
-            <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+            <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
               <SkeletonLine className="h-4 w-24" />
               <SkeletonLine className="mt-2 h-3 w-32" />
               <div className="mt-4 space-y-2">
-                <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border dark:bg-preview-dark-surface" />
-                <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border dark:bg-preview-dark-surface" />
+                <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
+                <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
               </div>
             </div>
           </div>
@@ -370,7 +370,7 @@ export function ModalFocusPreview() {
       }
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
-          <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">
+          <p className="text-center text-[13px] text-gray-200 dark:text-preview-dark-paragraph">
             The page behind the dialog should stop competing for focus and scroll.
           </p>
         </div>
@@ -378,9 +378,9 @@ export function ModalFocusPreview() {
     >
       <div className="bg-preview-surface px-4 py-10 sm:px-12 dark:bg-preview-dark-stage">
         <div className="relative mx-auto max-w-xl overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface">
-          <div className="flex h-12 items-center justify-between border-b border-preview-border px-4 dark:border-preview-dark-border">
+          <div className="flex h-12 items-center justify-between border-b border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
             <SkeletonLine className="h-4 w-28" />
-            <div className="h-8 w-20 rounded-full bg-black dark:bg-preview-surface" />
+            <div className="h-8 w-20 rounded-full bg-preview-text dark:bg-preview-dark-active" />
           </div>
           <div className="overflow-hidden">
             <div
@@ -390,12 +390,12 @@ export function ModalFocusPreview() {
               )}
             >
               <div className="space-y-3">
-                <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+                <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
                   <SkeletonLine className="h-4 w-40" />
                   <SkeletonLine className="mt-2 h-3 w-44" />
                 </div>
-                <div className="relative h-[12rem] overflow-hidden rounded-xl border border-dashed border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
-                  <div className="mb-3 flex h-9 items-center rounded-lg border border-preview-border bg-preview-surface px-3 dark:border-preview-dark-border dark:bg-preview-dark-surface">
+                <div className="relative h-[12rem] overflow-hidden rounded-xl border border-dashed border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
+                  <div className="mb-3 flex h-9 items-center rounded-lg border border-preview-border bg-preview-surface px-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface">
                     <SkeletonLine className="h-3 w-24" />
                   </div>
                   <div className="space-y-2">
@@ -406,12 +406,12 @@ export function ModalFocusPreview() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+              <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
                 <SkeletonLine className="h-4 w-24" />
                 <SkeletonLine className="mt-2 h-3 w-32" />
                 <div className="mt-4 space-y-2">
-                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border dark:bg-preview-dark-surface" />
-                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border dark:bg-preview-dark-surface" />
+                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
+                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
                 </div>
               </div>
             </div>
@@ -457,7 +457,7 @@ export function ModalShiftPreview() {
       }
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
-          <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">
+          <p className="text-center text-[13px] text-gray-200 dark:text-preview-dark-paragraph">
             Reserve the scrollbar gap so the page does not shift when scroll locks.
           </p>
         </div>
@@ -465,9 +465,9 @@ export function ModalShiftPreview() {
     >
       <div className="bg-preview-surface px-4 py-10 sm:px-12 dark:bg-preview-dark-stage">
         <div className="relative mx-auto max-w-xl overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface">
-          <div className="flex h-12 items-center justify-between border-b border-preview-border px-4 dark:border-preview-dark-border">
+          <div className="flex h-12 items-center justify-between border-b border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
             <SkeletonLine className="h-4 w-28" />
-            <div className="h-8 w-20 rounded-full bg-black dark:bg-preview-surface" />
+            <div className="h-8 w-20 rounded-full bg-preview-text dark:bg-preview-dark-active" />
           </div>
           <div className="overflow-hidden">
             <div
@@ -477,12 +477,12 @@ export function ModalShiftPreview() {
               )}
             >
               <div className="space-y-3">
-                <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+                <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
                   <SkeletonLine className="h-4 w-40" />
                   <SkeletonLine className="mt-2 h-3 w-44" />
                 </div>
-                <div className="relative h-[12rem] overflow-hidden rounded-xl border border-dashed border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
-                  <div className="mb-3 flex h-9 items-center rounded-lg border border-preview-border bg-preview-surface px-3 dark:border-preview-dark-border dark:bg-preview-dark-surface">
+                <div className="relative h-[12rem] overflow-hidden rounded-xl border border-dashed border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
+                  <div className="mb-3 flex h-9 items-center rounded-lg border border-preview-border bg-preview-surface px-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface">
                     <SkeletonLine className="h-3 w-24" />
                   </div>
                   <div className="space-y-2">
@@ -493,12 +493,12 @@ export function ModalShiftPreview() {
                 </div>
               </div>
 
-              <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+              <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
                 <SkeletonLine className="h-4 w-24" />
                 <SkeletonLine className="mt-2 h-3 w-32" />
                 <div className="mt-4 space-y-2">
-                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border dark:bg-preview-dark-surface" />
-                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border dark:bg-preview-dark-surface" />
+                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
+                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
                 </div>
               </div>
             </div>
@@ -537,7 +537,7 @@ export default function ModalPreview() {
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="flex h-9 min-w-16 select-none items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium text-black shadow-custom transition-[scale,color,background-color,shadow] duration-200 ease-out will-change-transform active:scale-[0.97] dark:bg-preview-dark-surface dark:text-white "
+              className="flex h-9 min-w-16 select-none items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium text-preview-text shadow-custom transition-[scale,color,background-color,shadow] duration-200 ease-out will-change-transform active:scale-[0.97] dark:bg-preview-dark-surface dark:text-preview-dark-text "
             >
               Open
             </button>

@@ -141,13 +141,12 @@ export default function TwitterImageGridPreview({
             <div
               className={cn(
                 "relative flex h-full w-full items-center justify-center",
-                "border border-[lab(91.996%_-0.0000298023_0.0000119209)]",
-                "bg-[lab(96.752%_0_0)] dark:border-[lab(17.06%_0_0)] dark:bg-[lab(8.708%_0_0)]",
+                "border border-preview-border bg-preview-surface-active shadow-custom dark:border-preview-dark-border dark:bg-preview-dark-surface-muted",
                 imageGrid(index, totalImages),
               )}
             >
               {showLabels ? (
-                <div className="flex h-6 w-12 select-none items-center justify-center rounded-full bg-[lab(100%_0_0)] text-xs font-medium shadow-custom dark:bg-[lab(3.04863%_0_0)]">
+                <div className="flex h-6 w-12 select-none items-center justify-center rounded-full bg-preview-surface text-xs font-medium text-preview-text shadow-custom dark:bg-preview-dark-surface dark:text-preview-dark-text">
                   {index + 1}
                 </div>
               ) : null}

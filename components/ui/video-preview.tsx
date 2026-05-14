@@ -8,20 +8,20 @@ import {
   ReactNode,
   memo,
 } from "react";
-import Image from "next/image";
 import PreviewCard from "@/components/ui/previews";
 import { cn } from "@/lib/utils";
 
-// Memoized phone frame to prevent re-renders
 const PhoneFrame = memo(function PhoneFrame() {
   return (
-    <Image
+    <img
       src="/phone-frame.png"
       alt="Phone"
       width={227}
       height={450}
       className="pointer-events-none relative z-10 select-none"
-      sizes="227px"
+      loading="eager"
+      decoding="async"
+      fetchPriority="low"
     />
   );
 });
@@ -60,13 +60,15 @@ export function VideoPreview({
       ([entry]) => {
         const isVisible = entry.isIntersecting;
 
-        setIsInView(isVisible);
+        setIsInView((current) =>
+          current === isVisible ? current : isVisible,
+        );
 
         if (isVisible) {
           setShouldLoadVideo(true);
         }
       },
-      { rootMargin: "300px 0px", threshold: 0.2 },
+      { rootMargin: "900px 0px", threshold: 0.01 },
     );
 
     observer.observe(container);
@@ -81,7 +83,11 @@ export function VideoPreview({
       return;
     }
 
-    if (isPlaying && isInView) {
+    if (
+      isPlaying &&
+      isInView &&
+      video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+    ) {
       video.play().catch(() => undefined);
     } else {
       video.pause();
@@ -94,7 +100,8 @@ export function VideoPreview({
     if (isPlaying) {
       videoRef.current.pause();
     } else {
-      videoRef.current.play();
+      setShouldLoadVideo(true);
+      videoRef.current.play().catch(() => undefined);
     }
     setIsPlaying(!isPlaying);
   }, [isPlaying]);
@@ -108,7 +115,7 @@ export function VideoPreview({
       full={full}
       video
     >
-      <div className="relative">
+      <div className="relative [contain:content]">
         <div className="flex items-center justify-center">
           <div ref={containerRef} className="relative inline-block">
             <PhoneFrame />
@@ -120,9 +127,13 @@ export function VideoPreview({
                   src={shouldLoadVideo ? src : undefined}
                   loop
                   playsInline
-                  autoPlay={shouldLoadVideo}
                   muted
                   preload={shouldLoadVideo ? "metadata" : "none"}
+                  onLoadedData={() => {
+                    if (isPlaying && isInView) {
+                      videoRef.current?.play().catch(() => undefined);
+                    }
+                  }}
                   className="h-full w-full"
                 />
 

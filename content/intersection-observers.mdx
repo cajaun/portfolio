@@ -7,6 +7,7 @@ export const metadata = {
 
 import {
   ActivePostPreview,
+  CarouselPrefetchPreview,
   InfiniteFeedPreview,
 } from "@/components/ui/intersection-observer-preview";
 
@@ -148,6 +149,37 @@ const observer = new IntersectionObserver(
 There are a few things going on here. The observer watches several posts at once. More than one can intersect at the same time, so the code picks the one with the highest `intersectionRatio`. That gives you one clear winner for autoplay, highlighting, or engagement tracking.
 
 I like this approach more than checking offsets by hand. It adapts better when cards have different heights, and it keeps the logic tied to the posts themselves instead of a set of cached measurements.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Carousel prefetch
+
+The same idea works inside horizontal containers. A carousel can observe each card against its own scroll root and start work before the card is fully centered.
+
+<CarouselPrefetchPreview />
+
+That is useful for image decoding, media preparation, or lightweight data prefetching. You do not need to watch every horizontal scroll event. You only need to know when a card is close enough to be worth preparing.
+
+```ts
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        preloadCard((entry.target as HTMLElement).dataset.cardId!);
+      }
+    });
+  },
+  {
+    root: carouselScroller,
+    threshold: 0.25,
+    rootMargin: "0px 32% 0px 32%",
+  },
+);
+```
+
+The horizontal `rootMargin` expands the carousel root on both sides. That means the next card can become ready before the user lands on it, without coupling the behavior to hand-written scroll math.
 
 </section>
 

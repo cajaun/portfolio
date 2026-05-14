@@ -30,7 +30,7 @@ export default function PreviewCard({
         {header ? (
           <div
             className={cn(
-              "flex h-[61px] items-center border-b border-preview-border bg-preview-surface-muted px-4 text-preview-text dark:border-preview-dark-border dark:bg-preview-dark-surface-muted dark:text-white",
+              "flex h-[61px] items-center border-b border-preview-border bg-preview-surface-muted px-4 text-preview-text dark:border-preview-dark-border dark:bg-preview-dark-surface-muted dark:text-preview-dark-text",
               headerClassName,
             )}
           >
@@ -42,7 +42,7 @@ export default function PreviewCard({
           className={`
     ${full ? "preview-card-inner-full" : "preview-card-inner"}
     ${full && !footer && !header ? (video ? "px-4 py-8" : "px-4 py-16") : ""}
-    ${scrollable ? "h-[28rem] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" : ""}
+    ${scrollable ? "h-[28rem] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" : ""}
   `}
           style={
             scrollable

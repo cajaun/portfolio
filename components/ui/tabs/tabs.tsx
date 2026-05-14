@@ -94,7 +94,7 @@ export function AnimatedTabs({
               <button
                 ref={activeTab === tab.id ? activeScrollTabRef : null}
                 type="button"
-                className={`flex h-9 items-center gap-2 rounded-full px-3 font-medium text-preview-text-muted transition duration-200 ease-in-out hover:text-black active:scale-[0.97] dark:text-gray-100 hover:dark:text-white`}
+                className={`flex h-9 items-center gap-2 rounded-full px-3 font-medium text-preview-text-muted transition duration-200 ease-in-out hover:text-preview-text active:scale-[0.97] dark:text-preview-dark-text-muted hover:dark:text-preview-dark-text`}
                 onClick={() => handleClick(tab.id)}
               >
                 {tab.icon && <span className="size-5">{tab.icon}</span>}
@@ -112,14 +112,14 @@ export function AnimatedTabs({
             clipPath: "inset(0px 80.41% 0px 3.5% round 999px)",
           }}
         >
-          <ul className="relative flex w-max gap-2 rounded-full bg-gray-300 dark:bg-[#2A2A2A]">
+          <ul className="relative flex w-max gap-2 rounded-full bg-preview-surface-active dark:bg-preview-dark-active">
             {tabs.map((tab) => (
               <li key={tab.id}>
                 <button
                   ref={activeTab === tab.id ? activeTabRef : null}
                   tabIndex={-1}
                   type="button"
-                  className={`flex h-9 items-center gap-2 rounded-full px-3 font-medium text-black dark:text-white `}
+                  className={`flex h-9 items-center gap-2 rounded-full px-3 font-medium text-preview-text dark:text-white `}
                 >
                   {tab.icon && <span className="size-5">{tab.icon}</span>}
                   <span>{tab.name}</span>

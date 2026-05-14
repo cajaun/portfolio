@@ -42,7 +42,7 @@ html.dark pre[data-theme*="github-dark"] span {
   box-shadow: 0 0 0 1px #ffffff14;
 }
 .dark .prose pre {
-  background-color: lab(3.04863% 0 0) !important;
+  background-color: lab(5.09437% -0.00000745058 0) !important;
   box-shadow: 0 0 0 1px #ffffff14;
 }
 
@@ -63,12 +63,16 @@ html.dark pre[data-theme*="github-dark"] span {
 }
 
 .dark .prose :not(pre) > code {
-  background-color: lab(3.04863% 0 0);
+  background-color: lab(5.09437% -0.00000745058 0);
   border: 1px solid lab(11.724% 0 0);
 }
 
 .prose p {
-  @apply my-4 text-gray-200 dark:text-gray-100 font-medium leading-6 tracking-[-0.1px];
+  @apply my-4 font-medium leading-6 tracking-[-0.1px];
+}
+
+.prose p:not([class*="text-"]) {
+  @apply text-gray-200 dark:text-gray-100;
 }
 
 .blog-content > * {
@@ -104,7 +108,7 @@ html.dark pre[data-theme*="github-dark"] span {
 }
 
 .dark .preview-card {
-  background: lab(3.04863% 0 0);
+  background: lab(4.4379% 0 0);
   box-shadow: 0 0 0 1px #ffffff14;
 }
 

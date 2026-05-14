@@ -6,7 +6,7 @@ const Footer = () => {
 
   return (
     <footer
-      className="mx-auto mt-auto w-full max-w-screen-sm border-t border-[#EBEBEB] px-4 dark:border-[#2C2C2B] animate-slide-down-fade"
+      className="mx-auto mt-auto w-full max-w-screen-sm border-t border-preview-border px-4 dark:border-preview-dark-border animate-slide-down-fade"
       style={{ animationDelay: "450ms" }}
     >
       <div

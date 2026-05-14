@@ -266,7 +266,7 @@ function ChromeButton({
   return (
     <button
       type="button"
-      className={`flex items-center justify-center rounded-xl border border-[#EBEBEB] bg-[#FCFCFC] text-black dark:border-[#2C2C2B] dark:bg-[lab(8.708%_0_0)] dark:text-white ${className ?? ""}`}
+      className={`flex items-center justify-center rounded-xl border border-preview-border bg-preview-surface text-preview-text dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-preview-dark-text ${className ?? ""}`}
       {...props}
     >
       {children}
@@ -284,7 +284,7 @@ The second piece is the link-permission row.
 ```tsx
 function ShareRow() {
   return (
-    <div className="mt-5 rounded-xl border border-[#EBEBEB] bg-[#FCFCFC] p-4 dark:border-[#2C2C2B] dark:bg-[lab(8.708%_0_0)]">
+    <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-4 dark:border-preview-dark-border dark:bg-preview-dark-stage">
       <div className="flex items-start gap-3">
         <Link2 className="mt-0.5 size-4 text-gray-200 dark:text-gray-100" />
         <div className="min-w-0 flex-1">
