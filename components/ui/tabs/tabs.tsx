@@ -28,13 +28,14 @@ export function AnimatedTabs({
   );
   const activeTab = activeTabId ?? internalActiveTab;
 
+  const tabScrollerRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const activeScrollTabRef = useRef<HTMLButtonElement>(null);
   const activeTabRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const activeEl = activeScrollTabRef.current;
-    const scroller = activeEl?.parentElement?.parentElement;
+    const scroller = tabScrollerRef.current;
 
     if (!activeEl || !scroller) {
       return;
@@ -79,6 +80,7 @@ export function AnimatedTabs({
   return (
     <div className={withBottomMargin ? "mb-4 w-full" : "w-full"}>
       <div
+        ref={tabScrollerRef}
         className="relative flex w-full flex-col overflow-x-auto whitespace-nowrap px-6 scrollbar-none animate-slide-down-fade"
         style={{
           overflowX: "auto",
@@ -92,7 +94,7 @@ export function AnimatedTabs({
               <button
                 ref={activeTab === tab.id ? activeScrollTabRef : null}
                 type="button"
-                className={`flex h-9 items-center gap-2 rounded-full px-3 font-medium text-gray-200 transition duration-200 ease-in-out hover:text-black active:scale-[0.97] dark:text-gray-100 hover:dark:text-white`}
+                className={`flex h-9 items-center gap-2 rounded-full px-3 font-medium text-preview-text-muted transition duration-200 ease-in-out hover:text-black active:scale-[0.97] dark:text-gray-100 hover:dark:text-white`}
                 onClick={() => handleClick(tab.id)}
               >
                 {tab.icon && <span className="size-5">{tab.icon}</span>}

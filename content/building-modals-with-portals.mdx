@@ -8,6 +8,7 @@ export const metadata = {
 import PreviewCard from "@/components/ui/previews";
 import ModalPreview, {
   ModalFocusPreview,
+  ModalShiftPreview,
   PortalLayerPreview,
 } from "@/components/ui/modal-preview";
 
@@ -141,6 +142,7 @@ useEffect(() => {
   }
 
   const previousOverflow = document.body.style.overflow;
+
   document.body.style.overflow = "hidden";
 
   return () => {
@@ -176,6 +178,46 @@ useEffect(() => {
 `Escape` is still part of the behavior, but it sits inside a bigger contract: the modal is a temporary context. While that context is active, keyboard movement should stay inside it and page scroll should wait.
 
 <ModalFocusPreview />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Scrollbar gap
+
+There is one detail hidden inside scroll locking: the scrollbar gap. On pages with a visible scrollbar, setting `overflow: hidden` removes the scrollbar and gives the page a little more horizontal space. If the layout is centered, that extra space can make the whole page jump sideways when the modal opens.
+
+The fix is to measure the missing scrollbar width and reserve that space while scroll is locked.
+
+```tsx
+useEffect(() => {
+  if (!open) {
+    return;
+  }
+
+  const root = document.documentElement;
+  const scrollbarWidth = window.innerWidth - root.clientWidth;
+  const previousOverflow = root.style.overflow;
+  const previousPaddingRight = root.style.paddingRight;
+
+  root.style.overflow = "hidden";
+
+  if (scrollbarWidth > 0) {
+    root.style.paddingRight = previousPaddingRight
+      ? `calc(${previousPaddingRight} + ${scrollbarWidth}px)`
+      : `${scrollbarWidth}px`;
+  }
+
+  return () => {
+    root.style.overflow = previousOverflow;
+    root.style.paddingRight = previousPaddingRight;
+  };
+}, [open]);
+```
+
+I prefer applying the compensation to the root element because it avoids fighting page-level body transitions. The important part is restoring both values when the modal closes.
+
+<ModalShiftPreview />
 
 </section>
 

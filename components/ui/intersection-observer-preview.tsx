@@ -105,20 +105,6 @@ function buildFeedBatch(start: number, count: number) {
   });
 }
 
-function PreviewHeader({ title, badge }: { title: string; badge: string }) {
-  return (
-    <div className="flex w-full items-center justify-center gap-2 text-center">
-      <p className="min-w-0 truncate text-sm font-medium tracking-[-0.01em] text-black dark:text-white">
-        {title}
-      </p>
-      <span className="text-sm text-gray-200 dark:text-gray-100">/</span>
-      <p className="min-w-0 truncate text-sm font-medium tracking-[-0.01em] text-gray-200 dark:text-gray-100">
-        {badge}
-      </p>
-    </div>
-  );
-}
-
 function ActivePostHeader({
   activePost,
   onChange,
@@ -160,14 +146,14 @@ function FeedPost({
   return (
     <article
       className={cn(
-        "rounded-[1.1rem] border p-3 transition-colors",
+        "rounded-[1.1rem] bg-preview-surface p-1 shadow-custom transition-colors dark:bg-preview-dark-surface",
         active
-          ? "border-[#EBEBEB] bg-white shadow-custom dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]"
-          : "border-[#EBEBEB] bg-white dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)]",
+          ? "ring-1 ring-preview-border dark:ring-preview-dark-border"
+          : "",
       )}
     >
-      <div className="flex  gap-3">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[#EBEBEB] bg-[#FCFCFC] text-[12px] font-medium tracking-[-0.01em] text-black dark:border-[#2C2C2B] dark:bg-[lab(8.708%_0_0)] dark:text-white mt-2">
+      <div className="flex gap-3 rounded-[0.9rem] border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-preview-border bg-preview-surface-muted text-[12px] font-medium tracking-[-0.01em] text-preview-text dark:border-preview-dark-border dark:bg-preview-dark-surface-muted dark:text-white mt-2">
           {author
             .split(" ")
             .map((part) => part[0])
@@ -176,15 +162,17 @@ function FeedPost({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-start gap-1 ">
-            <p className="truncate text-sm font-medium text-black dark:text-white">
+            <p className="truncate text-sm font-medium text-preview-text dark:text-white">
               {author}
             </p>
-            <p className="truncate text-sm text-gray-200 dark:text-gray-100">
+            <p className="truncate text-sm text-preview-text-muted dark:text-gray-100">
               {handle}
             </p>
-            <p className="text-sm  text-gray-200 dark:text-gray-100">· 1h</p>
+            <p className="text-sm text-preview-text-muted dark:text-gray-100">
+              · 1h
+            </p>
           </div>
-          <p className="text-sm  text-black dark:text-white">
+          <p className="text-sm text-preview-text dark:text-white">
             {body}
           </p>
           <div className="hidden sm:block">
@@ -207,7 +195,7 @@ function PostGrid({
   return (
     <div
       className={cn(
-        "overflow-hidden rounded-[0.9rem] bg-[lab(94.78%_0_0)] p-[3px]  dark:bg-[lab(17.06%_0_0)]",
+        "overflow-hidden rounded-[0.9rem] bg-preview-surface-muted p-[3px] dark:bg-preview-dark-stage",
         className,
       )}
     >
@@ -289,22 +277,23 @@ export function InfiniteFeedPreview() {
       full
       scrollable
       scrollContainerRef={rootRef}
-      header={
-        <PreviewHeader title="Infinite feed" badge={`${posts.length} posts`} />
-      }
       footer={
         <div className="flex w-full flex-wrap items-center justify-center gap-2">
           <button
             type="button"
             onClick={() => {
+              const root = rootRef.current;
               isResettingRef.current = true;
               canLoadMoreRef.current = false;
               setLoading(false);
               setHasLoadedMore(false);
               setPosts(buildFeedBatch(0, 4));
-              rootRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+
+              window.requestAnimationFrame(() => {
+                root?.scrollTo({ top: 0, behavior: "smooth" });
+              });
             }}
-            className="flex h-9 items-center justify-center rounded-lg border border-[#EBEBEB] bg-white px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)] dark:text-white"
+            className="flex h-9 items-center justify-center rounded-lg  bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-white"
           >
             Reset feed
           </button>
@@ -317,7 +306,7 @@ export function InfiniteFeedPreview() {
                 node.scrollTo({ top: node.scrollHeight, behavior: "smooth" });
               }
             }}
-            className="flex h-9 items-center justify-center rounded-lg bg-[lab(12.304%_-0.00000745058_0)] px-3 text-sm font-medium tracking-[-0.01em] text-white transition-transform duration-200 active:scale-[0.98] dark:bg-white dark:text-black"
+            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-white"
           >
             Trigger load
           </button>
@@ -331,7 +320,7 @@ export function InfiniteFeedPreview() {
         </div>
       }
     >
-      <div className="w-full bg-[lab(94.78%_0_0)] px-4 sm:px-12 py-4 dark:bg-[lab(17.06%_0_0)]">
+      <div className="w-full bg-preview-surface px-4 sm:px-12 py-4 dark:bg-preview-dark-stage">
         <div className="w-full space-y-3">
           {posts.map((post, index) => (
             <FeedPost
@@ -344,7 +333,7 @@ export function InfiniteFeedPreview() {
           ))}
 
           <div ref={sentinelRef} className="flex justify-center">
-            <div className="flex h-7 select-none items-center justify-center whitespace-nowrap rounded-md bg-[var(--color-preview-bg,#ffffff)] px-2  text-sm font-medium shadow-custom dark:bg-[lab(3.04863%_0_0)]">
+            <div className="flex h-7 select-none items-center justify-center whitespace-nowrap rounded-md border border-preview-border bg-preview-surface-muted px-2 text-sm font-medium shadow-custom dark:border-preview-dark-border dark:bg-preview-dark-surface">
               {loading
                 ? "Loading next posts..."
                 : hasLoadedMore
@@ -495,7 +484,7 @@ export function ActivePostPreview() {
             onClick={() =>
               rootRef.current?.scrollTo({ top: 0, behavior: "smooth" })
             }
-            className="flex h-9 items-center justify-center rounded-lg border border-[#EBEBEB] bg-white px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-[#2C2C2B] dark:bg-[lab(3.04863%_0_0)] dark:text-white"
+            className="flex h-9 items-center justify-center rounded-lg  bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-white"
           >
             Restart feed
           </button>
@@ -512,7 +501,7 @@ export function ActivePostPreview() {
               );
               scrollToPost(mainPosts[nextMainIndex].id);
             }}
-            className="flex h-9 items-center justify-center rounded-lg bg-[lab(12.304%_-0.00000745058_0)] px-3 text-sm font-medium tracking-[-0.01em] text-white transition-transform duration-200 active:scale-[0.98] dark:bg-white dark:text-black"
+            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-black shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-white"
           >
             Next active post
           </button>
@@ -526,7 +515,7 @@ export function ActivePostPreview() {
         </div>
       }
     >
-      <div className="w-full bg-[lab(94.78%_0_0)] px-4 py-4 sm:px-12 dark:bg-[lab(17.06%_0_0)]">
+      <div className="w-full bg-preview-surface px-4 py-4 sm:px-12 dark:bg-preview-dark-stage">
         <div className="w-full">
           <div className="space-y-3">
             {mediaPosts.map((post, index) => {
