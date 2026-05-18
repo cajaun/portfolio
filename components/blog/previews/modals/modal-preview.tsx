@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
-import PreviewCard from "@/components/ui/previews";
+import PreviewCard from "@/components/blog/previews/shared/preview-card";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 

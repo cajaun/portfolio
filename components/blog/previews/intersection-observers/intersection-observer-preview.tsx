@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import PreviewCard from "@/components/ui/previews";
-import TwitterImageGridPreview from "@/components/ui/twitter-image-grid-preview";
+import PreviewCard from "@/components/blog/previews/shared/preview-card";
+import TwitterImageGridPreview from "@/components/blog/previews/twitter-image-grid";
 import { AnimatedTabs } from "@/components/ui/tabs/tabs";
 import { cn } from "@/lib/utils";
 

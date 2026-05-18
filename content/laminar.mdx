@@ -5,8 +5,7 @@ export const metadata = {
     "How I built a character-level morphing text component for React Native, from grapheme splitting and identity tracking to number lanes, motion, and auto-sizing.",
 };
 
-import { VideoPreview } from "@/components/ui/video-preview";
-import PreviewCard from "@/components/ui/previews";
+import { LaminarVideoPreview } from "@/components/blog/previews/laminar";
 
 <section className="mb-16 px-2">
 
@@ -16,8 +15,8 @@ Most interfaces handle this by swapping the old string for the new one in a sing
 
 A morphing text component keeps that path visible. As the string changes, individual characters enter, exit, and shift position, and the container width follows along.
 
-<VideoPreview
-  src="/montage-demo.mp4"
+<LaminarVideoPreview
+  demo="montage-demo"
 />
 
 The public API is one prop.
@@ -79,8 +78,8 @@ A glyph that survives a value change should keep its key. A glyph that is new sh
 
 For text, the right way to find surviving glyphs is the Longest Common Subsequence algorithm. LCS finds the largest set of units, in order, that appears in both the previous string and the next string. Those matched units keep their keys, and the reconciler assigns fresh ones to everything else.
 
-<VideoPreview
-  src="/lcs.mp4"
+<LaminarVideoPreview
+  demo="lcs"
   footnote={
     <div className="mt-4 flex w-full select-none items-center justify-center text-center">
       <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">
@@ -178,8 +177,8 @@ Numbers look like text but they follow different rules. When `$1,234` changes to
 
 The numeric reconciler treats the value as a column-aligned structure instead. It splits the string into a lead section, the currency symbol or any prefix before the digits, and a tail section containing the digits, separators, and signs. The tail gets padded on the left so both the previous value and the next value share the same column positions from the right.
 
-<VideoPreview
-  src="/number-lane.mp4"
+<LaminarVideoPreview
+  demo="number-lane"
   footnote={
     <div className="mt-4 flex w-full select-none items-center justify-center text-center">
       <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">
@@ -266,8 +265,8 @@ export const createShiftTransition = ({
 
 Number lanes use one extra pattern that is worth understanding on its own. Each lane renders a hidden probe text node and an absolutely positioned animated token on top of it. The probe is invisible, but it holds the lane's width in the normal layout flow. The token is what the user sees animating in and out.
 
-<VideoPreview
-  src="/probe-token.mp4"
+<LaminarVideoPreview
+  demo="probe-token"
   footnote={
     <div className="mt-4 flex w-full select-none items-center justify-center text-center">
       <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">
@@ -340,8 +339,8 @@ One rule applies to all four presets: layout transitions always use timing, even
 
 The component solves this by measuring the incoming string before it renders. A hidden text node with `opacity: 0` renders the next value at the same font size and style as the live content. Its measured width drives a shared value through the same timing configuration as everything else, so the container follows the content at the same pace.
 
-<VideoPreview
-  src="/auto-size.mp4"
+<LaminarVideoPreview
+  demo="auto-size"
   footnote={
     <div className="mt-4 flex w-full select-none items-center justify-center text-center">
       <p className="text-center text-[13px] text-gray-200 dark:text-gray-100">

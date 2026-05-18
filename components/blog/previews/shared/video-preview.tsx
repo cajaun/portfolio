@@ -8,26 +8,32 @@ import {
   ReactNode,
   memo,
 } from "react";
-import PreviewCard from "@/components/ui/previews";
+import Image from "next/image";
+import PreviewCard from "@/components/blog/previews/shared/preview-card";
 import { cn } from "@/lib/utils";
 
 const PhoneFrame = memo(function PhoneFrame() {
   return (
-    <img
-      src="/phone-frame.png"
+    <Image
+      src="/frames/phone-frame.webp"
       alt="Phone"
       width={227}
       height={450}
       className="pointer-events-none relative z-10 select-none"
-      loading="eager"
-      decoding="async"
+      loading="lazy"
       fetchPriority="low"
+      sizes="227px"
+      unoptimized
     />
   );
 });
 
-interface VideoPreviewProps {
+const LOAD_ROOT_MARGIN = "500px 0px";
+const PLAYBACK_THRESHOLD = 0.25;
+
+export interface VideoPreviewProps {
   src: string;
+  poster?: string;
   header?: ReactNode;
   headerClassName?: string;
   footer?: ReactNode;
@@ -37,6 +43,7 @@ interface VideoPreviewProps {
 
 export function VideoPreview({
   src,
+  poster,
   header,
   headerClassName,
   footer,
@@ -46,6 +53,7 @@ export function VideoPreview({
   const [isPlaying, setIsPlaying] = useState(true);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const [isInView, setIsInView] = useState(false);
+  const [hasLoadedFrame, setHasLoadedFrame] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -58,23 +66,46 @@ export function VideoPreview({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const isVisible = entry.isIntersecting;
-
-        setIsInView((current) =>
-          current === isVisible ? current : isVisible,
-        );
-
-        if (isVisible) {
+        if (entry.isIntersecting) {
           setShouldLoadVideo(true);
         }
       },
-      { rootMargin: "900px 0px", threshold: 0.01 },
+      { rootMargin: LOAD_ROOT_MARGIN, threshold: 0.01 },
     );
 
     observer.observe(container);
 
     return () => observer.disconnect();
   }, []);
+
+  useEffect(() => {
+    const container = containerRef.current;
+
+    if (!container) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const isVisible =
+          entry.isIntersecting &&
+          entry.intersectionRatio >= PLAYBACK_THRESHOLD;
+
+        setIsInView((current) =>
+          current === isVisible ? current : isVisible,
+        );
+      },
+      { threshold: [0, PLAYBACK_THRESHOLD] },
+    );
+
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    setHasLoadedFrame(false);
+  }, [src]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -95,16 +126,17 @@ export function VideoPreview({
   }, [isInView, isPlaying, shouldLoadVideo]);
 
   const togglePlay = useCallback(() => {
-    if (!videoRef.current) return;
+    setShouldLoadVideo(true);
+    setIsPlaying((current) => {
+      if (current) {
+        videoRef.current?.pause();
+      }
 
-    if (isPlaying) {
-      videoRef.current.pause();
-    } else {
-      setShouldLoadVideo(true);
-      videoRef.current.play().catch(() => undefined);
-    }
-    setIsPlaying(!isPlaying);
-  }, [isPlaying]);
+      return !current;
+    });
+  }, []);
+
+  const showVideo = hasLoadedFrame || !poster;
 
   return (
     <PreviewCard
@@ -122,19 +154,41 @@ export function VideoPreview({
 
             <div className="absolute inset-[1.25%_3.3%] z-[1] overflow-hidden rounded-[7.5%]">
               <div className="group relative h-full w-full overflow-hidden bg-black">
+                {poster ? (
+                  <Image
+                    src={poster}
+                    alt=""
+                    aria-hidden="true"
+                    fill
+                    loading="lazy"
+                    sizes="227px"
+                    unoptimized
+                    className={cn(
+                      "absolute inset-0 h-full w-full select-none transition-opacity duration-200",
+                      showVideo ? "opacity-0" : "opacity-100",
+                    )}
+                  />
+                ) : null}
                 <video
                   ref={videoRef}
                   src={shouldLoadVideo ? src : undefined}
+                  poster={poster}
                   loop
                   playsInline
                   muted
-                  preload={shouldLoadVideo ? "metadata" : "none"}
+                  preload={shouldLoadVideo ? "auto" : "none"}
                   onLoadedData={() => {
+                    setHasLoadedFrame(true);
+
                     if (isPlaying && isInView) {
                       videoRef.current?.play().catch(() => undefined);
                     }
                   }}
-                  className="h-full w-full"
+                  onError={() => setHasLoadedFrame(false)}
+                  className={cn(
+                    "relative z-10 h-full w-full transition-opacity duration-200",
+                    showVideo ? "opacity-100" : "opacity-0",
+                  )}
                 />
 
                 <button
