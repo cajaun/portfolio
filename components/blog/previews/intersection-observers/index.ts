@@ -1,5 +1,5 @@
 export {
   ActivePostPreview,
-  CarouselPrefetchPreview,
+  FeedPreparationPreview,
   InfiniteFeedPreview,
 } from "./intersection-observer-preview";

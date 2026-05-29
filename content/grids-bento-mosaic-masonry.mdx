@@ -1,0 +1,461 @@
+export const metadata = {
+  title: "Choosing Between Grid, Bento, Mosaic, and Masonry",
+  publishedAt: "May 29, 2026",
+  summary:
+    "A practical walkthrough of how tracks, gaps, flow, spans, media counts, and packing produce common layout patterns.",
+};
+
+import {
+  AspectRatioPreview,
+  AutoFlowPreview,
+  BentoExamplesPreview,
+  DensePlacementPreview,
+  EqualTracksPreview,
+  FloorPreview,
+  GapPreview,
+  IntrinsicEdgesPreview,
+  MasonryExamplesPreview,
+  MosaicExamplesPreview,
+  NamedAreasPreview,
+  RegularGridExamplesPreview,
+} from "@/components/blog/previews/grids";
+
+<section className="mb-16 px-2">
+
+Most interface layouts ask you to divide a rectangle before you style a single card.
+
+A pricing page compares plans. You give one dashboard chart more room than the rest. A photo post changes shape when the author adds a second or third image. A saved-items board lets short notes sit beside tall ones. You can name those patterns grid, bento, mosaic, and masonry. Each pattern starts with the same questions: how many tracks exist, how wide each track can get, how much space sits between items, and where the next item lands.
+
+CSS Grid gives you the base language. You define columns and rows. The browser places each item into the cells those tracks create. Once an item spans tracks, leaves a hole, or carries its own height, you get a new layout problem to solve.
+
+The work happens in order. Choose the tracks. Choose the gap. Choose the placement rule. Give one item a span if it has more work to do. Change the composition when media count changes. Pack uneven heights into columns when a row grid leaves empty space.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Tracks Set the Math
+
+You choose tracks before the cards enter the layout. Equal tracks split the container into matching shares, so each peer card gets the same width.
+
+<EqualTracksPreview />
+
+```css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+```
+
+```tsx
+const columns = {
+  two: "repeat(2, minmax(0, 1fr))",
+  three: "repeat(3, minmax(0, 1fr))",
+  four: "repeat(4, minmax(0, 1fr))",
+};
+
+<motion.div layout style={{ gridTemplateColumns: columns[count] }} />
+```
+
+`1fr` takes one share of free space. Three `1fr` columns split the row into thirds. `minmax(0, 1fr)` tells the browser that a long title or wide image cannot force the column past its assigned share. The item has to handle its own overflow.
+
+A useful grid starts from the card, so the next question is the minimum width a card can survive. Product cards may need `14rem`. A compact stat card may need `10rem`. You pick that floor from the content, then let the browser add or remove columns as the container changes.
+
+<FloorPreview />
+
+```css
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+```
+
+```tsx
+const cardMin = compact ? "10rem" : "14rem";
+
+<div
+  className="grid gap-3"
+  style={{
+    gridTemplateColumns: `repeat(auto-fit, minmax(${cardMin}, 1fr))`,
+  }}
+/>
+```
+
+`auto-fit` creates as many columns as the floor allows. The grid wraps before the cards collapse, and the last row still stretches to fill the space.
+
+Some rows need fixed edges and a flexible center. Toolbars use this pattern often: the left edge holds a label, the right edge holds actions, and the center absorbs the remaining width.
+
+<IntrinsicEdgesPreview />
+
+```css
+.toolbar {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+}
+```
+
+`max-content` lets an edge hug its controls. `minmax(0, 1fr)` gives the center the space left over. You can avoid breakpoint branches because the track definition already describes the row.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Gap Belongs to the Container
+
+Cards do not need margin rules to create grid spacing. The container owns the distance between items, so the same card can sit in a tight grid, a loose gallery, or a dense dashboard without one-off spacing rules.
+
+<GapPreview />
+
+```css
+.grid {
+  display: grid;
+  gap: 0.75rem;
+}
+```
+
+```tsx
+const gaps = {
+  none: "0px",
+  balanced: "0.75rem",
+  loose: "1.75rem",
+};
+
+<div className="grid transition-[gap]" style={{ gap: gaps[mode] }} />
+```
+
+Use one value when rows and columns need the same rhythm. Use two values when rows need stronger grouping than columns.
+
+```css
+.settings-grid {
+  row-gap: 1.25rem;
+  column-gap: 0.75rem;
+}
+```
+
+That split works well in settings pages, form groups, and admin tables where a row carries more meaning than a column.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Peer Cards Use Regular Grids
+
+A regular grid fits items that share the same job. Product cards, feature cards, plan cards, and team cards all ask the reader to compare peers.
+
+<RegularGridExamplesPreview />
+
+You define the floor once and let item count fill the rows. Six items in a three-column grid make two rows. Nine items make three rows. A wider container can take four columns without changing the card markup.
+
+```css
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+}
+```
+
+```tsx
+function ProductGrid({ products }: { products: Product[] }) {
+  return (
+    <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(14rem,1fr))]">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
+```
+
+Keep a regular grid for peers. Once one tile needs more area than another, you have changed the reading order and the pattern needs a name.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Areas Name the Shell
+
+Many screens reuse the same roles across states: header, nav, main content, aside, footer. Named areas let you move those roles without renaming the parts or chasing line numbers.
+
+<NamedAreasPreview />
+
+```css
+.dashboard {
+  display: grid;
+  grid-template-columns: 10rem minmax(0, 1fr) minmax(0, 1fr) 12rem;
+  grid-template-areas:
+    "header header header header"
+    "nav main main aside"
+    "nav main main aside"
+    "nav main main aside"
+    "footer footer footer footer";
+}
+
+.nav {
+  grid-area: nav;
+}
+
+.main {
+  grid-area: main;
+}
+```
+
+```tsx
+const areas = {
+  dashboard: {
+    nav: { gridColumn: "1", gridRow: "2 / span 3" },
+    main: { gridColumn: "2 / span 2", gridRow: "2 / span 3" },
+  },
+  article: {
+    main: { gridColumn: "1 / span 3", gridRow: "2 / span 3" },
+    nav: { gridColumn: "4", gridRow: "4" },
+  },
+};
+
+<motion.main layout style={areas[mode].main} />
+```
+
+The dashboard map gives nav a left rail. The article map gives main content the wide reading lane and moves nav into the right rail. The role names stay the same, so you can reason about the shell instead of chasing line numbers.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Media Needs Reserved Space
+
+Image grids feel jumpy if the browser learns each media height after load. Give each media block an aspect ratio and the card can reserve space before the image source finishes.
+
+<AspectRatioPreview />
+
+```css
+.media-frame {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+}
+
+.media-frame > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+```
+
+```tsx
+<div className="grid gap-3">
+  <div className="aspect-[4/3] overflow-hidden rounded-xl">
+    {src ? <img alt="" src={src} className="h-full w-full object-cover" /> : null}
+  </div>
+
+  <h3>{title}</h3>
+  <p>{summary}</p>
+</div>
+```
+
+The reserved card keeps the same height before and after the image loads. The unreserved card grows when the image arrives and pushes the text down. Reserve the media rectangle first, then tune the grid around it.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Flow Chooses the Next Cell
+
+After tracks exist, the browser places unpositioned items along one axis. Row flow fills left to right, then moves down. Column flow fills top to bottom, then moves across.
+
+<AutoFlowPreview />
+
+```css
+.row-flow {
+  grid-auto-flow: row;
+}
+
+.column-flow {
+  grid-auto-flow: column;
+}
+```
+
+```tsx
+const flowClass = flow === "row" ? "grid-flow-row" : "grid-flow-col";
+
+<div className={cn("grid grid-cols-3 grid-rows-2 gap-3", flowClass)}>
+  {items.map((item) => (
+    <Card key={item.id} />
+  ))}
+</div>
+```
+
+Use row flow for peer cards that readers scan across. Use column flow for ranked lists, queues, and short step groups. Keep source order aligned with the order a keyboard user should follow.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Bento Gives One Tile More Work
+
+Bento starts as a regular grid. You give one tile more area because it carries more information or a stronger action.
+
+<BentoExamplesPreview />
+
+```css
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 8rem;
+  gap: 1rem;
+}
+
+.lead {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+```
+
+```tsx
+const positions = {
+  equal: {
+    lead: { gridColumn: "1 / span 2", gridRow: "1" },
+  },
+  composed: {
+    lead: { gridColumn: "1 / span 2", gridRow: "1 / span 3" },
+  },
+};
+
+<motion.article layout style={positions[state].lead} />
+```
+
+Give a span a reason. A chart needs room for axes. A media tile needs enough area to show detail. A summary card needs height for copy and a control. The smaller tiles still need to complete the rectangle, or the lead tile starts to look oversized.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Dense Placement Backfills Holes
+
+A spanning item can leave an open cell. Dense placement lets the browser try later items in that cell if they fit.
+
+<DensePlacementPreview />
+
+```css
+.dense-grid {
+  display: grid;
+  grid-auto-flow: row dense;
+}
+```
+
+```tsx
+const positions = {
+  normal: {
+    card3: { gridColumn: "3", gridRow: "2" },
+  },
+  dense: {
+    card3: { gridColumn: "3", gridRow: "1" },
+  },
+};
+```
+
+This can tighten a gallery. It can also move visual order away from DOM order. Keyboard navigation follows DOM order, and screen readers announce DOM order. Use dense placement for galleries, saved cards, and browsing surfaces. Keep it away from ranked results and task queues.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Mosaic Responds to Media Count
+
+A mosaic treats a small media group as one composed surface. The item count chooses the arrangement.
+
+<MosaicExamplesPreview />
+
+One image fills the frame. Two images split the frame. Three images give the first image a vertical span. Four images create a quad.
+
+```ts
+function getMosaicKind(count: number) {
+  if (count === 1) return "single";
+  if (count === 2) return "split";
+  if (count === 3) return "lead-and-stack";
+  return "quad";
+}
+```
+
+```tsx
+function getMosaicSlot(count: number, item: number) {
+  if (count === 1) {
+    return { gridColumn: "1 / span 2", gridRow: "1 / span 2" };
+  }
+
+  if (count === 3 && item === 1) {
+    return { gridColumn: "1", gridRow: "1 / span 2" };
+  }
+
+  return undefined;
+}
+```
+
+Use a lead image when one image anchors the set. Use a split or quad when the images carry equal weight. Keep these rules close to the media card, since the rest of the feed should treat the group as one item.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Masonry Packs Uneven Heights
+
+Masonry fits content with uneven heights: notes, saved images, discovery feeds, and pin boards.
+
+<MasonryExamplesPreview />
+
+A row grid gives each row the height of its tallest card. You see empty space under shorter cards. A masonry packer keeps separate column heights and puts each new card into the shortest column.
+
+CSS columns give you a browser-native version.
+
+```css
+.masonry {
+  columns: 16rem;
+  column-gap: 1rem;
+}
+
+.masonry > * {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}
+```
+
+```ts
+type Column<T> = {
+  height: number;
+  items: T[];
+};
+
+function packIntoColumns<T extends { height: number }>(
+  items: T[],
+  columnCount: number,
+) {
+  const columns: Column<T>[] = Array.from({ length: columnCount }, () => ({
+    height: 0,
+    items: [],
+  }));
+
+  for (const item of items) {
+    const shortest = columns.reduce((best, column) =>
+      column.height < best.height ? column : best,
+    );
+
+    shortest.items.push(item);
+    shortest.height += item.height;
+  }
+
+  return columns;
+}
+```
+
+Use CSS columns when you want a simple visual pack. Use a JavaScript packer when you need virtualization, drag and drop, or stable column ownership.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Pick the Pattern From the Job
+
+Start with the reader's task.
+
+Use a regular grid when the reader compares peers. Use named areas when a screen has stable roles. Use bento when one tile carries more work than the rest. Use mosaic when a single card contains a small media set. Use masonry when browsing content has uneven heights.
+
+Test the pattern with real counts before you ship it. Seven bento tiles can leave a lonely card. Three masonry items can make one sparse column. A two-image mosaic can feel balanced while a three-image set needs a lead. Run those count tests while you build the layout, then keep the rule that survives them.
+
+</section>

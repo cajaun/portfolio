@@ -7,7 +7,7 @@ export const metadata = {
 
 import {
   ActivePostPreview,
-  CarouselPrefetchPreview,
+  FeedPreparationPreview,
   InfiniteFeedPreview,
 } from "@/components/blog/previews/intersection-observers";
 
@@ -154,32 +154,50 @@ I like this approach more than checking offsets by hand. It adapts better when c
 
 <section className="mb-16 px-2">
 
-## Carousel prefetch
+## Preparing feed cards
 
-The same idea works inside horizontal containers. A carousel can observe each card against its own scroll root and start work before the card is fully centered.
+You can render a cheap image card below the fold, then expand it into the real media grid before the reader reaches it. The observer watches each card inside the feed root and marks it ready once it enters the prep zone.
 
-<CarouselPrefetchPreview />
+<FeedPreparationPreview />
 
-That is useful for image decoding, media preparation, or lightweight data prefetching. You do not need to watch every horizontal scroll event. You only need to know when a card is close enough to be worth preparing.
+That gives image decoding, media setup, and small fetches a head start. You do not need scroll math for each card. You only need to know when the card gets close enough to prepare.
 
-```ts
+```tsx
+const [preparedPosts, setPreparedPosts] = useState(
+  () => new Set(["design-camera"]),
+);
+
 const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        preloadCard((entry.target as HTMLElement).dataset.cardId!);
+      if (!entry.isIntersecting) {
+        return;
+      }
+
+      const id = (entry.target as HTMLElement).dataset.postId;
+
+      if (id) {
+        setPreparedPosts((posts) => new Set(posts).add(id));
       }
     });
   },
   {
-    root: carouselScroller,
-    threshold: 0.25,
-    rootMargin: "0px 32% 0px 32%",
+    root: feedScroller,
+    threshold: 0.2,
+    rootMargin: "0px 0px 40% 0px",
   },
 );
+
+feedCards.map((card) => (
+  <ImageCardSkeleton
+    key={card.id}
+    count={preparedPosts.has(card.id) ? card.imageCount : 1}
+    title={card.title}
+  />
+));
 ```
 
-The horizontal `rootMargin` expands the carousel root on both sides. That means the next card can become ready before the user lands on it, without coupling the behavior to hand-written scroll math.
+The bottom `rootMargin` expands the feed root downward. The next card can switch from the one-block placeholder to its full grid before it reaches the middle of the viewport.
 
 </section>
 

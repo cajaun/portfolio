@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import ImageCardSkeleton, {
-  type ImageCardCount,
-} from "@/components/blog/previews/shared/image-card-skeleton";
-import PreviewCard from "@/components/blog/previews/shared/preview-card";
+import PreviewCard from "@/components/ui/previews";
+import TwitterImageGridPreview from "@/components/ui/twitter-image-grid-preview";
 import { AnimatedTabs } from "@/components/ui/tabs/tabs";
 import { cn } from "@/lib/utils";
 
@@ -41,16 +39,7 @@ const feedSeed = [
   },
 ];
 
-type MediaPost = {
-  id: string;
-  author: string;
-  handle: string;
-  body: string;
-  gridSize: ImageCardCount;
-  filler?: boolean;
-};
-
-const mediaPosts: MediaPost[] = [
+const mediaPosts = [
   {
     id: "studio-tour",
     author: "Design Camera",
@@ -106,39 +95,28 @@ const mediaPosts: MediaPost[] = [
   },
 ];
 
-const preparationPosts: Array<{
-  id: string;
-  author: string;
-  gridSize: ImageCardCount;
-}> = [
+const carouselItems = [
   {
-    id: "prep-design-camera",
-    author: "Design Camera",
-    gridSize: 2,
+    id: "brief",
+    title: "Brief",
+    body: "The card enters the carousel root before it is centered.",
   },
   {
-    id: "prep-motion-notes",
-    author: "Motion Notes",
-    gridSize: 3,
+    id: "frames",
+    title: "Frames",
+    body: "The observer starts work before the user lands here.",
   },
   {
-    id: "prep-product-clips",
-    author: "Product Clips",
-    gridSize: 4,
+    id: "clips",
+    title: "Clips",
+    body: "Nearby media prepares without scroll-position math.",
   },
   {
-    id: "prep-layout-cuts",
-    author: "Layout Cuts",
-    gridSize: 2,
-  },
-  {
-    id: "prep-studio-roll",
-    author: "Studio Roll",
-    gridSize: 3,
+    id: "publish",
+    title: "Publish",
+    body: "The active card updates from the carousel center.",
   },
 ];
-
-const unpreparedGridSize: ImageCardCount = 1;
 
 function buildFeedBatch(start: number, count: number) {
   return Array.from({ length: count }, (_, index) => {
@@ -176,25 +154,76 @@ function ActivePostHeader({
 }
 
 function FeedPost({
+  author,
+  handle,
+  body,
   gridSize,
-  title,
   active = false,
 }: {
-  gridSize: ImageCardCount;
-  title?: string;
+  author: string;
+  handle: string;
+  body: string;
+  gridSize: number;
   active?: boolean;
 }) {
   return (
-    <article>
-      <ImageCardSkeleton
-        count={gridSize}
-        title={title}
-        className={cn(
-          "transition-shadow",
-          active && "ring-1 ring-preview-border dark:ring-preview-dark-border",
-        )}
-      />
+    <article
+      className={cn(
+        "rounded-[1.1rem] bg-preview-surface p-1 shadow-custom transition-colors dark:bg-preview-dark-surface",
+        active
+          ? "ring-1 ring-preview-border dark:ring-preview-dark-border"
+          : "",
+      )}
+    >
+      <div className="flex gap-3 rounded-[0.9rem] border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-stage">
+        <div className="mt-2 flex size-10 shrink-0 items-center justify-center rounded-full border border-preview-border bg-preview-surface-muted text-[12px] font-medium tracking-[-0.01em] text-[lab(12.304%_-0.00000745058_0)] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-preview-dark-text">
+          {author
+            .split(" ")
+            .map((part) => part[0])
+            .join("")
+            .slice(0, 2)}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start gap-1 ">
+            <p className="truncate text-sm font-medium text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
+              {author}
+            </p>
+            <p className="truncate text-sm text-preview-text-muted dark:text-preview-dark-text-muted">
+              {handle}
+            </p>
+            <p className="text-sm text-preview-text-muted dark:text-preview-dark-text-muted">
+              · 1h
+            </p>
+          </div>
+          <p className="text-sm text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
+            {body}
+          </p>
+          <div className="hidden sm:block">
+            <PostGrid gridSize={gridSize} />
+          </div>
+          
+        </div>
+      </div>
     </article>
+  );
+}
+
+function PostGrid({
+  gridSize,
+  className,
+}: {
+  gridSize: number;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "overflow-hidden rounded-[0.9rem] bg-preview-surface-muted p-[3px] dark:bg-preview-dark-stage",
+        className,
+      )}
+    >
+      <TwitterImageGridPreview totalImages={gridSize} showLabels={false} />
+    </div>
   );
 }
 
@@ -315,10 +344,13 @@ export function InfiniteFeedPreview() {
       }
     >
       <div className="w-full bg-preview-surface px-4 sm:px-12 py-4 dark:bg-preview-dark-stage">
-        <div className="w-full space-y-6">
+        <div className="w-full space-y-3">
           {posts.map((post, index) => (
             <FeedPost
               key={post.id}
+              author={post.author}
+              handle={post.handle}
+              body={post.body}
               gridSize={([2, 3, 4] as const)[index % 3]}
             />
           ))}
@@ -508,7 +540,7 @@ export function ActivePostPreview() {
     >
       <div className="w-full bg-preview-surface px-4 py-4 sm:px-12 dark:bg-preview-dark-stage">
         <div className="w-full">
-          <div className="space-y-6">
+          <div className="space-y-3">
             {mediaPosts.map((post, index) => {
               const isActive = activePost === post.id;
 
@@ -521,8 +553,10 @@ export function ActivePostPreview() {
                   data-post-id={post.id}
                 >
                   <FeedPost
+                    author={post.author}
+                    handle={post.handle}
+                    body={post.body}
                     gridSize={post.gridSize}
-                    title={post.filler ? undefined : post.author}
                     active={isActive}
                   />
                 </div>
@@ -535,12 +569,12 @@ export function ActivePostPreview() {
   );
 }
 
-export function FeedPreparationPreview() {
+export function CarouselPrefetchPreview() {
   const rootRef = useRef<HTMLDivElement | null>(null);
-  const postRefs = useRef<(HTMLElement | null)[]>([]);
-  const [focusedIndex, setFocusedIndex] = useState(0);
-  const [preparedPosts, setPreparedPosts] = useState(() =>
-    new Set([preparationPosts[0].id]),
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [activeCard, setActiveCard] = useState(carouselItems[0].id);
+  const [preloadedCards, setPreloadedCards] = useState(() =>
+    new Set([carouselItems[0].id]),
   );
 
   useEffect(() => {
@@ -550,60 +584,74 @@ export function FeedPreparationPreview() {
       return;
     }
 
+    const updateActiveCard = () => {
+      const rootRect = root.getBoundingClientRect();
+      const rootCenter = rootRect.left + rootRect.width / 2;
+      const nextCard = cardRefs.current
+        .filter((node): node is HTMLDivElement => Boolean(node))
+        .map((node) => {
+          const rect = node.getBoundingClientRect();
+
+          return {
+            id: node.dataset.cardId!,
+            centerDistance: Math.abs(rect.left + rect.width / 2 - rootCenter),
+          };
+        })
+        .sort((a, b) => a.centerDistance - b.centerDistance)[0];
+
+      if (!nextCard) {
+        return;
+      }
+
+      setActiveCard(nextCard.id);
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const id = (entry.target as HTMLElement).dataset.postId;
+          const id = (entry.target as HTMLElement).dataset.cardId;
 
           if (!id) {
             return;
           }
 
           if (entry.isIntersecting) {
-            setPreparedPosts((current) => {
-              if (current.has(id)) {
-                return current;
-              }
-
-              return new Set(current).add(id);
-            });
+            setPreloadedCards((current) => new Set(current).add(id));
           }
         });
+
+        updateActiveCard();
       },
       {
         root,
-        threshold: 0.2,
-        rootMargin: "0px 0px 40% 0px",
+        threshold: [0, 0.25, 0.5, 0.75, 0.95],
+        rootMargin: "0px 32% 0px 32%",
       },
     );
 
-    postRefs.current.forEach((node) => {
+    cardRefs.current.forEach((node) => {
       if (node) {
         observer.observe(node);
       }
     });
 
+    root.addEventListener("scroll", updateActiveCard, { passive: true });
+    updateActiveCard();
+
     return () => {
+      root.removeEventListener("scroll", updateActiveCard);
       observer.disconnect();
     };
   }, []);
 
-  const scrollToPost = (index: number) => {
-    const root = rootRef.current;
-    const node = postRefs.current[index];
-
-    if (!root || !node) {
-      return;
-    }
-
-    const rootRect = root.getBoundingClientRect();
-    const nodeRect = node.getBoundingClientRect();
-    const nextTop = root.scrollTop + nodeRect.top - rootRect.top - 16;
-
-    setFocusedIndex(index);
-    root.scrollTo({
-      top: Math.max(nextTop, 0),
+  const activeIndex = carouselItems.findIndex(
+    (item) => item.id === activeCard,
+  );
+  const scrollToCard = (index: number) => {
+    cardRefs.current[index]?.scrollIntoView({
       behavior: "smooth",
+      inline: "center",
+      block: "nearest",
     });
   };
 
@@ -614,21 +662,15 @@ export function FeedPreparationPreview() {
         <div className="flex w-full flex-wrap items-center justify-center gap-2">
           <button
             type="button"
-            onClick={() => {
-              setFocusedIndex(0);
-              setPreparedPosts(new Set([preparationPosts[0].id]));
-              rootRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-            }}
+            onClick={() => scrollToCard(Math.max(activeIndex - 1, 0))}
             className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
           >
-            Reset
+            Previous
           </button>
           <button
             type="button"
             onClick={() =>
-              scrollToPost(
-                Math.min(focusedIndex + 1, preparationPosts.length - 1),
-              )
+              scrollToCard(Math.min(activeIndex + 1, carouselItems.length - 1))
             }
             className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
           >
@@ -639,45 +681,71 @@ export function FeedPreparationPreview() {
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
           <p className="text-center text-[13px] text-preview-text-muted dark:text-preview-dark-text-muted">
-            Cards switch from one media block to their full grid in the prep zone
+            Scroll sideways to preload nearby cards
           </p>
         </div>
       }
     >
       <div className="w-full bg-preview-surface px-4 py-4 sm:px-12 dark:bg-preview-dark-stage">
-        <div
-          ref={rootRef}
-          className="h-[28rem] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          <div className="space-y-6">
-            {preparationPosts.map((post, index) => {
-              const prepared = preparedPosts.has(post.id);
-              const focused = focusedIndex === index;
+        <div className="rounded-[1.1rem] bg-preview-surface p-1 shadow-custom dark:bg-preview-dark-surface">
+          <div className="rounded-[0.9rem] border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border dark:bg-preview-dark-stage">
+            <div className="mb-3 flex items-center justify-between gap-3 px-3">
+              <div>
+                <p className="text-sm font-medium text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
+                  {carouselItems[activeIndex]?.title ?? "Brief"}
+                </p>
+                <p className="text-sm text-preview-text-muted dark:text-preview-dark-text-muted">
+                  Nearby cards prepare before they land
+                </p>
+              </div>
+              <p className="shrink-0 text-sm font-medium text-preview-text-muted dark:text-preview-dark-text-muted">
+                {activeIndex + 1} / {carouselItems.length}
+              </p>
+            </div>
 
-              return (
-                <article
-                  key={post.id}
-                  ref={(node) => {
-                    postRefs.current[index] = node;
-                  }}
-                  data-post-id={post.id}
-                  className={cn(
-                    "transition-transform duration-300 ease-out",
-                    focused && "scale-[1.01]",
-                  )}
-                >
-                  <ImageCardSkeleton
-                    count={prepared ? post.gridSize : unpreparedGridSize}
-                    title={post.author}
+            <div
+              ref={rootRef}
+              className="-mx-3 flex snap-x gap-3 overflow-x-auto overscroll-x-contain px-3 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            >
+              {carouselItems.map((item, index) => {
+                const isActive = item.id === activeCard;
+                const isPreloaded = preloadedCards.has(item.id);
+
+                return (
+                  <div
+                    key={item.id}
+                    ref={(node) => {
+                      cardRefs.current[index] = node;
+                    }}
+                    data-card-id={item.id}
                     className={cn(
-                      "transition-shadow",
-                      focused &&
-                        "ring-1 ring-preview-border dark:ring-preview-dark-border",
+                      "min-w-[14rem] snap-center rounded-[0.9rem] border p-3 transition-colors sm:min-w-[16rem]",
+                      isActive
+                        ? "border-preview-border bg-preview-surface dark:border-preview-dark-border dark:bg-preview-dark-surface"
+                        : "border-preview-border bg-preview-surface-muted dark:border-preview-dark-border dark:bg-preview-dark-stage",
                     )}
-                  />
-                </article>
-              );
-            })}
+                  >
+                    <p className="text-sm font-medium text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
+                      {item.title}
+                    </p>
+                    <p className="mt-3 line-clamp-2 min-h-12 text-sm leading-6 text-[lab(12.304%_-0.00000745058_0)] dark:text-preview-dark-text">
+                      {item.body}
+                    </p>
+                    <div className="mt-6 flex items-center gap-3">
+                      <div className="h-8 flex-1 rounded-lg bg-preview-surface shadow-custom dark:bg-preview-dark-surface" />
+                      <div
+                        className={cn(
+                          "h-8 w-14 rounded-lg transition-colors",
+                          isPreloaded
+                            ? "bg-preview-surface-active shadow-custom dark:bg-preview-dark-active"
+                            : "bg-preview-border dark:bg-preview-dark-border",
+                        )}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

@@ -1,8 +1,6 @@
-import ImageCardSkeleton, {
-  type ImageCardCount,
-} from "@/components/blog/previews/shared/image-card-skeleton";
+import { cn } from "@/lib/utils";
 
-type SupportedImageCount = ImageCardCount;
+type SupportedImageCount = number;
 
 type GridCellConfig = {
   roundedClass: string;
@@ -124,9 +122,38 @@ export const getImageStyle = (
 
 export default function TwitterImageGridPreview({
   totalImages,
+  showLabels = true,
 }: {
   totalImages: SupportedImageCount;
   showLabels?: boolean;
 }) {
-  return <ImageCardSkeleton count={totalImages} />;
+  const cells = Array.from({ length: totalImages });
+
+  return (
+    <div className={`grid ${gridClasses(totalImages)}`}>
+      {cells.map((_, index) => (
+        <div
+          key={index}
+          className={`relative w-full ${imageSpan(index, totalImages)}`}
+          style={getImageStyle(index, totalImages, 1, 1)}
+        >
+          <div className="absolute inset-0 p-[1px]">
+            <div
+              className={cn(
+                "relative flex h-full w-full items-center justify-center",
+                "border border-preview-border bg-preview-surface-active shadow-custom dark:border-preview-dark-border dark:bg-preview-dark-surface-muted",
+                imageGrid(index, totalImages),
+              )}
+            >
+              {showLabels ? (
+                <div className="flex h-6 w-12 select-none items-center justify-center rounded-full bg-preview-surface text-xs font-medium text-preview-text shadow-custom dark:bg-preview-dark-surface dark:text-preview-dark-text">
+                  {index + 1}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
