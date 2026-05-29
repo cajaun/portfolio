@@ -1,5 +1,5 @@
 export {
   ActivePostPreview,
-  FeedPreparationPreview,
   InfiniteFeedPreview,
+  VideoPlaybackPreview,
 } from "./intersection-observer-preview";

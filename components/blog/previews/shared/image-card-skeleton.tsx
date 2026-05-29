@@ -8,7 +8,7 @@ type ImageCardCount = 1 | 2 | 3 | 4;
 type ImageCardItem = 1 | 2 | 3 | 4;
 
 const imageCardItems: ImageCardItem[] = [1, 2, 3, 4];
-const imageCardFrameHeight = "13rem";
+const imageCardFrameHeight = "clamp(10rem, 54vw, 13rem)";
 
 const layoutTransition = {
   type: "spring" as const,
@@ -22,7 +22,7 @@ const fadeTransition = {
   ease: "easeOut" as const,
 };
 
-const skeletonTone = "bg-black/[0.06] dark:bg-preview-dark-surface-active";
+const skeletonTone = "bg-preview-border dark:bg-preview-dark-surface-active";
 
 function SkeletonLine({ className }: { className?: string }) {
   return <div className={cn("rounded-full", skeletonTone, className)} />;
@@ -77,7 +77,7 @@ export default function ImageCardSkeleton({
   return (
     <div
       className={cn(
-        "mx-auto max-w-sm overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface",
+        "mx-auto w-full max-w-sm overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface",
         className,
       )}
     >

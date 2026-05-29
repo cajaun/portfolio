@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 
 type PreviewProps = {
   children: ReactNode;
+  className?: string;
   header?: ReactNode;
   headerClassName?: string;
   footer?: ReactNode;
@@ -11,10 +12,12 @@ type PreviewProps = {
   scrollable?: boolean;
   scrollContainerRef?: RefObject<HTMLDivElement>;
   video?: boolean;
+  wideMobile?: boolean;
 };
 
 export default function PreviewCard({
   children,
+  className,
   header,
   headerClassName,
   footer,
@@ -23,10 +26,17 @@ export default function PreviewCard({
   scrollable = false,
   scrollContainerRef,
   video = false,
+  wideMobile = false,
 }: PreviewProps) {
   return (
     <>
-      <div className={`preview-card `}>
+      <div
+        className={cn(
+          "preview-card",
+          wideMobile && "preview-card-mobile-wide",
+          className,
+        )}
+      >
         {header ? (
           <div
             className={cn(

@@ -4,13 +4,60 @@ import CajaunArt from "@/public/Cajaun_art.png";
 import Image from "next/image";
 import Link from "next/link";
 import { animate, motion, useMotionValue } from "framer-motion";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { SITE } from "@/data/site";
 
 const Header = () => {
   const [isDetached, setIsDetached] = useState(false);
+  const selectionStylesRef = useRef<{
+    bodyUserSelect: string;
+    bodyWebkitUserSelect: string;
+    rootUserSelect: string;
+    rootWebkitUserSelect: string;
+  } | null>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+
+  const lockTextSelection = () => {
+    const body = document.body;
+    const root = document.documentElement;
+
+    if (!selectionStylesRef.current) {
+      selectionStylesRef.current = {
+        bodyUserSelect: body.style.userSelect,
+        bodyWebkitUserSelect: body.style.getPropertyValue(
+          "-webkit-user-select",
+        ),
+        rootUserSelect: root.style.userSelect,
+        rootWebkitUserSelect: root.style.getPropertyValue(
+          "-webkit-user-select",
+        ),
+      };
+    }
+
+    body.style.userSelect = "none";
+    root.style.userSelect = "none";
+    body.style.setProperty("-webkit-user-select", "none");
+    root.style.setProperty("-webkit-user-select", "none");
+    window.getSelection()?.removeAllRanges();
+  };
+
+  const unlockTextSelection = () => {
+    const previous = selectionStylesRef.current;
+
+    if (!previous) {
+      return;
+    }
+
+    const body = document.body;
+    const root = document.documentElement;
+
+    body.style.userSelect = previous.bodyUserSelect;
+    root.style.userSelect = previous.rootUserSelect;
+    body.style.setProperty("-webkit-user-select", previous.bodyWebkitUserSelect);
+    root.style.setProperty("-webkit-user-select", previous.rootWebkitUserSelect);
+    selectionStylesRef.current = null;
+  };
 
   const snapBack = async () => {
     const spring = {
@@ -26,7 +73,7 @@ const Header = () => {
 
   return (
     <div
-      className="relative z-20 mb-16 flex animate-slide-down-fade items-center px-2 isolation-isolate"
+      className="relative z-20 mb-16 flex animate-slide-down-fade select-none items-center px-2 isolation-isolate"
       style={{ animationDelay: "90ms" }}
     >
       <div className="relative flex h-16 w-16 items-center justify-center">
@@ -51,12 +98,25 @@ const Header = () => {
           onDragStart={() => {
             x.stop();
             y.stop();
+            lockTextSelection();
             setIsDetached(true);
           }}
           onDragEnd={() => {
+            unlockTextSelection();
             snapBack();
           }}
-          className="relative z-10 h-16 w-16 cursor-grab overflow-hidden rounded-full shadow-custom touch-none will-change-transform active:cursor-grabbing"
+          onPointerDown={() => {
+            const releaseSelection = () => {
+              window.removeEventListener("pointerup", releaseSelection);
+              window.removeEventListener("pointercancel", releaseSelection);
+              unlockTextSelection();
+            };
+
+            lockTextSelection();
+            window.addEventListener("pointerup", releaseSelection);
+            window.addEventListener("pointercancel", releaseSelection);
+          }}
+          className="relative z-10 h-16 w-16 cursor-grab overflow-hidden rounded-full shadow-custom touch-none select-none will-change-transform active:cursor-grabbing"
         >
           <Image
             alt={`Photo of ${SITE.name}`}
@@ -70,7 +130,7 @@ const Header = () => {
         </motion.div>
       </div>
 
-      <div className="ml-4">
+      <div className="ml-4 select-none">
         <Link href="/">
           <h1 className="mb-0.5 font-medium">{SITE.name}</h1>
         </Link>

@@ -106,39 +106,50 @@ const mediaPosts: MediaPost[] = [
   },
 ];
 
-const preparationPosts: Array<{
-  id: string;
-  author: string;
-  gridSize: ImageCardCount;
-}> = [
+const videoPosts: MediaPost[] = [
   {
-    id: "prep-design-camera",
+    id: "video-studio-tour",
     author: "Design Camera",
-    gridSize: 2,
+    handle: "@design",
+    body: "Only the video with the strongest intersection should play.",
+    gridSize: 1,
   },
   {
-    id: "prep-motion-notes",
-    author: "Motion Notes",
-    gridSize: 3,
-  },
-  {
-    id: "prep-product-clips",
-    author: "Product Clips",
-    gridSize: 4,
-  },
-  {
-    id: "prep-layout-cuts",
+    id: "video-layout-cuts",
     author: "Layout Cuts",
-    gridSize: 2,
+    handle: "@layout",
+    body: "As this card becomes primary, the previous video pauses.",
+    gridSize: 1,
   },
   {
-    id: "prep-studio-roll",
+    id: "video-motion-notes",
+    author: "Motion Notes",
+    handle: "@motion",
+    body: "A threshold keeps quick edge touches from starting playback.",
+    gridSize: 1,
+  },
+  {
+    id: "video-product-clips",
+    author: "Product Clips",
+    handle: "@product",
+    body: "The same observer can pause video when it leaves the feed window.",
+    gridSize: 1,
+  },
+  {
+    id: "video-studio-roll",
     author: "Studio Roll",
-    gridSize: 3,
+    handle: "@studio",
+    body: "Autoplay is just a visibility rule attached to the media card.",
+    gridSize: 1,
+  },
+  {
+    id: "video-final-cut",
+    author: "Final Cut",
+    handle: "@final",
+    body: "When nothing is visible enough, every video stays paused.",
+    gridSize: 1,
   },
 ];
-
-const unpreparedGridSize: ImageCardCount = 1;
 
 function buildFeedBatch(start: number, count: number) {
   return Array.from({ length: count }, (_, index) => {
@@ -194,6 +205,70 @@ function FeedPost({
           active && "ring-1 ring-preview-border dark:ring-preview-dark-border",
         )}
       />
+    </article>
+  );
+}
+
+function VideoPost({
+  post,
+  active = false,
+}: {
+  post: MediaPost;
+  active?: boolean;
+}) {
+  return (
+    <article
+      className={cn(
+        "mx-auto w-full max-w-sm overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom transition-shadow dark:bg-preview-dark-surface",
+        active && "ring-1 ring-preview-border dark:ring-preview-dark-border",
+      )}
+    >
+      <div className="flex h-11 items-center gap-2 border-b border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
+        <div className="size-7 rounded-full bg-preview-border dark:bg-preview-dark-surface-active" />
+        <p className="truncate text-[13px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
+          {post.author}
+        </p>
+      </div>
+      <div className="flex flex-col gap-2 px-4 pb-2 pt-3">
+        <div className="h-2.5 w-full rounded-full bg-preview-border dark:bg-preview-dark-surface-active" />
+        <div className="h-2.5 w-4/5 rounded-full bg-preview-border dark:bg-preview-dark-surface-active" />
+      </div>
+      <div className="px-3 pb-3">
+        <div
+          className={cn(
+            "relative overflow-hidden rounded-xl border transition-colors duration-300",
+            active
+              ? "border-preview-border bg-preview-surface-active dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active"
+              : "border-dashed border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-stage",
+          )}
+          style={{ height: "clamp(10rem, 54vw, 13rem)" }}
+        >
+          <div className="absolute inset-x-4 top-4 flex items-center justify-between">
+            <div className="h-2.5 w-20 rounded-full bg-preview-border dark:bg-preview-dark-surface-active" />
+            <div className="rounded-full border border-preview-border bg-preview-surface px-2 py-1 text-[11px] font-medium text-preview-text-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface dark:text-preview-dark-text-muted">
+              {active ? "Playing" : "Paused"}
+            </div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex size-12 items-center justify-center rounded-full border border-preview-border bg-preview-surface transition-colors duration-300 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface">
+              <div className="ml-1 h-0 w-0 border-y-[8px] border-l-[12px] border-y-transparent border-l-preview-text-muted dark:border-l-preview-dark-text-muted" />
+            </div>
+          </div>
+          <div className="absolute inset-x-4 bottom-4 h-1.5 overflow-hidden rounded-full bg-preview-border dark:bg-preview-dark-surface">
+            <div
+              className={cn(
+                "h-full rounded-full bg-preview-text-muted transition-[width] duration-500 dark:bg-preview-dark-text-muted",
+                active ? "w-2/3" : "w-1/5",
+              )}
+            />
+          </div>
+        </div>
+      </div>
+      <div className="flex h-10 items-center gap-4 border-t border-preview-border px-4 dark:border-preview-dark-border-strong">
+        <div className="h-3 w-8 rounded-full bg-preview-border dark:bg-preview-dark-surface-active" />
+        <div className="h-3 w-8 rounded-full bg-preview-border dark:bg-preview-dark-surface-active" />
+        <div className="ml-auto h-3 w-8 rounded-full bg-preview-border dark:bg-preview-dark-surface-active" />
+      </div>
     </article>
   );
 }
@@ -535,13 +610,11 @@ export function ActivePostPreview() {
   );
 }
 
-export function FeedPreparationPreview() {
+export function VideoPlaybackPreview() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const postRefs = useRef<(HTMLElement | null)[]>([]);
-  const [focusedIndex, setFocusedIndex] = useState(0);
-  const [preparedPosts, setPreparedPosts] = useState(() =>
-    new Set([preparationPosts[0].id]),
-  );
+  const ratiosRef = useRef(new Map<string, number>());
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
   useEffect(() => {
     const root = rootRef.current;
@@ -553,27 +626,28 @@ export function FeedPreparationPreview() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const id = (entry.target as HTMLElement).dataset.postId;
+          const id = (entry.target as HTMLElement).dataset.videoId;
 
           if (!id) {
             return;
           }
 
-          if (entry.isIntersecting) {
-            setPreparedPosts((current) => {
-              if (current.has(id)) {
-                return current;
-              }
-
-              return new Set(current).add(id);
-            });
-          }
+          ratiosRef.current.set(
+            id,
+            entry.isIntersecting ? entry.intersectionRatio : 0,
+          );
         });
+
+        const nextVideo = [...ratiosRef.current.entries()]
+          .filter(([, ratio]) => ratio >= 0.55)
+          .sort((a, b) => b[1] - a[1])[0]?.[0];
+
+        setActiveVideoId(nextVideo ?? null);
       },
       {
         root,
-        threshold: 0.2,
-        rootMargin: "0px 0px 40% 0px",
+        threshold: [0, 0.25, 0.55, 0.75, 0.9],
+        rootMargin: "-10% 0px -20% 0px",
       },
     );
 
@@ -588,7 +662,7 @@ export function FeedPreparationPreview() {
     };
   }, []);
 
-  const scrollToPost = (index: number) => {
+  const scrollToVideo = (index: number) => {
     const root = rootRef.current;
     const node = postRefs.current[index];
 
@@ -600,23 +674,28 @@ export function FeedPreparationPreview() {
     const nodeRect = node.getBoundingClientRect();
     const nextTop = root.scrollTop + nodeRect.top - rootRect.top - 16;
 
-    setFocusedIndex(index);
     root.scrollTo({
       top: Math.max(nextTop, 0),
       behavior: "smooth",
     });
   };
 
+  const activeVideoIndex = activeVideoId
+    ? videoPosts.findIndex((post) => post.id === activeVideoId)
+    : -1;
+
   return (
     <PreviewCard
       full
+      scrollable
+      scrollContainerRef={rootRef}
       footer={
         <div className="flex w-full flex-wrap items-center justify-center gap-2">
           <button
             type="button"
             onClick={() => {
-              setFocusedIndex(0);
-              setPreparedPosts(new Set([preparationPosts[0].id]));
+              setActiveVideoId(null);
+              ratiosRef.current.clear();
               rootRef.current?.scrollTo({ top: 0, behavior: "smooth" });
             }}
             className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
@@ -625,59 +704,51 @@ export function FeedPreparationPreview() {
           </button>
           <button
             type="button"
-            onClick={() =>
-              scrollToPost(
-                Math.min(focusedIndex + 1, preparationPosts.length - 1),
-              )
-            }
+            onClick={() => {
+              const targetIndex =
+                activeVideoIndex >= 0
+                  ? Math.min(activeVideoIndex + 1, videoPosts.length - 1)
+                  : 0;
+
+              scrollToVideo(targetIndex);
+            }}
             className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
           >
-            Next card
+            Next video
           </button>
         </div>
       }
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
           <p className="text-center text-[13px] text-preview-text-muted dark:text-preview-dark-text-muted">
-            Cards switch from one media block to their full grid in the prep zone
+            Only the most visible video skeleton plays; the rest pause
           </p>
         </div>
       }
     >
       <div className="w-full bg-preview-surface px-4 py-4 sm:px-12 dark:bg-preview-dark-stage">
-        <div
-          ref={rootRef}
-          className="h-[28rem] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        >
-          <div className="space-y-6">
-            {preparationPosts.map((post, index) => {
-              const prepared = preparedPosts.has(post.id);
-              const focused = focusedIndex === index;
+        <div className="w-full space-y-6">
+          {videoPosts.map((post, index) => {
+            const active = activeVideoId === post.id;
 
-              return (
-                <article
-                  key={post.id}
-                  ref={(node) => {
-                    postRefs.current[index] = node;
-                  }}
-                  data-post-id={post.id}
-                  className={cn(
-                    "transition-transform duration-300 ease-out",
-                    focused && "scale-[1.01]",
-                  )}
-                >
-                  <ImageCardSkeleton
-                    count={prepared ? post.gridSize : unpreparedGridSize}
-                    title={post.author}
-                    className={cn(
-                      "transition-shadow",
-                      focused &&
-                        "ring-1 ring-preview-border dark:ring-preview-dark-border",
-                    )}
-                  />
-                </article>
-              );
-            })}
+            return (
+              <div
+                key={post.id}
+                ref={(node) => {
+                  postRefs.current[index] = node;
+                }}
+                data-video-id={post.id}
+              >
+                <VideoPost post={post} active={active} />
+              </div>
+            );
+          })}
+          <div className="flex justify-center px-4 sm:px-0">
+            <div className="flex min-h-7 max-w-full select-none items-center justify-center rounded-md bg-preview-surface-muted px-3 py-1 text-center text-sm font-medium text-preview-text-muted shadow-custom dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-preview-dark-text-muted sm:whitespace-nowrap">
+              {activeVideoId
+                ? "The visible video is playing."
+                : "Scroll until a video crosses the play threshold."}
+            </div>
           </div>
         </div>
       </div>

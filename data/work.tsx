@@ -31,14 +31,19 @@ export const WORK_TABS = [
 
 export const COMPONENT_ITEMS: WorkItem[] = [
   {
-    title: "Slide to Listen",
-    date: "March 14, 2026",
-    href: "/",
+    title: "Modal Portal Layer",
+    date: "April 15, 2026",
+    href: "/work/modal-portal-layer",
   },
   {
-    title: "Elastic Slider",
-    date: "March 20, 2026",
-    href: "/",
+    title: "Active Post Observer",
+    date: "April 17, 2026",
+    href: "/work/active-post-observer",
+  },
+  {
+    title: "Image Grid Mosaic",
+    date: "May 29, 2026",
+    href: "/work/image-grid-mosaic",
   },
 ];
 

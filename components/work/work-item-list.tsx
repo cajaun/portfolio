@@ -17,13 +17,15 @@ export default function WorkItemList({ tabId, items }: WorkItemListProps) {
           href={item.href}
           target={item.external ? "_blank" : undefined}
           rel={item.external ? "noopener noreferrer" : undefined}
-          className="group -mx-2 flex items-center gap-4 rounded-xl p-2 transition-colors duration-500 ease-in-out hover:bg-gray-300 dark:hover:bg-[#2A2A2A]"
+          className="group -mx-2 flex min-w-0 items-center gap-4 rounded-xl p-2 transition-colors duration-500 ease-in-out hover:bg-gray-300 dark:hover:bg-[#2A2A2A]"
         >
           <WorkItemPreview tabId={tabId} />
 
           <div className="flex w-full min-w-0 items-center justify-between">
-            <div className="flex min-w-0 flex-col">
-              <TextMorph className="font-medium">{item.title}</TextMorph>
+            <div className="flex min-w-0 flex-1 flex-col">
+              <TextMorph className="block max-w-full truncate font-medium">
+                {item.title}
+              </TextMorph>
               <TextMorph className="text-gray-200 font-medium leading-6 tracking-[-0.1px] dark:text-gray-100">
                 {item.date}
               </TextMorph>

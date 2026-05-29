@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import ImageCardSkeleton from "@/components/blog/previews/shared/image-card-skeleton";
@@ -20,6 +20,29 @@ const fadeTransition = {
   duration: 0.22,
   ease: "easeOut" as const,
 };
+
+const previewCardBase =
+  "border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-stage";
+const previewCardHighlight =
+  "border-preview-border bg-preview-surface-active dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted";
+
+const mobilePreviewQuery = "(max-width: 640px)";
+
+function useMobilePreview() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia(mobilePreviewQuery);
+    const update = () => setIsMobile(media.matches);
+
+    update();
+    media.addEventListener("change", update);
+
+    return () => media.removeEventListener("change", update);
+  }, []);
+
+  return isMobile;
+}
 
 function SurfaceButton({
   children,
@@ -98,7 +121,7 @@ function AnimatedCardSkeleton({
       layout
       transition={layoutTransition}
       className={cn(
-        "flex flex-col gap-2 rounded-xl border border-preview-border bg-preview-surface p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface",
+        "flex flex-col gap-2 rounded-xl border border-preview-border bg-preview-surface p-2.5 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface sm:p-3",
         className,
       )}
       style={style}
@@ -112,17 +135,23 @@ function AnimatedCardSkeleton({
 
 function Stage({ children }: { children: ReactNode }) {
   return (
-    <div className="bg-preview-surface-muted px-4 py-8 sm:px-8 dark:bg-preview-dark-stage">
+    <div className="bg-preview-surface-muted px-1.5 py-5 sm:px-8 sm:py-8 dark:bg-preview-dark-stage">
       {children}
     </div>
   );
 }
 
-function Chrome({ children, className }: { children: ReactNode; className?: string }) {
+function Chrome({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
     <div
       className={cn(
-        "mx-auto overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface",
+        "mx-auto w-full overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface",
         className ?? "max-w-xl",
       )}
     >
@@ -150,16 +179,25 @@ type ColCount = 2 | 3 | 4;
 
 export function EqualTracksPreview() {
   const [cols, setCols] = useState<ColCount>(3);
+  const isMobile = useMobilePreview();
 
   const template: Record<ColCount, string> = {
     2: "repeat(2, minmax(0, 1fr))",
     3: "repeat(3, minmax(0, 1fr))",
     4: "repeat(4, minmax(0, 1fr))",
   };
+  const rowHeight = isMobile ? "7.25rem" : "6rem";
+
+  useEffect(() => {
+    if (isMobile && cols === 4) {
+      setCols(3);
+    }
+  }, [cols, isMobile]);
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton active={cols === 2} onClick={() => setCols(2)}>
@@ -168,9 +206,11 @@ export function EqualTracksPreview() {
           <SurfaceButton active={cols === 3} onClick={() => setCols(3)}>
             3 columns
           </SurfaceButton>
-          <SurfaceButton active={cols === 4} onClick={() => setCols(4)}>
-            4 columns
-          </SurfaceButton>
+          <div className="hidden sm:block">
+            <SurfaceButton active={cols === 4} onClick={() => setCols(4)}>
+              4 columns
+            </SurfaceButton>
+          </div>
         </FooterRow>
       }
       footnote={
@@ -182,18 +222,21 @@ export function EqualTracksPreview() {
       <Stage>
         <Chrome>
           <Toolbar />
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <motion.div
               layout
               transition={layoutTransition}
-              className="grid h-[20rem] content-center gap-3"
+              className="grid min-h-[23.5rem] content-center gap-2.5 sm:h-[20rem] sm:gap-3"
               style={{
                 gridTemplateColumns: template[cols],
-                gridAutoRows: "6rem",
+                gridAutoRows: rowHeight,
               }}
             >
               {[0, 1, 2, 3, 4, 5].map((i) => (
-                <AnimatedCardSkeleton key={i} className="h-24" />
+                <AnimatedCardSkeleton
+                  key={i}
+                  className="min-h-[7.25rem] sm:h-24 sm:min-h-0"
+                />
               ))}
             </motion.div>
           </div>
@@ -214,10 +257,12 @@ export function EqualTracksPreview() {
 
 export function FloorPreview() {
   const [narrow, setNarrow] = useState(false);
+  const isMobile = useMobilePreview();
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton active={!narrow} onClick={() => setNarrow(false)}>
@@ -238,11 +283,17 @@ export function FloorPreview() {
         <Chrome
           className={cn(
             "transition-[max-width] duration-500 ease-in-out",
-            narrow ? "max-w-[22rem]" : "max-w-xl",
+            isMobile
+              ? narrow
+                ? "max-w-[18rem]"
+                : "max-w-full"
+              : narrow
+                ? "max-w-[22rem]"
+                : "max-w-xl",
           )}
         >
           <Toolbar />
-          <div className="h-[25.5rem] p-4">
+          <div className="h-[39rem] p-3 sm:h-[25.5rem] sm:p-4">
             {/* Without floor — repeat(3, 1fr) crushes cards at narrow width */}
             <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-preview-text-muted dark:text-preview-dark-text-muted">
               No floor
@@ -250,14 +301,17 @@ export function FloorPreview() {
             <motion.div
               layout
               transition={layoutTransition}
-              className="mb-4 grid gap-3"
+              className="mb-5 grid gap-2.5 sm:mb-4 sm:gap-3"
               style={{
                 gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                gridAutoRows: "5rem",
+                gridAutoRows: isMobile ? "5.75rem" : "5rem",
               }}
             >
               {[0, 1, 2].map((i) => (
-                <AnimatedCardSkeleton key={i} className="h-20" />
+                <AnimatedCardSkeleton
+                  key={i}
+                  className="min-h-[5.75rem] sm:h-20 sm:min-h-0"
+                />
               ))}
             </motion.div>
 
@@ -268,16 +322,23 @@ export function FloorPreview() {
             <motion.div
               layout
               transition={layoutTransition}
-              className="grid gap-3"
+              className="grid gap-2.5 sm:gap-3"
               style={{
-                gridTemplateColumns: narrow
-                  ? "repeat(2, minmax(8rem, 1fr))"
-                  : "repeat(3, minmax(8rem, 1fr))",
-                gridAutoRows: "5rem",
+                gridTemplateColumns: isMobile
+                  ? narrow
+                    ? "repeat(1, minmax(0, 1fr))"
+                    : "repeat(2, minmax(8rem, 1fr))"
+                  : narrow
+                    ? "repeat(2, minmax(8rem, 1fr))"
+                    : "repeat(3, minmax(8rem, 1fr))",
+                gridAutoRows: isMobile ? "6.25rem" : "5rem",
               }}
             >
               {[0, 1, 2].map((i) => (
-                <AnimatedCardSkeleton key={i} className="h-20" />
+                <AnimatedCardSkeleton
+                  key={i}
+                  className="min-h-[6.25rem] sm:h-20 sm:min-h-0"
+                />
               ))}
             </motion.div>
           </div>
@@ -295,10 +356,12 @@ export function FloorPreview() {
 
 export function IntrinsicEdgesPreview() {
   const [wide, setWide] = useState(false);
+  const isMobile = useMobilePreview();
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton active={!wide} onClick={() => setWide(false)}>
@@ -318,43 +381,50 @@ export function IntrinsicEdgesPreview() {
       <Stage>
         <Chrome>
           <Toolbar />
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <div
               className="grid gap-3"
-              style={{ gridTemplateColumns: "max-content minmax(0, 1fr) max-content" }}
+              style={{
+                gridTemplateColumns: isMobile
+                  ? "1fr"
+                  : "max-content minmax(0, 1fr) max-content",
+              }}
             >
               {/* Left edge — hugs content */}
               <motion.div
                 layout
                 transition={layoutTransition}
-                className="flex flex-col gap-2 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted"
+                className="flex min-h-[4.5rem] flex-row items-center gap-2 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted sm:min-h-0 sm:flex-col sm:items-stretch"
               >
-                <SkeletonLine className="h-3 w-14" />
-                <SkeletonLine className="h-3 w-10" />
-                <SkeletonLine className="h-3 w-12" />
+                <SkeletonLine className="h-3 w-16 sm:w-14" />
+                <SkeletonLine className="h-3 w-12 sm:w-10" />
+                <SkeletonLine className="h-3 w-14 sm:w-12" />
               </motion.div>
 
               {/* Middle — absorbs remaining width, content varies */}
               <motion.div
                 layout
                 transition={layoutTransition}
-                className="flex flex-col gap-2 rounded-xl border border-preview-border bg-preview-surface p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface"
+                className={cn(
+                  "flex min-h-[8.5rem] flex-col gap-2 rounded-xl border p-3 sm:min-h-0",
+                  previewCardHighlight,
+                )}
               >
                 <SkeletonLine
                   className={cn(
                     "h-3 transition-[width] duration-500 ease-in-out",
-                    wide ? "w-full" : "w-1/3",
+                    wide ? "w-full" : "w-1/2 sm:w-1/3",
                   )}
                 />
                 <SkeletonLine
                   className={cn(
                     "h-3 transition-[width] duration-500 ease-in-out",
-                    wide ? "w-4/5" : "w-1/4",
+                    wide ? "w-4/5" : "w-2/5 sm:w-1/4",
                   )}
                 />
                 <SkeletonBlock
                   className={cn(
-                    "mt-2 h-10 transition-[width] duration-500 ease-in-out",
+                    "mt-auto h-12 transition-[width] duration-500 ease-in-out sm:mt-2 sm:h-10",
                     wide ? "w-full" : "w-2/3",
                   )}
                 />
@@ -364,11 +434,11 @@ export function IntrinsicEdgesPreview() {
               <motion.div
                 layout
                 transition={layoutTransition}
-                className="flex flex-col gap-2 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted"
+                className="grid min-h-[4.5rem] grid-cols-3 gap-2 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted sm:flex sm:min-h-0 sm:flex-col"
               >
-                <SkeletonBlock className="h-7 w-16" />
-                <SkeletonBlock className="h-7 w-16" />
-                <SkeletonBlock className="h-7 w-16" />
+                <SkeletonBlock className="h-8 w-full sm:h-7 sm:w-16" />
+                <SkeletonBlock className="h-8 w-full sm:h-7 sm:w-16" />
+                <SkeletonBlock className="h-8 w-full sm:h-7 sm:w-16" />
               </motion.div>
             </div>
           </div>
@@ -387,6 +457,7 @@ type GapMode = "none" | "tight" | "loose";
 
 export function GapPreview() {
   const [gap, setGap] = useState<GapMode>("tight");
+  const isMobile = useMobilePreview();
 
   const gapValue: Record<GapMode, string> = {
     none: "0px",
@@ -397,6 +468,7 @@ export function GapPreview() {
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton active={gap === "none"} onClick={() => setGap("none")}>
@@ -419,19 +491,21 @@ export function GapPreview() {
       <Stage>
         <Chrome>
           <Toolbar />
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <div
-              className="grid h-[13.75rem] grid-cols-3 content-center transition-[gap] duration-300 ease-out"
+              className="grid h-[24rem] grid-cols-2 content-center transition-[gap] duration-300 ease-out sm:h-[13.75rem] sm:grid-cols-3"
               style={{
                 gap: gapValue[gap],
-                gridTemplateRows: "repeat(2, 6rem)",
+                gridTemplateRows: isMobile
+                  ? "repeat(3, minmax(6.25rem, 1fr))"
+                  : "repeat(2, 6rem)",
               }}
             >
               {[0, 1, 2, 3, 4, 5].map((i) => (
                 <div
                   key={i}
                   className={cn(
-                    "flex min-h-[6rem] flex-col gap-2 bg-preview-surface-muted p-3 dark:bg-preview-dark-stage",
+                    "flex min-h-[6.25rem] flex-col gap-2 bg-preview-surface-muted p-3 dark:bg-preview-dark-stage sm:min-h-[6rem]",
                     gap !== "none" && "rounded-xl border border-preview-border dark:border-preview-dark-border-strong",
                   )}
                 >
@@ -457,15 +531,21 @@ type RegularGridMode = "six" | "nine" | "wide";
 
 export function RegularGridExamplesPreview() {
   const [mode, setMode] = useState<RegularGridMode>("six");
+  const isMobile = useMobilePreview();
   const itemCount = mode === "nine" ? 9 : mode === "wide" ? 8 : 6;
   const columns =
-    mode === "wide"
-      ? "repeat(4, minmax(0, 1fr))"
-      : "repeat(3, minmax(0, 1fr))";
+    isMobile
+      ? mode === "wide"
+        ? "repeat(3, minmax(0, 1fr))"
+        : "repeat(2, minmax(0, 1fr))"
+      : mode === "wide"
+        ? "repeat(4, minmax(0, 1fr))"
+        : "repeat(3, minmax(0, 1fr))";
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton active={mode === "six"} onClick={() => setMode("six")}>
@@ -488,14 +568,14 @@ export function RegularGridExamplesPreview() {
       <Stage>
         <Chrome>
           <Toolbar />
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <motion.div
               layout
               transition={layoutTransition}
-              className="grid h-[18.5rem] content-center gap-3"
+              className="grid h-[34rem] content-start gap-2.5 sm:h-[18.5rem] sm:content-center sm:gap-3"
               style={{
                 gridTemplateColumns: columns,
-                gridAutoRows: "5rem",
+                gridAutoRows: isMobile ? "6.25rem" : "5rem",
               }}
             >
               <AnimatePresence initial={false}>
@@ -507,7 +587,7 @@ export function RegularGridExamplesPreview() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.96 }}
                     transition={layoutTransition}
-                    className="flex h-20 flex-col gap-2 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-stage"
+                    className="flex min-h-[6.25rem] flex-col gap-2 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-stage sm:h-20 sm:min-h-0"
                   >
                     <SkeletonLine className="h-3 w-3/4" />
                     <SkeletonLine className="h-3 w-1/2" />
@@ -564,12 +644,32 @@ const areaPositions: Record<AreaMode, Record<AreaTileId, CSSProperties>> = {
   },
 };
 
+const mobileAreaPositions: Record<AreaMode, Record<AreaTileId, CSSProperties>> =
+  {
+    dashboard: {
+      header: { gridColumn: "1 / span 2", gridRow: "1" },
+      nav: { gridColumn: "1", gridRow: "2 / span 2" },
+      main: { gridColumn: "2", gridRow: "2 / span 2" },
+      aside: { gridColumn: "1 / span 2", gridRow: "4" },
+      footer: { gridColumn: "1 / span 2", gridRow: "5" },
+    },
+    article: {
+      header: { gridColumn: "1 / span 2", gridRow: "1" },
+      main: { gridColumn: "1 / span 2", gridRow: "2 / span 2" },
+      aside: { gridColumn: "1", gridRow: "4" },
+      nav: { gridColumn: "2", gridRow: "4" },
+      footer: { gridColumn: "1 / span 2", gridRow: "5" },
+    },
+  };
+
 function AreaTile({
   id,
   mode,
+  mobile,
 }: {
   id: AreaTileId;
   mode: AreaMode;
+  mobile: boolean;
 }) {
   const main = id === "main";
 
@@ -578,12 +678,10 @@ function AreaTile({
       layout
       transition={layoutTransition}
       className={cn(
-        "flex min-h-0 flex-col gap-2 rounded-xl border p-3",
-        main
-          ? "border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted"
-          : "border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-stage",
+        "flex min-h-0 flex-col gap-2 rounded-xl border p-2.5 sm:p-3",
+        main ? previewCardHighlight : previewCardBase,
       )}
-      style={areaPositions[mode][id]}
+      style={mobile ? mobileAreaPositions[mode][id] : areaPositions[mode][id]}
     >
       <span
         className={cn(
@@ -603,10 +701,12 @@ function AreaTile({
 
 export function NamedAreasPreview() {
   const [mode, setMode] = useState<AreaMode>("dashboard");
+  const isMobile = useMobilePreview();
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton
@@ -632,17 +732,24 @@ export function NamedAreasPreview() {
       <Stage>
         <Chrome className="max-w-2xl">
           <Toolbar />
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <motion.div
               layout
               transition={layoutTransition}
-              className="grid h-[26rem] grid-cols-4 gap-3"
+              className="grid h-[31.5rem] grid-cols-2 gap-2.5 sm:h-[26rem] sm:grid-cols-4 sm:gap-3"
               style={{
-                gridTemplateRows: "4.75rem repeat(3, minmax(0, 1fr)) 4.75rem",
+                gridTemplateRows: isMobile
+                  ? "4.5rem 7rem 7rem 5.75rem 4.5rem"
+                  : "4.75rem repeat(3, minmax(0, 1fr)) 4.75rem",
               }}
             >
               {areaTiles.map((tile) => (
-                <AreaTile key={tile} id={tile} mode={mode} />
+                <AreaTile
+                  key={tile}
+                  id={tile}
+                  mode={mode}
+                  mobile={isMobile}
+                />
               ))}
             </motion.div>
           </div>
@@ -671,6 +778,7 @@ export function AspectRatioPreview() {
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton
@@ -696,9 +804,14 @@ export function AspectRatioPreview() {
       <Stage>
         <Chrome className="max-w-2xl">
           <Toolbar />
-          <div className="p-4">
-            <div className="grid h-[22rem] grid-cols-2 gap-3">
-              <div className="flex min-h-0 flex-col rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-stage">
+          <div className="p-3 sm:p-4">
+            <div className="grid h-[43rem] grid-cols-1 gap-3 sm:h-[22rem] sm:grid-cols-2">
+              <div
+                className={cn(
+                  "flex h-[21.125rem] flex-col rounded-xl border p-3 sm:h-auto sm:min-h-0",
+                  previewCardBase,
+                )}
+              >
                 <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-preview-text-muted dark:text-preview-dark-text-muted">
                   No ratio
                 </p>
@@ -708,20 +821,25 @@ export function AspectRatioPreview() {
                   className="rounded-lg bg-preview-border dark:bg-preview-dark-surface-active"
                   style={{ height: mediaBlockHeight[mode] }}
                 />
-                <div className="mt-3 space-y-2">
+                <div className="mt-4 space-y-2.5">
                   <SkeletonLine className="h-2.5 w-4/5" />
                   <SkeletonLine className="h-2.5 w-3/5" />
                   <SkeletonLine className="h-2.5 w-2/3" />
                 </div>
-                <SkeletonBlock className="mt-auto h-10" />
+                <SkeletonBlock className="mt-auto h-12" />
               </div>
 
-              <div className="flex min-h-0 flex-col rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-stage">
+              <div
+                className={cn(
+                  "flex h-[21.125rem] flex-col rounded-xl border p-3 sm:h-auto sm:min-h-0",
+                  previewCardHighlight,
+                )}
+              >
                 <p className="mb-3 text-[11px] font-semibold uppercase tracking-wide text-preview-text-muted dark:text-preview-dark-text-muted">
                   Reserved
                 </p>
-                <div className="grid h-32 grid-cols-2 gap-2 rounded-lg bg-preview-surface dark:bg-preview-dark-surface p-2">
-                  {[0, 1, 2, 3].map((item) => (
+                <div className="grid h-28 grid-cols-2 gap-2 rounded-lg bg-preview-surface p-2 dark:bg-preview-dark-surface">
+                  {[0, 1].map((item) => (
                     <motion.div
                       key={item}
                       initial={false}
@@ -734,12 +852,12 @@ export function AspectRatioPreview() {
                     />
                   ))}
                 </div>
-                <div className="mt-3 space-y-2">
+                <div className="mt-4 space-y-2.5">
                   <SkeletonLine className="h-2.5 w-4/5" />
                   <SkeletonLine className="h-2.5 w-3/5" />
                   <SkeletonLine className="h-2.5 w-2/3" />
                 </div>
-                <SkeletonBlock className="mt-auto h-10" />
+                <SkeletonBlock className="mt-auto h-12" />
               </div>
             </div>
           </div>
@@ -776,12 +894,34 @@ const autoFlowPositions: Record<FlowDir, Record<number, CSSProperties>> = {
   },
 };
 
+const mobileAutoFlowPositions: Record<FlowDir, Record<number, CSSProperties>> =
+  {
+    row: {
+      1: { gridColumn: "1", gridRow: "1" },
+      2: { gridColumn: "2", gridRow: "1" },
+      3: { gridColumn: "1", gridRow: "2" },
+      4: { gridColumn: "2", gridRow: "2" },
+      5: { gridColumn: "1", gridRow: "3" },
+      6: { gridColumn: "2", gridRow: "3" },
+    },
+    column: {
+      1: { gridColumn: "1", gridRow: "1" },
+      2: { gridColumn: "1", gridRow: "2" },
+      3: { gridColumn: "1", gridRow: "3" },
+      4: { gridColumn: "2", gridRow: "1" },
+      5: { gridColumn: "2", gridRow: "2" },
+      6: { gridColumn: "2", gridRow: "3" },
+    },
+  };
+
 export function AutoFlowPreview() {
   const [flow, setFlow] = useState<FlowDir>("row");
+  const isMobile = useMobilePreview();
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton active={flow === "row"} onClick={() => setFlow("row")}>
@@ -801,20 +941,28 @@ export function AutoFlowPreview() {
       <Stage>
         <Chrome>
           <Toolbar />
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <motion.div
               layout
               transition={layoutTransition}
-              className="grid grid-cols-3 gap-3"
-              style={{ gridTemplateRows: "repeat(2, minmax(5.5rem, 1fr))" }}
+              className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3"
+              style={{
+                gridTemplateRows: isMobile
+                  ? "repeat(3, minmax(6rem, 1fr))"
+                  : "repeat(2, minmax(5.5rem, 1fr))",
+              }}
             >
               {[1, 2, 3, 4, 5, 6].map((n) => (
                 <motion.div
                   key={n}
                   layout
                   transition={layoutTransition}
-                  className="flex min-h-[5.5rem] flex-col justify-between rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-stage"
-                  style={autoFlowPositions[flow][n]}
+                  className="flex min-h-[6rem] flex-col justify-between rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-stage sm:min-h-[5.5rem]"
+                  style={
+                    isMobile
+                      ? mobileAutoFlowPositions[flow][n]
+                      : autoFlowPositions[flow][n]
+                  }
                 >
                   <span className="text-[11px] font-bold tabular-nums text-preview-text dark:text-preview-dark-text">
                     {n}
@@ -880,12 +1028,44 @@ const bentoPositions: Record<BentoStep, Record<BentoTileId, CSSProperties>> = {
   },
 };
 
+const mobileBentoPositions: Record<
+  BentoStep,
+  Record<BentoTileId, CSSProperties>
+> = {
+  equal: {
+    lead: { gridColumn: "1", gridRow: "1" },
+    metric: { gridColumn: "2", gridRow: "1" },
+    chart: { gridColumn: "1", gridRow: "2" },
+    notes: { gridColumn: "2", gridRow: "2" },
+    tasks: { gridColumn: "1", gridRow: "3" },
+    status: { gridColumn: "2", gridRow: "3" },
+  },
+  span: {
+    lead: { gridColumn: "1 / span 2", gridRow: "1 / span 2" },
+    metric: { gridColumn: "1", gridRow: "3" },
+    chart: { gridColumn: "2", gridRow: "3" },
+    notes: { gridColumn: "1", gridRow: "4" },
+    tasks: { gridColumn: "2", gridRow: "4" },
+    status: { gridColumn: "1 / span 2", gridRow: "5" },
+  },
+  compose: {
+    lead: { gridColumn: "1 / span 2", gridRow: "1 / span 2" },
+    metric: { gridColumn: "1", gridRow: "3" },
+    chart: { gridColumn: "2", gridRow: "3" },
+    notes: { gridColumn: "1 / span 2", gridRow: "4" },
+    tasks: { gridColumn: "1", gridRow: "5" },
+    status: { gridColumn: "2", gridRow: "5" },
+  },
+};
+
 function BentoTile({
   id,
   step,
+  mobile,
 }: {
   id: BentoTileId;
   step: BentoStep;
+  mobile: boolean;
 }) {
   const isLead = id === "lead";
   const composed = step === "compose";
@@ -896,13 +1076,11 @@ function BentoTile({
       layout
       transition={layoutTransition}
       className={cn(
-        "relative overflow-hidden rounded-xl border p-3",
+        "relative overflow-hidden rounded-xl border p-2.5 sm:p-3",
         "flex flex-col gap-2",
-        highlighted
-          ? "border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted"
-          : "border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-stage",
+        highlighted ? previewCardHighlight : previewCardBase,
       )}
-      style={bentoPositions[step][id]}
+      style={mobile ? mobileBentoPositions[step][id] : bentoPositions[step][id]}
     >
       <motion.div
         layout
@@ -968,10 +1146,12 @@ function BentoTile({
 
 export function BentoExamplesPreview() {
   const [step, setStep] = useState<BentoStep>("equal");
+  const isMobile = useMobilePreview();
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton active={step === "equal"} onClick={() => setStep("equal")}>
@@ -994,17 +1174,24 @@ export function BentoExamplesPreview() {
       <Stage>
         <Chrome>
           <Toolbar />
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <motion.div
               layout
               transition={layoutTransition}
-              className="grid h-[16rem] grid-cols-4 gap-3"
+              className="grid min-h-[31rem] grid-cols-2 gap-2.5 sm:h-[16rem] sm:grid-cols-4 sm:gap-3"
               style={{
-                gridTemplateRows: "repeat(3, minmax(0, 1fr))",
+                gridTemplateRows: isMobile
+                  ? "repeat(5, minmax(5.5rem, 1fr))"
+                  : "repeat(3, minmax(0, 1fr))",
               }}
             >
               {bentoTiles.map((tile) => (
-                <BentoTile key={tile} id={tile} step={step} />
+                <BentoTile
+                  key={tile}
+                  id={tile}
+                  step={step}
+                  mobile={isMobile}
+                />
               ))}
             </motion.div>
           </div>
@@ -1041,12 +1228,33 @@ const densePositions: Record<DenseMode, Record<number, CSSProperties>> = {
   },
 };
 
+const mobileDensePositions: Record<DenseMode, Record<number, CSSProperties>> = {
+  off: {
+    1: { gridColumn: "1 / span 2", gridRow: "1" },
+    2: { gridColumn: "1", gridRow: "2" },
+    3: { gridColumn: "1 / span 2", gridRow: "3" },
+    4: { gridColumn: "1", gridRow: "4" },
+    5: { gridColumn: "2", gridRow: "4" },
+    6: { gridColumn: "1", gridRow: "5" },
+  },
+  on: {
+    1: { gridColumn: "1 / span 2", gridRow: "1" },
+    2: { gridColumn: "1", gridRow: "2" },
+    3: { gridColumn: "2", gridRow: "2" },
+    4: { gridColumn: "1 / span 2", gridRow: "3" },
+    5: { gridColumn: "1", gridRow: "4" },
+    6: { gridColumn: "2", gridRow: "4" },
+  },
+};
+
 export function DensePlacementPreview() {
   const [dense, setDense] = useState<DenseMode>("off");
+  const isMobile = useMobilePreview();
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton active={dense === "off"} onClick={() => setDense("off")}>
@@ -1066,12 +1274,16 @@ export function DensePlacementPreview() {
       <Stage>
         <Chrome>
           <Toolbar />
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             <motion.div
               layout
               transition={layoutTransition}
-              className="grid grid-cols-3 gap-3"
-              style={{ gridTemplateRows: "repeat(3, minmax(5rem, 1fr))" }}
+              className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 sm:gap-3"
+              style={{
+                gridTemplateRows: isMobile
+                  ? "repeat(5, minmax(5.25rem, 1fr))"
+                  : "repeat(3, minmax(5rem, 1fr))",
+              }}
             >
               <motion.div
                 aria-hidden="true"
@@ -1081,8 +1293,12 @@ export function DensePlacementPreview() {
                   scale: dense === "off" ? 1 : 0.94,
                 }}
                 transition={fadeTransition}
-                className="pointer-events-none z-0 flex min-h-[5rem] items-center justify-center rounded-xl border border-dashed border-preview-border dark:border-preview-dark-border-strong"
-                style={{ gridColumn: "3", gridRow: "1" }}
+                className="pointer-events-none z-0 flex min-h-[5.25rem] items-center justify-center rounded-xl border border-dashed border-preview-border dark:border-preview-dark-border-strong sm:min-h-[5rem]"
+                style={
+                  isMobile
+                    ? { gridColumn: "2", gridRow: "2" }
+                    : { gridColumn: "3", gridRow: "1" }
+                }
               >
                 <span className="text-[11px] font-medium text-preview-text-muted dark:text-preview-dark-text-muted">
                   gap
@@ -1096,12 +1312,15 @@ export function DensePlacementPreview() {
                   layout
                   transition={layoutTransition}
                   className={cn(
-                    "z-10 flex min-h-[5rem] flex-col justify-between rounded-xl p-3",
-                    n === 1
-                      ? "border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted"
-                      : "border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-stage",
+                    "z-10 flex min-h-[5.25rem] flex-col justify-between rounded-xl p-3 sm:min-h-[5rem]",
+                    "border",
+                    n === 1 ? previewCardHighlight : previewCardBase,
                   )}
-                  style={densePositions[dense][n]}
+                  style={
+                    isMobile
+                      ? mobileDensePositions[dense][n]
+                      : densePositions[dense][n]
+                  }
                 >
                   <span
                     className={cn(
@@ -1132,24 +1351,34 @@ export function DensePlacementPreview() {
 
 type MosaicCount = 1 | 2 | 3 | 4;
 
+function clampMosaicCount(value: number): MosaicCount {
+  return Math.min(4, Math.max(1, value)) as MosaicCount;
+}
+
 export function MosaicExamplesPreview() {
-  const [count, setCount] = useState<MosaicCount>(3);
+  const [count, setCount] = useState<MosaicCount>(1);
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
-          {([1, 2, 3, 4] as MosaicCount[]).map((n) => (
-            <SurfaceButton key={n} active={count === n} onClick={() => setCount(n)}>
-              {n} {n === 1 ? "image" : "images"}
-            </SurfaceButton>
-          ))}
+          <SurfaceButton
+            onClick={() => setCount((current) => clampMosaicCount(current - 1))}
+          >
+            Remove image
+          </SurfaceButton>
+          <SurfaceButton
+            onClick={() => setCount((current) => clampMosaicCount(current + 1))}
+          >
+            Add image
+          </SurfaceButton>
         </FooterRow>
       }
       footnote={
         <PreviewFootnote>
-          Each count gets its own composition rule, not a uniform grid stretched across all cases.
+          {count} {count === 1 ? "image uses" : "images use"} a count-specific composition rule.
         </PreviewFootnote>
       }
     >
@@ -1179,14 +1408,22 @@ interface MasonryItem {
 // Row 1: items 1,2,3 — tallest is item 2 at 9rem
 // Row 2: items 4,5,6 — tallest is item 4 at 7.5rem
 const masonryItems: MasonryItem[] = [
-  { id: 1, naturalRem: 5,   rowRem: 9   },
-  { id: 2, naturalRem: 9,   rowRem: 9   },
-  { id: 3, naturalRem: 4,   rowRem: 9   },
-  { id: 4, naturalRem: 7.5, rowRem: 7.5 },
-  { id: 5, naturalRem: 5,   rowRem: 7.5 },
-  { id: 6, naturalRem: 6,   rowRem: 7.5 },
-];
+  { id: 1,  naturalRem: 5,   rowRem: 9 },
+  { id: 2,  naturalRem: 9,   rowRem: 9 },
+  { id: 3,  naturalRem: 4,   rowRem: 9 },
 
+  { id: 4,  naturalRem: 7.5, rowRem: 7.5 },
+  { id: 5,  naturalRem: 5,   rowRem: 7.5 },
+  { id: 6,  naturalRem: 6,   rowRem: 7.5 },
+
+  { id: 7,  naturalRem: 8,   rowRem: 8 },
+  { id: 8,  naturalRem: 3.5, rowRem: 8 },
+  { id: 9,  naturalRem: 6.5, rowRem: 8 },
+
+  { id: 10, naturalRem: 4.5, rowRem: 8.5 },
+  { id: 11, naturalRem: 8.5, rowRem: 8.5 },
+  { id: 12, naturalRem: 5.5, rowRem: 8.5 },
+];
 function packIntoColumns(items: MasonryItem[], cols: number): MasonryItem[][] {
   const columns: { sum: number; items: MasonryItem[] }[] = Array.from(
     { length: cols },
@@ -1204,11 +1441,20 @@ function packIntoColumns(items: MasonryItem[], cols: number): MasonryItem[][] {
 
 export function MasonryExamplesPreview() {
   const [mode, setMode] = useState<MasonryMode>("rows");
-  const packedColumns = useMemo(() => packIntoColumns(masonryItems, 3), []);
+  const isMobile = useMobilePreview();
+  const packedColumns = useMemo(
+    () =>
+      packIntoColumns(
+        isMobile ? masonryItems.slice(0, 8) : masonryItems,
+        isMobile ? 2 : 3,
+      ),
+    [isMobile],
+  );
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <SurfaceButton active={mode === "rows"} onClick={() => setMode("rows")}>
@@ -1228,14 +1474,14 @@ export function MasonryExamplesPreview() {
       <Stage>
         <Chrome>
           <Toolbar />
-          <div className="p-4">
-            <div className="grid h-[17.5rem] grid-cols-3 gap-3">
+          <div className="p-3 sm:p-4">
+            <div className="grid h-[36rem] grid-cols-2 gap-2.5 sm:h-[30rem] sm:grid-cols-3 sm:gap-3">
               {packedColumns.map((col, ci) => (
-                <div key={ci} className="flex flex-col gap-3">
+                <div key={ci} className="flex flex-col gap-2.5 sm:gap-3">
                   {col.map((item) => (
                     <div
                       key={item.id}
-                      className="rounded-xl border border-preview-border bg-preview-surface-muted transition-[height] duration-500 ease-in-out dark:border-preview-dark-border-strong dark:bg-preview-dark-stage"
+                      className="rounded-xl border border-preview-border bg-preview-surface-muted transition-[height] duration-500 ease-in-out dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted"
                       style={{
                         height: `${mode === "rows" ? item.rowRem : item.naturalRem}rem`,
                       }}

@@ -1,9 +1,23 @@
 "use client";
 
 import { useEffect, useId, useState } from "react";
+import type { ReactNode } from "react";
 import PreviewCard from "@/components/blog/previews/shared/preview-card";
 import { createPortal } from "react-dom";
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+
+const layoutTransition = {
+  type: "spring" as const,
+  stiffness: 420,
+  damping: 34,
+  mass: 0.8,
+};
+
+const fadeTransition = {
+  duration: 0.18,
+  ease: "easeOut" as const,
+};
 
 function SkeletonLine({
   className,
@@ -19,30 +33,32 @@ function SkeletonLine({
 
 function MiniModalSkeleton() {
   return (
-    <div className="flex min-h-[19rem] w-full items-center justify-center bg-preview-surface px-4 py-10 dark:bg-preview-dark-stage">
-      <div className="w-full max-w-[18rem] rounded-[1.25rem] bg-preview-surface p-4 shadow-custom dark:bg-preview-dark-surface">
-        <SkeletonLine className="h-5 w-32" />
-        <SkeletonLine className="mt-3 h-3 w-44" />
-        <SkeletonLine className="mt-1.5 h-3 w-36" />
+    <Stage>
+      <div className="flex min-h-[19rem] w-full items-center justify-center">
+        <div className="w-full max-w-[18rem] rounded-[1.25rem] bg-preview-surface p-4 shadow-custom dark:bg-preview-dark-surface">
+          <SkeletonLine className="h-5 w-32" />
+          <SkeletonLine className="mt-3 h-3 w-44" />
+          <SkeletonLine className="mt-1.5 h-3 w-36" />
 
-        <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
-          <SkeletonLine className="h-4 w-28" />
-          <SkeletonLine className="mt-2.5 h-3 w-40" />
-        </div>
+          <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
+            <SkeletonLine className="h-4 w-28" />
+            <SkeletonLine className="mt-2.5 h-3 w-40" />
+          </div>
 
-        <div className="my-4 border-t border-dashed border-preview-border dark:border-preview-dark-border-strong" />
+          <div className="my-4 border-t border-dashed border-preview-border dark:border-preview-dark-border-strong" />
 
-        <SkeletonLine className="h-4 w-24" />
-        <SkeletonLine className="mt-2 h-3 w-40" />
-        <div className="mt-4 h-10 rounded-xl border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
-        <div className="mt-3 h-10 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
+          <SkeletonLine className="h-4 w-24" />
+          <SkeletonLine className="mt-2 h-3 w-40" />
+          <div className="mt-4 h-10 rounded-xl border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
+          <div className="mt-3 h-10 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
 
-        <div className="mt-4 flex items-center justify-between border-t border-preview-border pt-4 dark:border-preview-dark-border-strong">
-          <div className="h-9 w-24 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
-          <div className="h-9 w-16 rounded-xl bg-preview-text dark:bg-preview-dark-active" />
+          <div className="mt-4 flex items-center justify-between border-t border-preview-border pt-4 dark:border-preview-dark-border-strong">
+            <div className="h-9 w-24 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
+            <div className="h-9 w-16 rounded-xl border border-preview-border bg-preview-surface-active dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active" />
+          </div>
         </div>
       </div>
-    </div>
+    </Stage>
   );
 }
 
@@ -63,7 +79,7 @@ function SurfaceButton({
   active = false,
   onClick,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   active?: boolean;
   onClick?: () => void;
 }) {
@@ -80,6 +96,33 @@ function SurfaceButton({
     >
       {children}
     </button>
+  );
+}
+
+function Stage({ children }: { children: ReactNode }) {
+  return (
+    <div className="bg-preview-surface-muted px-2 py-6 sm:px-8 sm:py-8 dark:bg-preview-dark-stage">
+      {children}
+    </div>
+  );
+}
+
+function Chrome({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface",
+        className ?? "max-w-xl",
+      )}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -107,7 +150,7 @@ function PreviewModalShell({
         <div className="h-9 w-24 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised" />
         <div
           className={cn(
-            "h-9 rounded-xl bg-preview-text dark:bg-preview-dark-active",
+            "h-9 rounded-xl border border-preview-border bg-preview-surface-active dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active",
             compact ? "w-16" : "w-20",
           )}
         />
@@ -249,9 +292,9 @@ function ShareModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl bg-preview-text px-4 py-2.5 dark:bg-preview-dark-active"
+            className="rounded-xl border border-preview-border bg-preview-surface-active px-4 py-2.5 transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active"
           >
-            <p className="text-[14px] font-semibold tracking-[-0.01em] text-white dark:text-preview-dark-text">
+            <p className="text-[14px] font-semibold tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
               Done
             </p>
           </button>
@@ -292,62 +335,98 @@ export function PortalLayerPreview() {
         </div>
       }
     >
-      <div className="bg-preview-surface px-4 py-10 sm:px-12 dark:bg-preview-dark-stage">
-        <div className="relative mx-auto max-w-xl overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface">
-          <div className="flex h-12 items-center justify-between border-b border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
-            <SkeletonLine className="h-4 w-28" />
-            <div className="h-8 w-20 rounded-full bg-preview-text dark:bg-preview-dark-active" />
-          </div>
-          <div className="grid gap-4 p-4 md:grid-cols-[minmax(0,1fr)_15rem]">
-            <div className="space-y-3">
-              <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
-                <SkeletonLine className="h-4 w-40" />
-                <SkeletonLine className="mt-2 h-3 w-44" />
-              </div>
-              <div className="relative h-[12rem] overflow-hidden rounded-xl border border-dashed border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
-                <div className="mb-3 flex h-9 items-center rounded-lg border border-preview-border bg-preview-surface px-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface">
-                  <SkeletonLine className="h-3 w-24" />
+      <Stage>
+        <LayoutGroup id="portal-layer-preview">
+          <Chrome className="relative max-w-xl">
+            <div className="flex h-12 items-center justify-between border-b border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
+              <SkeletonLine className="h-4 w-28" />
+              <div className="h-8 w-20 rounded-full border border-preview-border bg-preview-surface-active dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active" />
+            </div>
+            <div className="grid gap-4 p-4 md:grid-cols-[minmax(0,1fr)_15rem]">
+              <div className="space-y-3">
+                <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
+                  <SkeletonLine className="h-4 w-40" />
+                  <SkeletonLine className="mt-2 h-3 w-44" />
                 </div>
-                <div className="space-y-2">
-                  <SkeletonLine className="h-3 w-36" />
-                  <SkeletonLine className="h-3 w-44" />
-                  <SkeletonLine className="h-3 w-28" />
-                </div>
+                <div className="relative h-[12rem] overflow-hidden rounded-xl border border-dashed border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
+                  <div className="mb-3 flex h-9 items-center rounded-lg border border-preview-border bg-preview-surface px-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface">
+                    <SkeletonLine className="h-3 w-24" />
+                  </div>
+                  <div className="space-y-2">
+                    <SkeletonLine className="h-3 w-36" />
+                    <SkeletonLine className="h-3 w-44" />
+                    <SkeletonLine className="h-3 w-28" />
+                  </div>
 
-                {mode === "local" ? (
-                  <div className="absolute inset-x-4 bottom-[-2.75rem] ">
+                  <AnimatePresence initial={false}>
+                    {mode === "local" ? (
+                      <motion.div
+                        key="local-modal"
+                        layout
+                        className="absolute inset-x-4 bottom-[-2.75rem]"
+                        transition={layoutTransition}
+                      >
+                        <motion.div
+                          layoutId="portal-preview-modal"
+                          transition={layoutTransition}
+                        >
+                          <PreviewModalShell
+                            title="Share this file"
+                            description="Rendered inside the clipped container."
+                            compact
+                          />
+                        </motion.div>
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
+                <SkeletonLine className="h-4 w-24" />
+                <SkeletonLine className="mt-2 h-3 w-32" />
+                <div className="mt-4 space-y-2">
+                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
+                  <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
+                </div>
+              </div>
+            </div>
+
+            <AnimatePresence initial={false}>
+              {mode === "portal" ? (
+                <motion.div
+                  key="portal-modal"
+                  className="absolute inset-0 flex items-center justify-center bg-black/15 px-4 py-8 dark:bg-black/35"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={fadeTransition}
+                >
+                  <motion.div
+                    layoutId="portal-preview-modal"
+                    className="w-full max-w-[22rem]"
+                    transition={layoutTransition}
+                  >
                     <PreviewModalShell
                       title="Share this file"
-                      description="Rendered inside the clipped container."
-                      compact
+                      description="Rendered above the page through a portal."
                     />
-                  </div>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
-              <SkeletonLine className="h-4 w-24" />
-              <SkeletonLine className="mt-2 h-3 w-32" />
-              <div className="mt-4 space-y-2">
-                <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
-                <div className="h-10 rounded-lg border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface" />
-              </div>
-            </div>
-          </div>
-
-          {mode === "portal" ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/15 px-4 py-8 dark:bg-black/35">
-              <PreviewModalShell
-                title="Share this file"
-                description="Rendered above the page through a portal."
-              />
-            </div>
-          ) : (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-preview-surface to-transparent dark:from-preview-dark-surface" />
-          )}
-        </div>
-      </div>
+                  </motion.div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="clip-gradient"
+                  className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-preview-surface to-transparent dark:from-preview-dark-surface"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={fadeTransition}
+                />
+              )}
+            </AnimatePresence>
+          </Chrome>
+        </LayoutGroup>
+      </Stage>
     </PreviewCard>
   );
 }
@@ -376,11 +455,11 @@ export function ModalFocusPreview() {
         </div>
       }
     >
-      <div className="bg-preview-surface px-4 py-10 sm:px-12 dark:bg-preview-dark-stage">
-        <div className="relative mx-auto max-w-xl overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface">
+      <Stage>
+        <Chrome className="relative max-w-xl">
           <div className="flex h-12 items-center justify-between border-b border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
             <SkeletonLine className="h-4 w-28" />
-            <div className="h-8 w-20 rounded-full bg-preview-text dark:bg-preview-dark-active" />
+            <div className="h-8 w-20 rounded-full border border-preview-border bg-preview-surface-active dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active" />
           </div>
           <div className="overflow-hidden">
             <div
@@ -430,8 +509,8 @@ export function ModalFocusPreview() {
               />
             </div>
           </div>
-        </div>
-      </div>
+        </Chrome>
+      </Stage>
     </PreviewCard>
   );
 }
@@ -463,11 +542,11 @@ export function ModalShiftPreview() {
         </div>
       }
     >
-      <div className="bg-preview-surface px-4 py-10 sm:px-12 dark:bg-preview-dark-stage">
-        <div className="relative mx-auto max-w-xl overflow-hidden rounded-[1.4rem] bg-preview-surface shadow-custom dark:bg-preview-dark-surface">
+      <Stage>
+        <Chrome className="relative max-w-xl">
           <div className="flex h-12 items-center justify-between border-b border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
             <SkeletonLine className="h-4 w-28" />
-            <div className="h-8 w-20 rounded-full bg-preview-text dark:bg-preview-dark-active" />
+            <div className="h-8 w-20 rounded-full border border-preview-border bg-preview-surface-active dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active" />
           </div>
           <div className="overflow-hidden">
             <div
@@ -519,8 +598,8 @@ export function ModalShiftPreview() {
               />
             </div>
           </div>
-        </div>
-      </div>
+        </Chrome>
+      </Stage>
     </PreviewCard>
   );
 }

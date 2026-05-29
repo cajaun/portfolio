@@ -7,8 +7,8 @@ export const metadata = {
 
 import {
   ActivePostPreview,
-  FeedPreparationPreview,
   InfiniteFeedPreview,
+  VideoPlaybackPreview,
 } from "@/components/blog/previews/intersection-observers";
 
 
@@ -154,50 +154,52 @@ I like this approach more than checking offsets by hand. It adapts better when c
 
 <section className="mb-16 px-2">
 
-## Preparing feed cards
+## Video playback
 
-You can render a cheap image card below the fold, then expand it into the real media grid before the reader reaches it. The observer watches each card inside the feed root and marks it ready once it enters the prep zone.
+Another core social-feed pattern is video autoplay. The feed should play the video that is actually primary in the scroll window and pause the rest.
 
-<FeedPreparationPreview />
+<VideoPlaybackPreview />
 
-That gives image decoding, media setup, and small fetches a head start. You do not need scroll math for each card. You only need to know when the card gets close enough to prepare.
+The observer can watch every video card and keep a ratio map. The card with the strongest visible ratio becomes the active video.
 
 ```tsx
-const [preparedPosts, setPreparedPosts] = useState(
-  () => new Set(["design-camera"]),
-);
+const ratios = useRef(new Map<string, number>());
+const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
 const observer = new IntersectionObserver(
   (entries) => {
     entries.forEach((entry) => {
-      if (!entry.isIntersecting) {
-        return;
-      }
-
-      const id = (entry.target as HTMLElement).dataset.postId;
+      const id = (entry.target as HTMLElement).dataset.videoId;
 
       if (id) {
-        setPreparedPosts((posts) => new Set(posts).add(id));
+        ratios.current.set(id, entry.isIntersecting ? entry.intersectionRatio : 0);
       }
     });
+
+    const nextVideo = [...ratios.current.entries()]
+      .filter(([, ratio]) => ratio >= 0.55)
+      .sort((a, b) => b[1] - a[1])[0]?.[0];
+
+    setActiveVideoId(nextVideo ?? null);
   },
   {
     root: feedScroller,
-    threshold: 0.2,
-    rootMargin: "0px 0px 40% 0px",
+    threshold: [0, 0.25, 0.55, 0.75, 0.9],
+    rootMargin: "-10% 0px -20% 0px",
   },
 );
 
-feedCards.map((card) => (
-  <ImageCardSkeleton
-    key={card.id}
-    count={preparedPosts.has(card.id) ? card.imageCount : 1}
-    title={card.title}
-  />
+posts.map((post) => (
+  <div
+    key={post.id}
+    data-video-id={post.id}
+  >
+    <VideoPost playing={activeVideoId === post.id} />
+  </div>
 ));
 ```
 
-The bottom `rootMargin` expands the feed root downward. The next card can switch from the one-block placeholder to its full grid before it reaches the middle of the viewport.
+The threshold keeps a video from starting when only a sliver is visible. The negative margins make the play zone smaller than the scroll box, which helps the active video feel tied to the center of attention.
 
 </section>
 

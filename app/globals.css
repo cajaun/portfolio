@@ -107,6 +107,13 @@ html.dark pre[data-theme*="github-dark"] span {
   width: 100%;
 }
 
+@media (max-width: 640px) {
+  .preview-card-mobile-wide {
+    width: calc(100vw - 1rem);
+    margin-left: calc(50% - 50vw + 0.5rem);
+  }
+}
+
 .dark .preview-card {
   background: lab(4.4379% 0 0);
   box-shadow: 0 0 0 1px #ffffff14;
