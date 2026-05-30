@@ -22,15 +22,15 @@ type WorkExample = {
 };
 
 const WORK_EXAMPLES: WorkExample[] = [
-  {
-    slug: "modal-portal-layer",
-    title: "Modal Portal Layer",
-    publishedAt: "April 15, 2026",
+   {
+    slug: "image-grid-mosaic",
+    title: "Image Grid Mosaic",
+    publishedAt: "May 29, 2026",
     summary:
-      "A modal demo that shows the dialog moving out of a clipped container when it renders through a portal.",
-    Component: PortalLayerPreview,
+      "A media grid that switches between one, two, three, and four image compositions.",
+    Component: MosaicExamplesPreview,
   },
-  {
+    {
     slug: "active-post-observer",
     title: "Active Post Observer",
     publishedAt: "April 17, 2026",
@@ -39,12 +39,12 @@ const WORK_EXAMPLES: WorkExample[] = [
     Component: ActivePostPreview,
   },
   {
-    slug: "image-grid-mosaic",
-    title: "Image Grid Mosaic",
-    publishedAt: "May 29, 2026",
+    slug: "modal-portal-layer",
+    title: "Modal Portal Layer",
+    publishedAt: "April 15, 2026",
     summary:
-      "A media grid that switches between one, two, three, and four image compositions.",
-    Component: MosaicExamplesPreview,
+      "A modal demo that shows the dialog moving out of a clipped container when it renders through a portal.",
+    Component: PortalLayerPreview,
   },
 ];
 

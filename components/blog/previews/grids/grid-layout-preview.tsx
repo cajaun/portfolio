@@ -135,7 +135,7 @@ function AnimatedCardSkeleton({
 
 function Stage({ children }: { children: ReactNode }) {
   return (
-    <div className="bg-preview-surface-muted px-1.5 py-5 sm:px-8 sm:py-8 dark:bg-preview-dark-stage">
+    <div className="bg-preview-surface-muted px-4 py-4 sm:px-8 sm:py-8 dark:bg-preview-dark-stage">
       {children}
     </div>
   );
