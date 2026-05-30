@@ -1,5 +1,3 @@
-export {
-  ActivePostPreview,
-  InfiniteFeedPreview,
-  VideoPlaybackPreview,
-} from "./intersection-observer-preview";
+export * from "./examples/infinite-feed-preview";
+export * from "./examples/active-post-preview";
+export * from "./examples/video-playback-preview";
