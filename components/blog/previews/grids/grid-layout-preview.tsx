@@ -248,16 +248,18 @@ export function EqualTracksPreview() {
 
 // ─── 2. FloorPreview ──────────────────────────────────────────────────────────
 //
-// The floor's job is visible only under pressure. A wide container makes both
-// approaches look fine. A narrow container reveals the difference: without a
-// floor the cards get crushed; with a floor they wrap to the next row instead.
-//
-// The button narrows the container. One card set has no minimum (crushes),
-// the other has minmax(8rem, 1fr) (wraps). Side-by-side in a narrow context.
+// The container stays fixed. The button changes the grid rule so the same
+// pressure either crushes cards or lets them wrap before they get too small.
+
+type FloorMode = "none" | "floor";
 
 export function FloorPreview() {
-  const [narrow, setNarrow] = useState(false);
+  const [mode, setMode] = useState<FloorMode>("floor");
   const isMobile = useMobilePreview();
+  const columns =
+    mode === "floor"
+      ? "repeat(auto-fit, minmax(8rem, 1fr))"
+      : "repeat(3, minmax(0, 1fr))";
 
   return (
     <PreviewCard
@@ -265,82 +267,48 @@ export function FloorPreview() {
       wideMobile
       footer={
         <FooterRow>
-          <SurfaceButton active={!narrow} onClick={() => setNarrow(false)}>
-            Wide container
+          <SurfaceButton active={mode === "none"} onClick={() => setMode("none")}>
+            No floor
           </SurfaceButton>
-          <SurfaceButton active={narrow} onClick={() => setNarrow(true)}>
-            Narrow container
+          <SurfaceButton active={mode === "floor"} onClick={() => setMode("floor")}>
+            With floor
           </SurfaceButton>
         </FooterRow>
       }
       footnote={
         <PreviewFootnote>
-          A floor only matters under pressure. Wide containers make both approaches look fine.
+          The container stays fixed. The floor decides whether cards shrink or wrap.
         </PreviewFootnote>
       }
     >
       <Stage>
-        <Chrome
-          className={cn(
-            "transition-[max-width] duration-500 ease-in-out",
-            isMobile
-              ? narrow
-                ? "max-w-[18rem]"
-                : "max-w-full"
-              : narrow
-                ? "max-w-[22rem]"
-                : "max-w-xl",
-          )}
-        >
+        <Chrome>
           <Toolbar />
-          <div className="h-[39rem] p-3 sm:h-[25.5rem] sm:p-4">
-            {/* Without floor — repeat(3, 1fr) crushes cards at narrow width */}
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-preview-text-muted dark:text-preview-dark-text-muted">
-              No floor
-            </p>
-            <motion.div
-              layout
-              transition={layoutTransition}
-              className="mb-5 grid gap-2.5 sm:mb-4 sm:gap-3"
-              style={{
-                gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-                gridAutoRows: isMobile ? "5.75rem" : "5rem",
-              }}
-            >
-              {[0, 1, 2].map((i) => (
-                <AnimatedCardSkeleton
-                  key={i}
-                  className="min-h-[5.75rem] sm:h-20 sm:min-h-0"
-                />
-              ))}
-            </motion.div>
-
-            {/* With floor — the cards wrap before crushing */}
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-preview-text-muted dark:text-preview-dark-text-muted">
-              With floor
-            </p>
-            <motion.div
-              layout
-              transition={layoutTransition}
-              className="grid gap-2.5 sm:gap-3"
-              style={{
-                gridTemplateColumns: isMobile
-                  ? narrow
-                    ? "repeat(1, minmax(0, 1fr))"
-                    : "repeat(2, minmax(8rem, 1fr))"
-                  : narrow
-                    ? "repeat(2, minmax(8rem, 1fr))"
-                    : "repeat(3, minmax(8rem, 1fr))",
-                gridAutoRows: isMobile ? "6.25rem" : "5rem",
-              }}
-            >
-              {[0, 1, 2].map((i) => (
-                <AnimatedCardSkeleton
-                  key={i}
-                  className="min-h-[6.25rem] sm:h-20 sm:min-h-0"
-                />
-              ))}
-            </motion.div>
+          <div className="p-3 sm:p-4">
+            <div className="mx-auto w-full max-w-[24rem] rounded-2xl border border-dashed border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-stage">
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-preview-text-muted dark:text-preview-dark-text-muted">
+                  Fixed container
+                </p>
+                <SkeletonLine className="h-2.5 w-20" />
+              </div>
+              <motion.div
+                layout
+                transition={layoutTransition}
+                className="grid h-[26rem] content-start gap-2.5 sm:h-[19rem] sm:gap-3"
+                style={{
+                  gridTemplateColumns: columns,
+                  gridAutoRows: isMobile ? "6.25rem" : "5.5rem",
+                }}
+              >
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <AnimatedCardSkeleton
+                    key={i}
+                    className="min-h-[6.25rem] sm:h-[5.5rem] sm:min-h-0"
+                  />
+                ))}
+              </motion.div>
+            </div>
           </div>
         </Chrome>
       </Stage>
@@ -1178,7 +1146,7 @@ export function BentoExamplesPreview() {
             <motion.div
               layout
               transition={layoutTransition}
-              className="grid min-h-[31rem] grid-cols-2 gap-2.5 sm:h-[16rem] sm:grid-cols-4 sm:gap-3"
+              className="grid h-[31rem] grid-cols-2 gap-2.5 sm:h-[16rem] sm:grid-cols-4 sm:gap-3"
               style={{
                 gridTemplateRows: isMobile
                   ? "repeat(5, minmax(5.5rem, 1fr))"

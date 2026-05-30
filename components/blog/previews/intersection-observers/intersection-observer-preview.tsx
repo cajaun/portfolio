@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
 import ImageCardSkeleton, {
   type ImageCardCount,
 } from "@/components/blog/previews/shared/image-card-skeleton";
@@ -151,6 +152,31 @@ const videoPosts: MediaPost[] = [
   },
 ];
 
+const videoDurationSeconds = 93;
+const videoPreviewDurationMs = 45000;
+const initialVideoProgress: Record<string, number> = {
+  "video-studio-tour": 0,
+  "video-layout-cuts": 0.26,
+  "video-motion-notes": 0.08,
+  "video-product-clips": 0.48,
+  "video-studio-roll": 0.18,
+  "video-final-cut": 0,
+};
+
+function buildInitialVideoProgress() {
+  return videoPosts.reduce<Record<string, number>>((progress, post) => {
+    progress[post.id] = initialVideoProgress[post.id] ?? 0;
+    return progress;
+  }, {});
+}
+
+function formatVideoTime(seconds: number) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+}
+
 function buildFeedBatch(start: number, count: number) {
   return Array.from({ length: count }, (_, index) => {
     const seed = feedSeed[(start + index) % feedSeed.length];
@@ -212,10 +238,17 @@ function FeedPost({
 function VideoPost({
   post,
   active = false,
+  progress,
 }: {
   post: MediaPost;
   active?: boolean;
+  progress: number;
 }) {
+  const remainingSeconds = Math.max(
+    Math.ceil(videoDurationSeconds * (1 - progress)),
+    1,
+  );
+
   return (
     <article
       className={cn(
@@ -245,22 +278,38 @@ function VideoPost({
         >
           <div className="absolute inset-x-4 top-4 flex items-center justify-between">
             <div className="h-2.5 w-20 rounded-full bg-preview-border dark:bg-preview-dark-surface-active" />
-            <div className="rounded-full border border-preview-border bg-preview-surface px-2 py-1 text-[11px] font-medium text-preview-text-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface dark:text-preview-dark-text-muted">
-              {active ? "Playing" : "Paused"}
-            </div>
+            {!active ? (
+              <div className="rounded-full border border-preview-border bg-preview-surface px-2 py-1 text-[11px] font-medium text-preview-text-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface dark:text-preview-dark-text-muted">
+                Paused
+              </div>
+            ) : null}
           </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex size-12 items-center justify-center rounded-full border border-preview-border bg-preview-surface transition-colors duration-300 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface">
-              <div className="ml-1 h-0 w-0 border-y-[8px] border-l-[12px] border-y-transparent border-l-preview-text-muted dark:border-l-preview-dark-text-muted" />
+          {!active ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex size-12 items-center justify-center rounded-full border border-preview-border bg-preview-surface transition-colors duration-300 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface">
+                <div className="flex items-center gap-1">
+                  <span className="h-4 w-1.5 rounded-full bg-preview-text-muted dark:bg-preview-dark-text-muted" />
+                  <span className="h-4 w-1.5 rounded-full bg-preview-text-muted dark:bg-preview-dark-text-muted" />
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="absolute inset-x-4 bottom-4 h-1.5 overflow-hidden rounded-full bg-preview-border dark:bg-preview-dark-surface">
-            <div
-              className={cn(
-                "h-full rounded-full bg-preview-text-muted transition-[width] duration-500 dark:bg-preview-dark-text-muted",
-                active ? "w-2/3" : "w-1/5",
-              )}
-            />
+          ) : null}
+          <div className="absolute inset-x-4 bottom-4">
+            {active ? (
+              <div className="mb-1.5 flex justify-start">
+                <div className="rounded-md bg-black/60 px-2 py-1 text-[12px] font-medium tabular-nums tracking-[-0.01em] text-white shadow-custom dark:bg-black/55 dark:text-preview-dark-text">
+                  {formatVideoTime(remainingSeconds)}
+                </div>
+              </div>
+            ) : null}
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-preview-border dark:bg-preview-dark-surface">
+              <motion.div
+                className="h-full w-full origin-left rounded-full bg-preview-text-muted opacity-70 dark:bg-preview-dark-text-muted"
+                initial={false}
+                animate={{ scaleX: progress }}
+                transition={{ duration: 0.18, ease: "linear" }}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -615,6 +664,9 @@ export function VideoPlaybackPreview() {
   const postRefs = useRef<(HTMLElement | null)[]>([]);
   const ratiosRef = useRef(new Map<string, number>());
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+  const [videoProgress, setVideoProgress] = useState(() =>
+    buildInitialVideoProgress(),
+  );
 
   useEffect(() => {
     const root = rootRef.current;
@@ -662,6 +714,34 @@ export function VideoPlaybackPreview() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!activeVideoId) {
+      return;
+    }
+
+    let lastTick = window.performance.now();
+
+    const timer = window.setInterval(() => {
+      const now = window.performance.now();
+      const delta = now - lastTick;
+      lastTick = now;
+
+      setVideoProgress((current) => {
+        const currentProgress =
+          current[activeVideoId] ?? initialVideoProgress[activeVideoId] ?? 0;
+        const nextProgress =
+          (currentProgress + delta / videoPreviewDurationMs) % 1;
+
+        return {
+          ...current,
+          [activeVideoId]: nextProgress,
+        };
+      });
+    }, 250);
+
+    return () => window.clearInterval(timer);
+  }, [activeVideoId]);
+
   const scrollToVideo = (index: number) => {
     const root = rootRef.current;
     const node = postRefs.current[index];
@@ -696,6 +776,7 @@ export function VideoPlaybackPreview() {
             onClick={() => {
               setActiveVideoId(null);
               ratiosRef.current.clear();
+              setVideoProgress(buildInitialVideoProgress());
               rootRef.current?.scrollTo({ top: 0, behavior: "smooth" });
             }}
             className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
@@ -730,6 +811,8 @@ export function VideoPlaybackPreview() {
         <div className="w-full space-y-6">
           {videoPosts.map((post, index) => {
             const active = activeVideoId === post.id;
+            const progress =
+              videoProgress[post.id] ?? initialVideoProgress[post.id] ?? 0;
 
             return (
               <div
@@ -739,7 +822,7 @@ export function VideoPlaybackPreview() {
                 }}
                 data-video-id={post.id}
               >
-                <VideoPost post={post} active={active} />
+                <VideoPost post={post} active={active} progress={progress} />
               </div>
             );
           })}

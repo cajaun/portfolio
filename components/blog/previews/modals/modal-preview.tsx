@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import PreviewCard from "@/components/blog/previews/shared/preview-card";
 import { createPortal } from "react-dom";
@@ -31,46 +31,141 @@ function SkeletonLine({
   );
 }
 
-function MiniModalSkeleton() {
+function ModalSkeletonSurface({
+  expanded = false,
+  layoutId,
+  onClose,
+}: {
+  expanded?: boolean;
+  layoutId?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <motion.div
+      layout
+      layoutId={layoutId}
+      transition={layoutTransition}
+      className={cn(
+        "w-full rounded-[1.25rem] bg-preview-surface p-4 shadow-custom dark:bg-preview-dark-surface",
+        expanded
+          ? "max-w-[30rem] rounded-[1.5rem] p-5 dark:bg-preview-dark-surface-muted dark:shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
+          : "max-w-[18rem]",
+      )}
+      onClick={(event) => event.stopPropagation()}
+      role={expanded ? "dialog" : undefined}
+      aria-modal={expanded ? true : undefined}
+      aria-label={expanded ? "Skeleton modal preview" : undefined}
+    >
+      <SkeletonLine className={cn("h-5", expanded ? "w-44" : "w-32")} />
+      <SkeletonLine
+        className={cn("mt-3 h-3", expanded ? "w-64 max-w-full" : "w-44")}
+      />
+      <SkeletonLine
+        className={cn(
+          "mt-1.5 h-3",
+          expanded ? "w-52 max-w-full" : "w-36",
+        )}
+      />
+
+      <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
+        <SkeletonLine className={cn("h-4", expanded ? "w-36" : "w-28")} />
+        <SkeletonLine
+          className={cn(
+            "mt-2.5 h-3",
+            expanded ? "w-52 max-w-full" : "w-40",
+          )}
+        />
+      </div>
+
+      <div className="my-4 border-t border-dashed border-preview-border dark:border-preview-dark-border-strong" />
+
+      <SkeletonLine className={cn("h-4", expanded ? "w-32" : "w-24")} />
+      <SkeletonLine
+        className={cn("mt-2 h-3", expanded ? "w-56 max-w-full" : "w-40")}
+      />
+      <div className="mt-4 h-10 rounded-xl border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised" />
+      <div className="mt-3 h-10 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised" />
+
+      <div className="mt-4 flex items-center justify-between border-t border-preview-border pt-4 dark:border-preview-dark-border-strong">
+        <div className="h-9 w-24 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised" />
+        {expanded && onClose ? (
+          <button
+            type="button"
+            aria-label="Close modal preview"
+            onClick={onClose}
+            className="h-9 w-16 rounded-xl border border-preview-border bg-preview-surface-active transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active"
+          />
+        ) : (
+          <div className="h-9 w-16 rounded-xl border border-preview-border bg-preview-surface-active dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active" />
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+function MiniModalSkeleton({ open }: { open: boolean }) {
   return (
     <Stage>
-      <div className="flex min-h-[19rem] w-full items-center justify-center">
-        <div className="w-full max-w-[18rem] rounded-[1.25rem] bg-preview-surface p-4 shadow-custom dark:bg-preview-dark-surface">
-          <SkeletonLine className="h-5 w-32" />
-          <SkeletonLine className="mt-3 h-3 w-44" />
-          <SkeletonLine className="mt-1.5 h-3 w-36" />
-
-          <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted">
-            <SkeletonLine className="h-4 w-28" />
-            <SkeletonLine className="mt-2.5 h-3 w-40" />
-          </div>
-
-          <div className="my-4 border-t border-dashed border-preview-border dark:border-preview-dark-border-strong" />
-
-          <SkeletonLine className="h-4 w-24" />
-          <SkeletonLine className="mt-2 h-3 w-40" />
-          <div className="mt-4 h-10 rounded-xl border border-preview-border bg-preview-surface dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
-          <div className="mt-3 h-10 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
-
-          <div className="mt-4 flex items-center justify-between border-t border-preview-border pt-4 dark:border-preview-dark-border-strong">
-            <div className="h-9 w-24 rounded-xl border border-preview-border bg-preview-surface-muted dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted" />
-            <div className="h-9 w-16 rounded-xl border border-preview-border bg-preview-surface-active dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active" />
-          </div>
-        </div>
+      <div className="flex h-[28rem] w-full items-center justify-center">
+        <AnimatePresence initial={false}>
+          {!open ? (
+            <ModalSkeletonSurface
+              key="inline-skeleton-modal"
+              layoutId="modal-preview-skeleton"
+            />
+          ) : null}
+        </AnimatePresence>
       </div>
     </Stage>
   );
 }
 
-function Avatar({
-  initials,
-}: {
-  initials: string;
-}) {
-  return (
-    <div className="flex size-10 items-center justify-center rounded-full border border-preview-border bg-preview-surface-muted text-[12px] font-medium tracking-[-0.01em] text-preview-text dark:border-preview-dark-border-strong dark:bg-preview-dark-stage dark:text-preview-dark-text">
-      {initials}
-    </div>
+function SkeletonModalOverlay({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        onClose();
+      }
+    };
+
+    const root = document.documentElement;
+    const scrollbarWidth = window.innerWidth - root.clientWidth;
+    const previousOverflow = root.style.overflow;
+    const previousPaddingRight = root.style.paddingRight;
+
+    root.style.overflow = "hidden";
+
+    if (scrollbarWidth > 0) {
+      root.style.paddingRight = previousPaddingRight
+        ? `calc(${previousPaddingRight} + ${scrollbarWidth}px)`
+        : `${scrollbarWidth}px`;
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      root.style.overflow = previousOverflow;
+      root.style.paddingRight = previousPaddingRight;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <motion.div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 px-3 py-8 dark:bg-black/55"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={fadeTransition}
+      onClick={onClose}
+    >
+      <ModalSkeletonSurface
+        expanded
+        layoutId="modal-preview-skeleton"
+        onClose={onClose}
+      />
+    </motion.div>,
+    document.body,
   );
 }
 
@@ -156,152 +251,6 @@ function PreviewModalShell({
         />
       </div>
     </div>
-  );
-}
-
-function ShareModal({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
-  const [mounted, setMounted] = useState(false);
-  const titleId = useId();
-  const descriptionId = useId();
-
-  useEffect(() => {
-    setMounted(true);
-
-    return () => setMounted(false);
-  }, []);
-
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
-
-    const root = document.documentElement;
-    const scrollbarWidth = window.innerWidth - root.clientWidth;
-    const previousOverflow = root.style.overflow;
-    const previousPaddingRight = root.style.paddingRight;
-
-    root.style.overflow = "hidden";
-
-    if (scrollbarWidth > 0) {
-      root.style.paddingRight = previousPaddingRight
-        ? `calc(${previousPaddingRight} + ${scrollbarWidth}px)`
-        : `${scrollbarWidth}px`;
-    }
-
-    window.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      root.style.overflow = previousOverflow;
-      root.style.paddingRight = previousPaddingRight;
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open, onClose]);
-
-  if (!mounted || !open) {
-    return null;
-  }
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 px-3 py-8 dark:bg-black/55"
-      onClick={onClose}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        aria-describedby={descriptionId}
-        className="w-full max-w-[30rem] rounded-[1.5rem] border border-preview-border bg-preview-surface p-5 text-preview-text shadow-[0_30px_80px_rgba(0,0,0,0.12)] dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted dark:text-preview-dark-text dark:shadow-[0_30px_80px_rgba(0,0,0,0.45)]"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2
-          id={titleId}
-          className="text-[1.45rem] font-medium tracking-[-0.03em] text-preview-text dark:text-preview-dark-text"
-        >
-          Share this file
-        </h2>
-        <p
-          id={descriptionId}
-          className="mt-2 text-[15px] font-medium leading-6 tracking-[-0.01em] text-gray-200 dark:text-preview-dark-paragraph"
-        >
-          Invite your team to review and collaborate.
-        </p>
-
-        <div className="mt-5 rounded-xl border border-preview-border bg-preview-surface-muted p-4 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
-          <p className="text-[15px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
-            Anyone with the link can view
-          </p>
-          <p className="mt-1 text-[14px] leading-6 text-gray-200 dark:text-preview-dark-paragraph">
-            cajaun.com/project/valmiera
-          </p>
-        </div>
-
-        <div className="my-5 border-t border-dashed border-preview-border dark:border-preview-dark-border-strong" />
-
-        <div>
-          <h3 className="text-[15px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
-            People with access
-          </h3>
-          <p className="mt-1 text-[14px] leading-6 text-gray-200 dark:text-preview-dark-paragraph">
-            Email addresses at these domains are allowed.
-          </p>
-          <div className="mt-4 rounded-xl border border-preview-border bg-preview-surface px-3 py-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
-            <p className="text-[14px] text-gray-200 dark:text-preview-dark-paragraph">
-              Search by name, email or group
-            </p>
-          </div>
-          <div className="mt-4 flex items-center gap-3">
-            <Avatar initials="JB" />
-            <div className="flex-1">
-              <p className="text-[15px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
-                Justin Brown
-              </p>
-              <p className=" text-[14px]  text-gray-200 dark:text-preview-dark-paragraph">
-                justin@gmail.com
-              </p>
-            </div>
-            <p className="text-[14px] font-medium tracking-[-0.01em] text-gray-200 dark:text-preview-dark-paragraph">
-              Viewer
-            </p>
-          </div>
-          <div className="mt-4 rounded-xl border border-preview-border bg-preview-surface-muted px-4 py-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
-            <p className="text-[15px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
-              Create a group
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-5 flex items-center justify-between gap-3 border-t border-preview-border pt-5 dark:border-preview-dark-border-strong">
-          <div className="rounded-xl border border-preview-border bg-preview-surface-muted px-4 py-2.5 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-raised">
-            <p className="text-[14px] font-medium tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
-              Get embed code
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-xl border border-preview-border bg-preview-surface-active px-4 py-2.5 transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-active"
-          >
-            <p className="text-[14px] font-semibold tracking-[-0.01em] text-preview-text dark:text-preview-dark-text">
-              Done
-            </p>
-          </button>
-        </div>
-      </div>
-    </div>,
-    document.body,
   );
 }
 
@@ -608,7 +557,7 @@ export default function ModalPreview() {
   const [open, setOpen] = useState(false);
 
   return (
-    <>
+    <LayoutGroup id="modal-state-preview">
       <PreviewCard
         full
         footer={
@@ -623,10 +572,17 @@ export default function ModalPreview() {
           </div>
         }
       >
-        <MiniModalSkeleton />
+        <MiniModalSkeleton open={open} />
       </PreviewCard>
 
-      <ShareModal open={open} onClose={() => setOpen(false)} />
-    </>
+      <AnimatePresence initial={false}>
+        {open ? (
+          <SkeletonModalOverlay
+            key="expanded-skeleton-modal"
+            onClose={() => setOpen(false)}
+          />
+        ) : null}
+      </AnimatePresence>
+    </LayoutGroup>
   );
 }

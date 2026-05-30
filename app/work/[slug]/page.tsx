@@ -22,7 +22,7 @@ type WorkExample = {
 };
 
 const WORK_EXAMPLES: WorkExample[] = [
-   {
+  {
     slug: "image-grid-mosaic",
     title: "Image Grid Mosaic",
     publishedAt: "May 29, 2026",
@@ -30,7 +30,7 @@ const WORK_EXAMPLES: WorkExample[] = [
       "A media grid that switches between one, two, three, and four image compositions.",
     Component: MosaicExamplesPreview,
   },
-    {
+  {
     slug: "active-post-observer",
     title: "Active Post Observer",
     publishedAt: "April 17, 2026",
