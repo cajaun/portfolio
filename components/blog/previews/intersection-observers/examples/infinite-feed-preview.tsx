@@ -94,7 +94,7 @@ export function InfiniteFeedPreview() {
                 root?.scrollTo({ top: 0, behavior: "smooth" });
               });
             }}
-            className="flex h-9 items-center justify-center rounded-lg  bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-preview-dark-text"
+            className="flex h-9 items-center justify-center rounded-lg  bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:border-preview-dark-border dark:bg-preview-dark-stage dark:text-preview-dark-text"
           >
             Reset feed
           </button>
@@ -107,7 +107,7 @@ export function InfiniteFeedPreview() {
                 node.scrollTo({ top: node.scrollHeight, behavior: "smooth" });
               }
             }}
-            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-surface dark:text-preview-dark-text"
+            className="flex h-9 items-center justify-center rounded-lg bg-preview-surface px-3 text-sm font-medium tracking-[-0.01em] text-preview-text shadow-custom transition-transform duration-200 active:scale-[0.98] dark:bg-preview-dark-stage dark:text-preview-dark-text"
           >
             Trigger load
           </button>

@@ -40,7 +40,7 @@ export default function PreviewCard({
         {header ? (
           <div
             className={cn(
-              "flex h-[61px] items-center border-b border-preview-border bg-preview-surface-muted px-4 text-preview-text dark:border-preview-dark-border dark:bg-preview-dark-surface-muted dark:text-preview-dark-text",
+              "flex h-[61px] items-center border-b border-preview-border bg-preview-surface-muted px-4 text-preview-text dark:border-preview-dark-border dark:bg-preview-dark-surface dark:text-preview-dark-text",
               headerClassName,
             )}
           >
@@ -66,7 +66,7 @@ export default function PreviewCard({
           {children}
         </div>
         {footer ? (
-          <div className="flex h-[61px] items-center border-t border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border dark:bg-preview-dark-surface-muted">
+          <div className="flex h-[61px] items-center border-t border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border dark:bg-preview-dark-surface">
             {footer}
           </div>
         ) : null}

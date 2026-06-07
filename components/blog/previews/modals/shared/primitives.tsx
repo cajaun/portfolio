@@ -43,8 +43,8 @@ export function SurfaceButton({
       className={cn(
         "flex h-9 items-center justify-center rounded-lg px-3 text-[13px] font-medium tracking-[-0.01em] transition-transform duration-200 active:scale-[0.98]",
         active
-          ? "bg-preview-surface-active text-preview-text shadow-custom dark:bg-preview-dark-active dark:text-preview-dark-text"
-          : "bg-preview-surface text-preview-text shadow-custom dark:border-preview-dark-border-strong dark:bg-preview-dark-surface dark:text-preview-dark-text",
+          ? "bg-preview-surface-active text-preview-text shadow-custom dark:bg-preview-dark-surface-muted dark:text-preview-dark-text"
+          : "bg-preview-surface text-preview-text shadow-custom dark:border-preview-dark-border-strong dark:bg-preview-dark-stage dark:text-preview-dark-text",
       )}
     >
       {children}
