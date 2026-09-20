@@ -1,0 +1,424 @@
+export const metadata = {
+  title: "A Series of Curves",
+  publishedAt: "September 20, 2026",
+  summary:
+    "A walkthrough of the geometry, interaction model, motion layers and controls behind an interactive chart.",
+};
+
+import {
+  MorphingChartExamplePreview,
+  MorphingChartFillPreview,
+  MorphingChartLayerPreview,
+  MorphingChartPreview,
+} from "@/components/blog/previews/morphing-chart";
+
+
+<section className="mb-16 px-2">
+
+## Anatomy
+
+An interactive chart begins with a line. The line becomes useful when a reader can change the range, press on the graph, move a cursor along the rendered curve and see the remaining series recede without losing its shape.
+
+That experience depends on a chain of small decisions. The data layer supplies samples. The coordinate layer turns those samples into points. The path writer turns the points into one SVG path. The interaction layer converts pointer coordinates back into chart coordinates. The motion layer interpolates the values that change between states.
+
+Each part answers one question. Data describes the series. Geometry places it in the viewBox. Pointer input identifies the place under the reader’s finger. The renderer assembles those answers into one surface.
+
+Press and drag across the graph to place the cursor. Release to watch the future segment return. Select another range to see the same interaction continue through a new shape. The cursor, future segment, endpoint and path use one coordinate system.
+
+<MorphingChartPreview footnote="The cursor, future line and endpoint share one path." />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Data before JSX
+
+The chart should receive a predictable data shape before it renders anything. Each range owns an array of values and every array uses the same sample count. The motion layer can then interpolate one path command sequence into the next path command sequence.
+
+```tsx
+export type RangeType = "1H" | "1D" | "1W" | "1M" | "1Y";
+
+type ChartDataSet = Record<RangeType, number[]>;
+
+type ChartSeries = {
+  chartDataSets: ChartDataSet;
+};
+
+const values = dataBySource[source].chartDataSets[range];
+```
+
+The component does not need to know whether the values came from a request, a fixture, or a local calculation. It receives a series and a range, then asks the geometry layer to map the selected values. That keeps range selection in React state and leaves the path calculation independent from the controls that choose it.
+
+The same contract supports another series without adding another interaction model. Press and drag across the graph to inspect the curve, then select a range to compare its shape.
+
+<MorphingChartExamplePreview example="info" initialRange="1D" showFill={false} footnote="One data shape drives every range" />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## One coordinate system
+
+SVG gives the chart a stable internal coordinate system through `viewBox`. The browser can resize the chart to fit its card, while the code continues to work with the same width and height.
+
+```tsx
+export const VIEWBOX_WIDTH = 520;
+export const CHART_HEIGHT = 280;
+export const CHART_TOP = CHART_HEIGHT * 0.08;
+export const CHART_BOTTOM = CHART_HEIGHT * 0.92;
+export const CHART_RANGE = CHART_BOTTOM - CHART_TOP;
+
+function getPointY(value: number) {
+  return CHART_BOTTOM - (value / 100) * CHART_RANGE;
+}
+
+export function buildChartPoints(values: number[], graphWidth: number) {
+  return values.map((value, index) => ({
+    x: (index / Math.max(1, values.length - 1)) * graphWidth,
+    y: getPointY(value),
+    value,
+  }));
+}
+```
+
+The chart uses a value range from zero to one hundred. `getPointY` reverses that range because SVG increases `y` as it moves down the screen. `buildChartPoints` distributes each sample across the current graph width. The path, pointer lookup, clip rectangles and cursor all use these same units.
+
+That shared frame prevents a common interaction bug. If the pointer uses CSS pixels while the path uses viewBox units, the cursor drifts as the card changes size. Converting both sides through the SVG bounds keeps the pointer attached to the rendered chart.
+
+<MorphingChartExamplePreview example="success" initialRange="1W" showFill={false} footnote="The pointer and path stay in the same viewBox" />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Write one smooth path
+
+The chart needs one path definition that every visual layer can reuse. The path writer below connects each pair of samples with a cubic Bézier segment. Neighboring points influence the control points, so the line keeps a continuous slope as it crosses each sample.
+
+```tsx
+export function buildSmoothPath(values: number[], graphWidth: number) {
+  const points = buildChartPoints(values, graphWidth);
+  if (points.length === 0) return "";
+
+  let path = `M ${points[0].x} ${points[0].y}`;
+
+  for (let index = 1; index < points.length; index += 1) {
+    const start = points[index - 1];
+    const end = points[index];
+    const previous = points[Math.max(0, index - 2)];
+    const following = points[Math.min(points.length - 1, index + 1)];
+    const stepX = end.x - start.x;
+
+    const firstControlY = start.y + (end.y - previous.y) / 6;
+    const secondControlY = end.y - (following.y - start.y) / 6;
+
+    path += ` C ${start.x + stepX / 3} ${firstControlY}
+      ${end.x - stepX / 3} ${secondControlY}
+      ${end.x} ${end.y}`;
+  }
+
+  return path;
+}
+```
+
+The important choice sits outside the formula. The stroke, the area fill, the live clip and the future clip all consume the same path. That gives the chart one geometry source. A cursor evaluated against the same Bézier segments lands on the visible curve instead of stopping at the nearest raw sample.
+
+<MorphingChartExamplePreview example="warning" initialRange="1M" showFill footnote="One Bézier path drives the stroke and fill" />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Morph the path and its width together
+
+A range change can alter two things at once. The values produce a new curve and the range can use a different graph extent. Those values need one animation clock so the endpoint remains attached while the shape changes.
+
+```tsx
+const path = useMemo(
+  () => buildSmoothPath(values, graphWidth),
+  [values, graphWidth],
+);
+const fillPath = `${path} L ${graphWidth} ${CHART_HEIGHT}
+  L 0 ${CHART_HEIGHT} Z`;
+
+const animatedPath = useMotionValue(path);
+const animatedFillPath = useMotionValue(fillPath);
+const animatedGraphWidth = useMotionValue(graphWidth);
+
+useEffect(() => {
+  const transition = {
+    duration: 0.25,
+    ease: [0.22, 0.75, 0.28, 1] as const,
+  };
+
+  const pathAnimation = animate(animatedPath, path, transition);
+  const fillAnimation = animate(animatedFillPath, fillPath, transition);
+  const widthAnimation = animate(animatedGraphWidth, graphWidth, transition);
+
+  return () => {
+    pathAnimation.stop();
+    fillAnimation.stop();
+    widthAnimation.stop();
+  };
+}, [animatedFillPath, animatedGraphWidth, animatedPath, fillPath, graphWidth, path]);
+```
+
+The fill path closes against the chart floor, so it inherits every change in the line. The width motion value drives the endpoint marker and the clip rectangles. When the selected range changes, the visible line, the area and the graph boundary travel as one state change.
+
+<MorphingChartLayerPreview footnote="The stroke and area morph from one path" />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Capture the pointer in chart space
+
+The pointer surface needs to cover the graph without changing the geometry. An invisible SVG rectangle gives the chart a stable hit area, while pointer capture keeps the drag alive when the cursor crosses a curve or moves beyond a narrow line.
+
+```tsx
+function getPointerX(
+  event: React.PointerEvent<SVGRectElement>,
+  svg: SVGSVGElement | null,
+) {
+  if (!svg) return 0;
+
+  const rect = svg.getBoundingClientRect();
+  const relativeX = Math.max(
+    0,
+    Math.min(rect.width, event.clientX - rect.left),
+  );
+
+  return (relativeX / Math.max(1, rect.width)) * VIEWBOX_WIDTH;
+}
+
+function handlePointerDown(event: React.PointerEvent<SVGRectElement>) {
+  event.preventDefault();
+  event.currentTarget.setPointerCapture(event.pointerId);
+  setScrubbing(true);
+  updateCursor(event);
+}
+
+<rect
+  x="0"
+  y="0"
+  width={graphWidth}
+  height={CHART_HEIGHT}
+  fill="transparent"
+  style={{ touchAction: "none", userSelect: "none" }}
+  onPointerDown={handlePointerDown}
+  onPointerMove={(event) => {
+    if (scrubbing) updateCursor(event);
+  }}
+  onPointerUp={handlePointerUp}
+  onPointerCancel={handlePointerUp}
+/>
+```
+
+The interaction layer converts the browser coordinate into the SVG coordinate before it asks the data layer for a point. This keeps the chart responsive and gives touch input the same path as mouse input.
+
+<MorphingChartExamplePreview example="error" initialRange="1D" showFill={false} footnote="Pointer capture keeps the cursor inside the chart" />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Evaluate the rendered curve
+
+The nearest array sample can sit above or below the line between two samples. The cursor should follow the curve the reader sees, so the lookup function evaluates the same cubic segment that `buildSmoothPath` writes.
+
+```tsx
+function cubicAt(
+  start: number,
+  controlOne: number,
+  controlTwo: number,
+  end: number,
+  progress: number,
+) {
+  const inverse = 1 - progress;
+
+  return (
+    inverse ** 3 * start +
+    3 * inverse ** 2 * progress * controlOne +
+    3 * inverse * progress ** 2 * controlTwo +
+    progress ** 3 * end
+  );
+}
+
+const segmentPosition = (x / graphWidth) * (points.length - 1);
+const segmentIndex = Math.min(
+  points.length - 2,
+  Math.floor(segmentPosition),
+);
+const progress = segmentPosition - segmentIndex;
+
+return {
+  x,
+  y: cubicAt(left.y, firstControlY, secondControlY, right.y, progress),
+  value: cubicAt(
+    left.value,
+    firstControlValue,
+    secondControlValue,
+    right.value,
+    progress,
+  ),
+};
+```
+
+The returned point carries both screen position and value. The chart uses `x` to place the guide and split the path and it uses `y` to place the cursor on the stroke. A single lookup keeps those visual details aligned during a scrub.
+
+<MorphingChartExamplePreview example="info" initialRange="1Y" showFill footnote="The cursor follows the curve between samples" />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Split one path into live and future segments
+
+Scrubbing changes the meaning of the line. The portion before the cursor stays active, while the portion after the cursor becomes a preview of what follows. Both portions must come from the same animated path. Two clip paths divide the line at the cursor without creating a second geometry calculation.
+
+```tsx
+<clipPath id={`${clipId}-live`}>
+  <motion.rect
+    x="0"
+    y="0"
+    width={displayCursor ? animatedCursorClipX : animatedLiveClipWidth}
+    height={CHART_HEIGHT}
+  />
+</clipPath>
+
+<clipPath id={`${clipId}-future`}>
+  <motion.rect
+    x={displayCursor ? animatedCursorClipX : animatedGraphWidth}
+    y="0"
+    width={VIEWBOX_WIDTH}
+    height={CHART_HEIGHT}
+  />
+</clipPath>
+
+<motion.path
+  d={animatedPath}
+  stroke={lineColor}
+  clipPath={`url(#${clipId}-live)`}
+  markerEnd={`url(#${clipId}-live-endpoint)`}
+/>
+
+{displayCursor ? (
+  <>
+    <motion.path
+      d={animatedPath}
+      stroke={futureStrokeColor}
+      clipPath={`url(#${clipId}-future)`}
+      style={{ opacity: futureStrokeOpacity }}
+    />
+    <motion.circle
+      cx={animatedGraphWidth}
+      cy={animatedEndpointY}
+      r={endpointRadius}
+      fill={futureEndpointColor}
+    />
+  </>
+) : null}
+```
+
+The fade value controls the future stroke, fill, guide and endpoint as one group. The cursor exit uses the same value, so releasing the pointer does not leave a border or endpoint behind after the future line disappears. The clip boundary also moves with the cursor, which keeps the two path segments joined at one point.
+
+<MorphingChartExamplePreview example="success" initialRange="1M" showFill footnote="The future segment fades from the same path" />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Treat the fill as a layer
+
+The area under a line adds context, but it should remain independent from the line control. The renderer can keep the path and cursor active while React decides whether the closed area path belongs in the scene.
+
+```tsx
+const fillPath = `${path} L ${graphWidth} ${CHART_HEIGHT}
+  L 0 ${CHART_HEIGHT} Z`;
+
+<motion.path
+  d={animatedFillPath}
+  fill={`url(#${clipId}-fill)`}
+  clipPath={`url(#${clipId}-live)`}
+  style={{ opacity: fillOpacity }}
+/>
+
+{displayCursor ? (
+  <motion.path
+    d={animatedFillPath}
+    fill={`url(#${clipId}-fill)`}
+    clipPath={`url(#${clipId}-future)`}
+    style={{ opacity: futureFillOpacity }}
+  />
+) : null}
+```
+
+The preview footer owns the switch because the footer changes a rendering layer, not the chart data. The selected value stays in the preview component and passes into the plot as `showFill`.
+
+```tsx
+const [fillMode, setFillMode] = useState<FillMode>("on");
+
+<ChartFillFooter
+  selected={fillMode}
+  onSelect={setFillMode}
+/>
+<ChartPlot
+  values={values}
+  showFill={fillMode === "on"}
+  {...chartProps}
+/>
+```
+
+<MorphingChartFillPreview footnote="The area layer follows the line geometry." />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Keep range controls in the footer
+
+The range control changes data, so it belongs beside the chart without entering the chart’s geometry. The preview card owns the footer boundary. The stage owns the edge-to-edge chart surface. The footer keeps the site’s animated tab primitive and passes a controlled value back to the chart.
+
+```tsx
+<PreviewCard
+  full
+  footer={
+    <ChartRangeFooter
+      selected={range}
+      onSelect={(nextRange) => {
+        setCursor(null);
+        setRange(nextRange);
+      }}
+    />
+  }
+>
+  <Stage>
+    <ChartPlot
+      values={values}
+      range={range}
+      cursor={cursor}
+      onCursorChange={setCursor}
+      onCursorEnd={() => setCursor(null)}
+      showFill={showFill}
+    />
+  </Stage>
+</PreviewCard>
+```
+
+The `setCursor(null)` call gives a range change a clean interaction state. The plot then morphs from the old series into the new one and the animated tabs keep the selected range visible in the footer.
+
+<MorphingChartPreview footnote="The footer changes the range without changing the chart anatomy" />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## A small boundary with a large contract
+
+The chart surface has a narrow boundary. It accepts values, a range, a cursor, a series and a fill flag. The hooks handle motion and pointer state. The SVG owns geometry. The preview card owns composition. Each boundary keeps the next change local.
+
+That structure lets you add a new series without rewriting the cursor, add a new range without changing the path writer and remove the fill without changing the chart’s interaction model. The line remains a shared geometric object while each visual layer decides how much of it to show.
+
+The same rule carries into production charts. Keep the data shape stable, map all interactions into one coordinate system and let every animated layer read from the same path state. The motion layer can then interpolate the transitions without forcing the chart to maintain parallel versions of its geometry.
+
+</section>

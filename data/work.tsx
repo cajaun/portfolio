@@ -31,7 +31,12 @@ export const WORK_TABS = [
 
 export const COMPONENT_ITEMS: WorkItem[] = [
   {
-    title: "Image Grid Mosaic",
+    title: "Morphing Chart",
+    date: "September 20, 2026",
+    href: "/work/morphing-chart",
+  },
+  {
+    title: "Everything in Its Place",
     date: "May 29, 2026",
     href: "/work/image-grid-mosaic",
   },

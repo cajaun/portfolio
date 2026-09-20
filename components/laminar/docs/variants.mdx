@@ -1,0 +1,100 @@
+<section id="variants" className="mb-16 scroll-mt-20 px-6">
+
+<h1 className="mb-4 text-[32px] font-semibold leading-tight text-black dark:text-white">Variants</h1>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+The variant controls how Laminar assigns identity to the value. Pick the variant based on what the text means, not just what it looks like.
+</p>
+
+</section>
+
+<section id="text" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Text</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use the default text variant for labels, button states, short names, and copy where matching characters should survive between values.
+</p>
+
+```tsx
+function ConnectionState({ connected }: { connected: boolean }) {
+  return (
+    <Laminar
+      text={connected ? "Connected" : "Connecting"}
+      variant="text"
+      animationPreset="default"
+    />
+  );
+}
+```
+
+</section>
+
+<section id="number" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Number</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use the number variant for prices, balances, counts, scores, and measurements. Laminar aligns the numeric tail from the right so place-value lanes stay visually stable.
+</p>
+
+```tsx
+function Balance({ amount }: { amount: number }) {
+  const value = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+
+  return (
+    <Laminar
+      text={value}
+      variant="number"
+      align="right"
+      fontSize={32}
+      animationPreset="snappy"
+    />
+  );
+}
+```
+
+</section>
+
+<section id="slots" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Slots</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use the slots variant when digits should roll through a reel. Non-digit characters, like currency symbols or separators, still render as ordinary animated text.
+</p>
+
+```tsx
+function Score({ score }: { score: number }) {
+  return (
+    <Laminar
+      text={score}
+      variant="slots"
+      fontSize={44}
+      fontStyle={{ fontVariant: ["tabular-nums"] }}
+      clipToBounds
+    />
+  );
+}
+```
+
+</section>
+
+<section id="choosing-a-variant" className="mb-6 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Choosing a variant</h2>
+
+```tsx
+<Laminar text="Laminar" />
+<Laminar text="$1,234.56" variant="number" />
+<Laminar text={42} variant="slots" />
+```
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+If the value is ordinary language, use text. If the value has numeric place value, use number. If you want a mechanical digit reel, use slots.
+</p>
+
+</section>

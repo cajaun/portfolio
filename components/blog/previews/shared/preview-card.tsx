@@ -7,6 +7,7 @@ type PreviewProps = {
   header?: ReactNode;
   headerClassName?: string;
   footer?: ReactNode;
+  footerClassName?: string;
   footnote?: ReactNode;
   full?: boolean;
   scrollable?: boolean;
@@ -21,6 +22,7 @@ export default function PreviewCard({
   header,
   headerClassName,
   footer,
+  footerClassName,
   footnote,
   full = false,
   scrollable = false,
@@ -66,7 +68,12 @@ export default function PreviewCard({
           {children}
         </div>
         {footer ? (
-          <div className="flex h-[61px] items-center border-t border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border dark:bg-preview-dark-surface">
+          <div
+            className={cn(
+              "flex h-[61px] items-center border-t border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border dark:bg-preview-dark-surface",
+              footerClassName,
+            )}
+          >
             {footer}
           </div>
         ) : null}

@@ -1,0 +1,84 @@
+<section id="guides" className="mb-16 scroll-mt-20 px-6">
+
+<h1 className="mb-4 text-[32px] font-semibold leading-tight text-black dark:text-white">Guides</h1>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+These patterns cover the places where Laminar is most useful: short text state changes, numeric values, and layout-sensitive labels.
+</p>
+
+</section>
+
+<section id="animated-labels" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Animated labels</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use the default text variant for labels that change because of user intent or app state. Laminar keeps shared characters stable and only animates the pieces that changed.
+</p>
+
+```tsx
+<Laminar
+  text={isSaving ? "Saving" : "Save changes"}
+  variant="text"
+  animationPreset="smooth"
+/>
+```
+
+</section>
+
+<section id="numbers" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Numbers</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use <code>variant="number"</code> when the value has place value. The numeric tail is reconciled from the right, so the ones and tens columns do not jump when the value grows.
+</p>
+
+```tsx
+<Laminar
+  text={new Intl.NumberFormat("en-US").format(count)}
+  variant="number"
+  animationPreset="snappy"
+/>
+```
+
+</section>
+
+<section id="layout" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Layout</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Leave <code>autoSize</code> on for inline labels. Turn it off when Laminar should occupy the full width of its parent and align the text inside that space.
+</p>
+
+```tsx
+<Laminar text={label} autoSize />
+
+<Laminar
+  text={headline}
+  autoSize={false}
+  align="center"
+  containerStyle={{ width: "100%" }}
+/>
+```
+
+</section>
+
+<section id="clipping" className="mb-6 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Clipping</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use <code>clipToBounds</code> when the text is inside a tight surface and moving glyphs should not travel outside the component viewport.
+</p>
+
+```tsx
+<Laminar
+  text={ticker}
+  variant="number"
+  clipToBounds
+/>
+```
+
+</section>

@@ -1,0 +1,78 @@
+<section id="getting-started" className="mb-16 scroll-mt-20 px-6">
+
+<h1 className="mb-4 text-[32px] font-semibold leading-tight text-black dark:text-white">Getting started</h1>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Laminar is a morphing text component for React Native interfaces. It animates strings, numbers, and layout-aware text changes without asking you to manage glyph keys by hand.
+</p>
+
+</section>
+
+<section id="installation" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Installation</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Install Laminar and React Native Reanimated.
+</p>
+
+```bash
+npm i react-native-laminar react-native-reanimated
+```
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Laminar uses Reanimated for layout, enter, exit, and numeric motion. If Reanimated is new to your app, finish its native setup before using Laminar.
+</p>
+
+</section>
+
+<section id="reanimated-setup" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Reanimated setup</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Add the Reanimated Babel plugin at the end of your Babel plugin list.
+</p>
+
+```js
+module.exports = {
+  presets: ["module:@react-native/babel-preset"],
+  plugins: ["react-native-reanimated/plugin"],
+};
+```
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+After changing native animation setup, restart Metro and rebuild the native app so the worklet transforms are applied.
+</p>
+
+</section>
+
+<section id="first-component" className="mb-6 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">First component</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Import Laminar, pass a value through <code>text</code>, and update that value like normal React state.
+</p>
+
+```tsx
+import { useState } from "react";
+import { Pressable, View } from "react-native";
+import Laminar from "react-native-laminar";
+
+export function SubmitLabel() {
+  const [label, setLabel] = useState("Send Request");
+
+  return (
+    <View>
+      <Laminar text={label} fontSize={18} />
+
+      <Pressable onPress={() => setLabel("Request Sent")}>
+        <Laminar text="Update label" fontSize={14} />
+      </Pressable>
+    </View>
+  );
+}
+```
+
+</section>

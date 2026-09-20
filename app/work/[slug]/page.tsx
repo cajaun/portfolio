@@ -3,6 +3,7 @@ import Header from "@/components/ui/header";
 import { MosaicExamplesPreview } from "@/components/blog/previews/grids";
 import { ActivePostPreview } from "@/components/blog/previews/intersection-observers";
 import { PortalLayerPreview } from "@/components/blog/previews/modals";
+import { MorphingChartPreview } from "@/components/blog/previews/morphing-chart";
 import { SITE } from "@/data/site";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -23,8 +24,16 @@ type WorkExample = {
 
 const WORK_EXAMPLES: WorkExample[] = [
   {
+    slug: "morphing-chart",
+    title: "Morphing Chart",
+    publishedAt: "September 20, 2026",
+    summary:
+      "An interactive line chart that morphs between ranges while keeping its cursor and future series connected.",
+    Component: MorphingChartPreview,
+  },
+  {
     slug: "image-grid-mosaic",
-    title: "Image Grid Mosaic",
+    title: "Everything in Its Place",
     publishedAt: "May 29, 2026",
     summary:
       "A media grid that switches between one, two, three, and four image compositions.",

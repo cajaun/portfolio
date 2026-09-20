@@ -33,6 +33,7 @@ const openRunde = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE.url),
   title: SITE.name,
   description: SITE.description,
 };

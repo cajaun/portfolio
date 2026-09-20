@@ -1,0 +1,102 @@
+<section id="styling" className="mb-16 scroll-mt-20 px-6">
+
+<h1 className="mb-4 text-[32px] font-semibold leading-tight text-black dark:text-white">Styling</h1>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Laminar renders React Native text under the hood, so styling follows the same split between text styles and container styles.
+</p>
+
+</section>
+
+<section id="text-style" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Text style</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use <code>fontSize</code> and <code>color</code> for the simple path. Use <code>fontStyle</code> or <code>style</code> when you need native text style objects.
+</p>
+
+```tsx
+<Laminar
+  text="Laminar"
+  fontSize={28}
+  color="#111111"
+  fontStyle={{
+    fontWeight: "700",
+    lineHeight: 34,
+  }}
+/>
+```
+
+</section>
+
+<section id="container-style" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Container style</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use <code>containerStyle</code> for the outer shell around the morphing viewport.
+</p>
+
+```tsx
+<Laminar
+  text={label}
+  containerStyle={{
+    alignSelf: "center",
+    marginTop: 12,
+  }}
+/>
+```
+
+</section>
+
+<section id="nativewind" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">NativeWind</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+The <code>className</code> prop is passed to each animated text node, which keeps NativeWind usage straightforward.
+</p>
+
+```tsx
+<Laminar
+  text="Request sent"
+  className="text-lg font-semibold text-neutral-950"
+/>
+```
+
+</section>
+
+<section id="alignment" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Alignment</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use <code>align</code> to align the morphing run inside the viewport. This matters most when <code>autoSize</code> is disabled or the container has a fixed width.
+</p>
+
+```tsx
+<Laminar
+  text={headline}
+  align="center"
+  autoSize={false}
+  containerStyle={{ width: "100%" }}
+/>
+```
+
+</section>
+
+<section id="layout" className="mb-6 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Layout</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+By default, Laminar measures the next value in a hidden text node and animates the viewport width. Turn <code>autoSize</code> off when the component should occupy the full width of its parent.
+</p>
+
+```tsx
+<Laminar text={ticker} autoSize clipToBounds />
+<Laminar text={headline} autoSize={false} />
+```
+
+</section>

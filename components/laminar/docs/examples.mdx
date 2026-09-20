@@ -1,0 +1,84 @@
+<section id="examples" className="mb-16 scroll-mt-20 px-6">
+
+<h1 className="mb-4 text-[32px] font-semibold leading-tight text-black dark:text-white">Examples</h1>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Copy these as starting points and adjust the motion or styles to fit the surrounding interface.
+</p>
+
+</section>
+
+<section id="button-state" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Button state</h2>
+
+```tsx
+import { useState } from "react";
+import { Pressable } from "react-native";
+import Laminar from "react-native-laminar";
+
+export function SaveButton() {
+  const [saved, setSaved] = useState(false);
+
+  return (
+    <Pressable onPress={() => setSaved(true)}>
+      <Laminar
+        text={saved ? "Saved" : "Save changes"}
+        animationPreset="smooth"
+      />
+    </Pressable>
+  );
+}
+```
+
+</section>
+
+<section id="balance" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Balance</h2>
+
+```tsx
+import Laminar from "react-native-laminar";
+
+export function Balance({ amount }: { amount: number }) {
+  const value = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+
+  return (
+    <Laminar
+      text={value}
+      variant="number"
+      align="right"
+      fontSize={32}
+      animationPreset="snappy"
+    />
+  );
+}
+```
+
+</section>
+
+<section id="score-reel" className="mb-6 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Score reel</h2>
+
+```tsx
+import Laminar from "react-native-laminar";
+
+export function Score({ score }: { score: number }) {
+  return (
+    <Laminar
+      text={score}
+      variant="slots"
+      fontSize={44}
+      fontStyle={{ fontVariant: ["tabular-nums"] }}
+      animationPreset="bouncy"
+      clipToBounds
+    />
+  );
+}
+```
+
+</section>

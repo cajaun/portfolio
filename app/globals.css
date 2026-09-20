@@ -50,6 +50,14 @@ html.dark pre[data-theme*="github-dark"] span {
   @apply font-medium;
 }
 
+.laminar-docs :where(h1, h2, h3, h4) {
+  color: #000000;
+}
+
+.dark .laminar-docs :where(h1, h2, h3, h4) {
+  color: #ffffff;
+}
+
 .prose a {
   @apply font-medium mb-16;
 }

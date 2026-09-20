@@ -1,0 +1,115 @@
+import ApiReferenceTable from "@/components/laminar/api-reference-table";
+
+<section id="api" className="mb-16 scroll-mt-20 px-6">
+
+<h1 className="mb-4 text-[32px] font-semibold leading-tight text-black dark:text-white">API</h1>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Laminar exposes one component and a small set of props. The component handles glyph identity, numeric lanes, measurement, and motion internally.
+</p>
+
+</section>
+
+<section id="exports" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Exports</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use the default export for most cases. Named exports are available when you want explicit imports or prop types.
+</p>
+
+```tsx
+import Laminar from "react-native-laminar";
+
+import {
+  Laminar,
+  MorphingText,
+  type LaminarProps,
+  type MorphingTextProps,
+} from "react-native-laminar";
+```
+
+</section>
+
+<section id="props" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Props</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+The <code>text</code> prop is required. Everything else controls how the value is reconciled, styled, measured, or animated.
+</p>
+
+```ts
+type LaminarProps = {
+  text: string | number;
+  variant?: "text" | "number" | "slots";
+  fontSize?: number;
+  color?: string;
+  align?: "left" | "center" | "right";
+  className?: string;
+  style?: StyleProp<TextStyle>;
+  containerStyle?: StyleProp<ViewStyle>;
+  fontStyle?: StyleProp<TextStyle>;
+  animationDuration?: number;
+  animationPreset?: "default" | "smooth" | "snappy" | "bouncy";
+  stagger?: number;
+  autoSize?: boolean;
+  clipToBounds?: boolean;
+};
+```
+
+</section>
+
+<section id="reference" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Reference</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use the info button beside a prop to quickly see what it controls.
+</p>
+
+<ApiReferenceTable />
+
+</section>
+
+<section id="style-props" className="mb-16 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Style props</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+Use <code>fontSize</code> and <code>color</code> for common cases. Use <code>fontStyle</code> and <code>style</code> for React Native text style objects. Use <code>containerStyle</code> for the outer viewport.
+</p>
+
+```tsx
+<Laminar
+  text="Laminar"
+  fontSize={28}
+  color="#111111"
+  fontStyle={{ fontWeight: "700", lineHeight: 34 }}
+  style={{ letterSpacing: 0.2 }}
+  containerStyle={{ alignSelf: "center" }}
+/>
+```
+
+</section>
+
+<section id="motion-props" className="mb-6 scroll-mt-20 px-6">
+
+<h2 className="mb-4 text-[20px] font-semibold text-black dark:text-white">Motion props</h2>
+
+<p className="font-medium leading-6 tracking-[-0.1px] text-gray-200 dark:text-gray-100">
+The motion props change timing without changing how Laminar identifies surviving glyphs or numeric lanes.
+</p>
+
+```tsx
+<Laminar
+  text={status}
+  animationPreset="smooth"
+  animationDuration={420}
+  stagger={0.03}
+  autoSize
+  clipToBounds={false}
+/>
+```
+
+</section>

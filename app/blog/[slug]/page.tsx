@@ -10,6 +10,11 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+function getOgImageUrl(title: string, description: string) {
+  const params = new URLSearchParams({ description, title });
+  return `${SITE.url}/og?${params.toString()}`;
+}
+
 export async function generateStaticParams() {
   const posts = await getBlogPosts();
   return posts.map((post) => ({ slug: post.slug }));
@@ -31,7 +36,7 @@ export async function generateMetadata(
 
   const ogImage = image
     ? `${SITE.url}${image}`
-    : `${SITE.url}/og?title=${encodeURIComponent(title)}`;
+    : getOgImageUrl(title, description);
 
   return {
     title,
@@ -92,9 +97,10 @@ export default async function Blog(props: PageProps) {
               description: post.metadata.summary,
               image: post.metadata.image
                 ? `${SITE.url}${post.metadata.image}`
-                : `${SITE.url}/og?title=${encodeURIComponent(
+                : getOgImageUrl(
                     post.metadata.title,
-                  )}`,
+                    post.metadata.summary,
+                  ),
               url: `${SITE.url}/blog/${post.slug}`,
               author: {
                 "@type": "Person",
