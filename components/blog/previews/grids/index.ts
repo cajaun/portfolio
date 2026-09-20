@@ -10,3 +10,4 @@ export * from "./examples/bento-preview";
 export * from "./examples/dense-placement-preview";
 export * from "./examples/mosaic-preview";
 export * from "./examples/masonry-preview";
+export * from "./examples/grid-pattern-overview-preview";

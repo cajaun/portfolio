@@ -43,7 +43,7 @@ export function FloorPreview() {
       }
       footnote={
         <PreviewFootnote>
-          The container stays fixed. The floor decides whether cards shrink or wrap.
+          The container stays fixed. The floor decides whether cards shrink or wrap
         </PreviewFootnote>
       }
     >

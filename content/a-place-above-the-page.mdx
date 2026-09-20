@@ -1,11 +1,12 @@
 export const metadata = {
-  title: "Building Modals with Portals",
+  title: "A Place Above the Page",
   publishedAt: "April 15, 2026",
   summary:
     "A walkthrough of how to build modal dialogs that escape layout traps, keep focus, and render through portals.",
 };
 
 import ModalPreview, {
+  ModalDismissalPreview,
   ModalFocusPreview,
   ModalShiftPreview,
   PortalLayerPreview,
@@ -128,6 +129,43 @@ It also changes how I think about the component boundary. The trigger belongs to
 
 <section className="mb-16 px-2">
 
+## Dismissal is a contract
+
+Opening the dialog is only half of the interaction. Every way out should call the same `onClose` function: the close button, the backdrop, and the `Escape` key.
+
+The backdrop owns the outside click. The surface stops that click from bubbling, so pressing a field or a button inside the dialog does not dismiss it by accident.
+
+```tsx
+function ModalOverlay({
+  onClose,
+  children,
+}: {
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 flex items-center justify-center bg-black/40 p-4"
+      onMouseDown={onClose}
+    >
+      <div onMouseDown={(event) => event.stopPropagation()}>
+        {children}
+      </div>
+    </div>
+  );
+}
+```
+
+The important part is not the backdrop color. It is the boundary between the page and the dialog surface. Outside input closes the temporary context. Inside input stays inside it.
+
+<ModalDismissalPreview />
+
+</section>
+
+<section className="mb-16 px-2">
+
 ## Focus and scroll lock
 
 A modal should own the interaction while it is open. The page behind it can stay visible, but it should stop competing for scroll and focus.
@@ -152,17 +190,49 @@ useEffect(() => {
 
 That small effect changes the feel of the whole layer. The background no longer drifts while someone is trying to read or act inside the dialog.
 
-Focus needs the same care. When the modal opens, move focus into it. When it closes, send focus back to the trigger. The browser will not do all of that work for you.
+Focus needs the same care. When the modal opens, move focus into it. While it is open, keep `Tab` inside the dialog. When it closes, send focus back to the element that opened it. The browser will not do all of that work for you.
 
 ```tsx
+const dialogRef = useRef<HTMLDivElement>(null);
+
 useEffect(() => {
   if (!open) {
     return;
   }
 
+  const previousFocus = document.activeElement as HTMLElement | null;
+  dialogRef.current?.focus();
+
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
       onClose();
+      return;
+    }
+
+    if (event.key !== "Tab" || !dialogRef.current) {
+      return;
+    }
+
+    const focusable = Array.from(
+      dialogRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((element) => !element.hasAttribute("disabled"));
+
+    if (focusable.length === 0) {
+      event.preventDefault();
+      return;
+    }
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
     }
   };
 
@@ -170,9 +240,12 @@ useEffect(() => {
 
   return () => {
     window.removeEventListener("keydown", onKeyDown);
+    previousFocus?.focus();
   };
 }, [open, onClose]);
 ```
+
+The `Tab` loop keeps keyboard focus inside the temporary context. The cleanup restores the previous focus target, so closing the modal returns the reader to the action that opened it.
 
 `Escape` is still part of the behavior, but it sits inside a bigger contract: the modal is a temporary context. While that context is active, keyboard movement should stay inside it and page scroll should wait.
 
@@ -372,6 +445,43 @@ The last step is composition.
 Small pieces make the modal easier to adjust. You can change `ShareRow`, `CollaboratorPanel`, or the footer actions without digging through one large render function.
 
 That is usually the point where the component starts paying you back. If design changes later, you are not rebuilding the modal from scratch. You are adjusting one row, one helper, or one footer action while the structure stays intact.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## One lifecycle, one boundary
+
+The modal is easiest to reason about when every behavior derives from the same `open` state and exits through the same `onClose` callback.
+
+```tsx
+type ModalProps = {
+  open: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+};
+
+function ShareModal({ open, onClose, children }: ModalProps) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  if (!open) {
+    return null;
+  }
+
+  return createPortal(
+    <ModalOverlay onClose={onClose}>
+      <div ref={dialogRef} tabIndex={-1}>
+        {children}
+      </div>
+    </ModalOverlay>,
+    document.body,
+  );
+}
+```
+
+That boundary gives the component one predictable lifecycle: render through the portal, lock the page, move focus into the dialog, handle dismissal, then restore the page and the previous focus target during cleanup.
+
+The surface can change from a share sheet to a form or a confirmation dialog without changing those rules. The content belongs inside the boundary. The boundary owns the behavior around it.
 
 </section>
 

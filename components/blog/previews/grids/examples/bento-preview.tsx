@@ -198,7 +198,7 @@ export function BentoExamplesPreview() {
       }
       footnote={
         <PreviewFootnote>
-          Bento is a plain grid where one tile has earned more space.
+          Bento is a plain grid where one tile has earned more space
         </PreviewFootnote>
       }
     >

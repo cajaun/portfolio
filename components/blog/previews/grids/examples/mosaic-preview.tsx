@@ -35,7 +35,7 @@ export function MosaicExamplesPreview() {
       }
       footnote={
         <PreviewFootnote>
-          {count} {count === 1 ? "image uses" : "images use"} a count-specific composition rule.
+          {count} {count === 1 ? "image uses" : "images use"} a count-specific composition rule
         </PreviewFootnote>
       }
     >

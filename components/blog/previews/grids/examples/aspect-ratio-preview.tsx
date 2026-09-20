@@ -53,7 +53,7 @@ export function AspectRatioPreview() {
       }
       footnote={
         <PreviewFootnote>
-          The reserved card keeps its height. The unreserved card pushes content down after load.
+          The reserved card keeps its height. The unreserved card pushes content down after load
         </PreviewFootnote>
       }
     >

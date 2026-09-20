@@ -39,7 +39,7 @@ export function IntrinsicEdgesPreview() {
       }
       footnote={
         <PreviewFootnote>
-          Edges hug their content. The middle absorbs whatever space is left.
+          Edges hug their content. The middle absorbs whatever space is left
         </PreviewFootnote>
       }
     >

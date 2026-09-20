@@ -38,7 +38,7 @@ export function PortalLayerPreview() {
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
           <p className="text-center text-[13px] text-gray-200 dark:text-preview-dark-paragraph">
-            The trigger stays in the page. The dialog moves to a cleaner layer.
+            The trigger stays in the page. The dialog moves to a cleaner layer
           </p>
         </div>
       }

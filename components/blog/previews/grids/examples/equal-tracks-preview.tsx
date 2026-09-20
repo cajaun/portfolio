@@ -56,7 +56,7 @@ export function EqualTracksPreview() {
       }
       footnote={
         <PreviewFootnote>
-          Equal tracks split the container width evenly. Every card gets the same share.
+          Equal tracks split the container width evenly. Every card gets the same share
         </PreviewFootnote>
       }
     >

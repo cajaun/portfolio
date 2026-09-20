@@ -33,7 +33,7 @@ export function ModalShiftPreview() {
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
           <p className="text-center text-[13px] text-gray-200 dark:text-preview-dark-paragraph">
-            Reserve the scrollbar gap so the page does not shift when scroll locks.
+            Reserve the scrollbar gap so the page does not shift when scroll locks
           </p>
         </div>
       }

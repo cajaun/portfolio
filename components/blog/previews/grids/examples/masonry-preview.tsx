@@ -83,7 +83,7 @@ export function MasonryExamplesPreview() {
       }
       footnote={
         <PreviewFootnote>
-          Row grid forces every card in a row to match the tallest. Packing lets each card breathe.
+          Row grid forces every card in a row to match the tallest. Packing lets each card breathe
         </PreviewFootnote>
       }
     >

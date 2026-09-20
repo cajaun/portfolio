@@ -137,7 +137,7 @@ export function NamedAreasPreview() {
       }
       footnote={
         <PreviewFootnote>
-          The role names stay put. The area map changes where those roles land.
+          The role names stay put. The area map changes where those roles land
         </PreviewFootnote>
       }
     >

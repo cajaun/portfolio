@@ -78,7 +78,7 @@ export function AutoFlowPreview() {
       }
       footnote={
         <PreviewFootnote>
-          The numbers show source order. Flow direction decides where each number lands.
+          The numbers show source order. Flow direction decides where each number lands
         </PreviewFootnote>
       }
     >

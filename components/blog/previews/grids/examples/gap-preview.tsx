@@ -47,7 +47,7 @@ export function GapPreview() {
       }
       footnote={
         <PreviewFootnote>
-          Gap is the container&apos;s property. The cards do not know it exists.
+          Gap is the container&apos;s property. The cards do not know it exists
         </PreviewFootnote>
       }
     >

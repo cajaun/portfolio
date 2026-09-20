@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Using Intersection Observers",
+  title: "When Things Come Into View",
   publishedAt: "April 17, 2026",
   summary:
     "A walkthrough of how to use Intersection Observer for reveal-on-scroll effects, active section tracking, and other viewport-aware UI.",
@@ -68,11 +68,42 @@ That is enough for a lot of interfaces. In many cases you do not need the raw sc
 
 <section className="mb-16 px-2">
 
+## One observer lifecycle
+
+The observer has a small lifecycle: create it, attach it to the targets, respond to entries, then disconnect it when the component leaves the page.
+
+```tsx
+function useIntersectionObserver(
+  targetRef: React.RefObject<Element | null>,
+  callback: IntersectionObserverCallback,
+  options: IntersectionObserverInit,
+) {
+  useEffect(() => {
+    const target = targetRef.current;
+
+    if (!target) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(callback, options);
+    observer.observe(target);
+
+    return () => observer.disconnect();
+  }, [callback, options, targetRef]);
+}
+```
+
+The `targetRef` owns the node. The callback owns the state change. The options describe the boundary. Keeping those responsibilities separate makes the same hook useful for a sentinel, a video card, or a section heading.
+
+The callback and options should be stable in a real component, usually through `useCallback` and `useMemo`. Otherwise, every render can create a new observer even though the visibility rule has not changed.
+
+</section>
+
+<section className="mb-16 px-2">
+
 ## Loading more posts
 
 One common use is loading more posts at the end of a feed. Instead of checking `scrollTop` on every movement, you observe a sentinel near the bottom of the list.
-
-<InfiniteFeedPreview />
 
 This pattern works well because the observer only cares about one boundary. Once the sentinel enters the `root`, fetch the next batch and append it to the timeline.
 
@@ -94,6 +125,8 @@ const observer = new IntersectionObserver(
 The `rootMargin` here starts the fetch before the user fully hits the end. That gives the next posts a little time to arrive, which makes the feed feel smoother.
 
 This is one of the clearest observer use cases because the rule is simple: when the loading boundary becomes visible, the feed grows.
+
+<InfiniteFeedPreview />
 
 </section>
 
@@ -119,23 +152,70 @@ This is useful for carousels, drawers, side panels, and preview cards where the 
 
 <section className="mb-16 px-2">
 
+## A signal is not a decision
+
+An observer reports what crossed a boundary. It does not decide which item should become active or what the application should do next.
+
+When several targets intersect at once, the callback needs a policy. Loading more posts can use one sentinel. An autoplay feed may need the item with the strongest ratio. A reading indicator may prefer the heading closest to the root's top edge.
+
+```ts
+const ratiosRef = useRef(new Map<Element, number>());
+
+function pickMostVisible(ratios: Map<Element, number>) {
+  return [...ratios.entries()]
+    .filter(([, ratio]) => ratio > 0)
+    .sort(([, a], [, b]) => b - a)[0]
+    ?.[0];
+}
+
+const ratios = new Map<Element, number>();
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    ratiosRef.current.set(
+      entry.target,
+      entry.isIntersecting ? entry.intersectionRatio : 0,
+    );
+  });
+
+  const nextTarget = pickMostVisible(ratiosRef.current);
+
+  if (nextTarget) {
+    setActiveId((nextTarget as HTMLElement).dataset.id ?? null);
+  }
+});
+```
+
+The observer provides the signal. The active-item rule belongs to the interface that consumes it. That separation keeps visibility mechanics independent from decisions like autoplay, highlighting, prefetching, or analytics.
+
+</section>
+
+<section className="mb-16 px-2">
+
 ## Active posts
 
 Another good fit is deciding which post counts as active inside a media feed.
 
-<ActivePostPreview />
-
 This is the pattern behind autoplay rules in short-form video feeds. The browser does not need to know the full scroll position. It only needs to know which post owns the strongest intersection inside the feed window.
 
 ```ts
+const ratiosRef = useRef(new Map<Element, number>());
+
 const observer = new IntersectionObserver(
   (entries) => {
-    const nextPost = entries
-      .filter((entry) => entry.isIntersecting)
-      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    entries.forEach((entry) => {
+      ratiosRef.current.set(
+        entry.target,
+        entry.isIntersecting ? entry.intersectionRatio : 0,
+      );
+    });
+
+    const nextPost = [...ratiosRef.current.entries()]
+      .filter(([, ratio]) => ratio > 0)
+      .sort(([, a], [, b]) => b - a)[0]?.[0];
 
     if (nextPost) {
-      setActivePost((nextPost.target as HTMLElement).dataset.postId!);
+      setActivePost((nextPost as HTMLElement).dataset.postId!);
     }
   },
   {
@@ -148,7 +228,11 @@ const observer = new IntersectionObserver(
 
 There are a few things going on here. The observer watches several posts at once. More than one can intersect at the same time, so the code picks the one with the highest `intersectionRatio`. That gives you one clear winner for autoplay, highlighting, or engagement tracking.
 
+The preview also measures the posts inside the root with `getBoundingClientRect`. The observer tells the component that visibility changed; the root-relative geometry decides which post is closest to the feed's attention zone. That is the same separation as any other interaction model: one layer reports a change, another layer applies the product rule.
+
 I like this approach more than checking offsets by hand. It adapts better when cards have different heights, and it keeps the logic tied to the posts themselves instead of a set of cached measurements.
+
+<ActivePostPreview />
 
 </section>
 
@@ -157,8 +241,6 @@ I like this approach more than checking offsets by hand. It adapts better when c
 ## Video playback
 
 Another core social-feed pattern is video autoplay. The feed should play the video that is actually primary in the scroll window and pause the rest.
-
-<VideoPlaybackPreview />
 
 The observer can watch every video card and keep a ratio map. The card with the strongest visible ratio becomes the active video.
 
@@ -201,6 +283,10 @@ posts.map((post) => (
 
 The threshold keeps a video from starting when only a sliver is visible. The negative margins make the play zone smaller than the scroll box, which helps the active video feel tied to the center of attention.
 
+The observer is only the invalidation signal here. The ratio map holds the latest visibility value for every video, and the selection policy chooses one active id. That prevents a later callback for one card from accidentally forgetting the other cards still inside the root.
+
+<VideoPlaybackPreview />
+
 </section>
 
 <section className="mb-16 px-2">
@@ -224,6 +310,45 @@ useEffect(() => {
 If several targets share the same `root`, `threshold`, and callback shape, I prefer using one observer instance for all of them. That keeps setup simpler and usually matches how the UI behaves anyway.
 
 I also try to avoid turning every animation into an observer problem. If the effect only needs to run once on page load, plain CSS is enough. The API is most useful when visibility is the actual trigger.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## A small boundary with a large contract
+
+The observer surface can stay small. It needs a root, a set of targets, a visibility rule, and a callback that translates entries into UI state.
+
+```tsx
+type VisibilityBoundary = {
+  root: Element | null;
+  rootMargin: string;
+  threshold: number | number[];
+};
+
+function VisibilityAwareFeed({
+  boundary,
+  posts,
+}: {
+  boundary: VisibilityBoundary;
+  posts: Post[];
+}) {
+  const [activePostId, setActivePostId] = useState<string | null>(null);
+
+  // The observer watches posts inside boundary.root.
+  // The callback turns the strongest entry into activePostId.
+
+  return posts.map((post) => (
+    <PostCard
+      key={post.id}
+      post={post}
+      active={post.id === activePostId}
+    />
+  ));
+}
+```
+
+The feed owns the policy. The observer owns visibility updates. The cards only receive the result. That boundary lets you change a threshold without rewriting a card, add a new target without changing the root math, and replace autoplay with prefetching without inventing a second visibility system.
 
 </section>
 

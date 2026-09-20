@@ -82,7 +82,7 @@ export function DensePlacementPreview() {
       }
       footnote={
         <PreviewFootnote>
-          Dense backfills the gap left by a spanning item. Source order diverges from visual order.
+          Dense backfills the gap left by a spanning item. Source order diverges from visual order
         </PreviewFootnote>
       }
     >

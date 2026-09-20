@@ -30,7 +30,7 @@ export function ModalFocusPreview() {
       footnote={
         <div className="mt-4 flex w-full select-none items-center justify-center text-center">
           <p className="text-center text-[13px] text-gray-200 dark:text-preview-dark-paragraph">
-            The page behind the dialog should stop competing for focus and scroll.
+            The page behind the dialog should stop competing for focus and scroll
           </p>
         </div>
       }

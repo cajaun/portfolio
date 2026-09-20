@@ -51,7 +51,7 @@ export function RegularGridExamplesPreview() {
       }
       footnote={
         <PreviewFootnote>
-          Peer items keep the same role. The grid only changes tracks and count.
+          Peer items keep the same role. The grid only changes tracks and count
         </PreviewFootnote>
       }
     >
