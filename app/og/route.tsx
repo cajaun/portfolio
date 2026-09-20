@@ -6,6 +6,9 @@ export const runtime = "edge";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const title = searchParams.get("title") ?? SITE.name;
+  const boldFont = await fetch(
+    new URL("../fonts/OpenRunde-Bold.otf", import.meta.url),
+  ).then((response) => response.arrayBuffer());
 
   return new ImageResponse(
     (
@@ -24,6 +27,7 @@ export async function GET(request: Request) {
           style={{
             color: "#222222",
             display: "flex",
+            fontFamily: "Open Runde",
             fontSize: 78,
             fontWeight: 700,
             letterSpacing: "-0.045em",
@@ -36,6 +40,14 @@ export async function GET(request: Request) {
       </div>
     ),
     {
+      fonts: [
+        {
+          data: boldFont,
+          name: "Open Runde",
+          style: "normal",
+          weight: 700,
+        },
+      ],
       height: 630,
       width: 1200,
     },
