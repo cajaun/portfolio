@@ -33,7 +33,7 @@ const WORK_EXAMPLES: WorkExample[] = [
   },
   {
     slug: "image-grid-mosaic",
-    title: "Everything in Its Place",
+    title: "Image Grid Mosaic",
     publishedAt: "May 29, 2026",
     summary:
       "A media grid that switches between one, two, three, and four image compositions.",

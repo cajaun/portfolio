@@ -36,7 +36,7 @@ export const COMPONENT_ITEMS: WorkItem[] = [
     href: "/work/morphing-chart",
   },
   {
-    title: "Everything in Its Place",
+    title: "Image Grid Mosaic",
     date: "May 29, 2026",
     href: "/work/image-grid-mosaic",
   },
