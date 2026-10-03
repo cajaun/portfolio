@@ -32,7 +32,11 @@ export function ChartPlot({
   cursor,
   onCursorChange,
   onCursorEnd,
+  cursorLabel,
   showFill,
+  fillRange,
+  focusRange,
+  interactive = true,
   palette = DEFAULT_CHART_PALETTE,
 }: {
   values: number[];
@@ -40,7 +44,17 @@ export function ChartPlot({
   cursor: ChartPoint | null;
   onCursorChange: (point: ChartPoint) => void;
   onCursorEnd: () => void;
+  cursorLabel?: string;
   showFill: boolean;
+  fillRange?: {
+    start: number;
+    end: number;
+  };
+  focusRange?: {
+    start: number;
+    end: number;
+  };
+  interactive?: boolean;
   palette?: ChartPalette;
 }) {
   const clipId = useId().replace(/:/g, "");
@@ -49,6 +63,18 @@ export function ChartPlot({
   const [cursorLabelLeft, setCursorLabelLeft] = useState(0);
   const [cursorGuideStart, setCursorGuideStart] = useState(26);
   const graphWidth = VIEWBOX_WIDTH * GRAPH_EXTENT[range];
+  const fillStart = fillRange
+    ? Math.max(0, Math.min(1, fillRange.start)) * graphWidth
+    : 0;
+  const fillEnd = fillRange
+    ? Math.max(fillStart, Math.max(0, Math.min(1, fillRange.end)) * graphWidth)
+    : graphWidth;
+  const focusStart = focusRange
+    ? Math.max(0, Math.min(1, focusRange.start)) * graphWidth
+    : 0;
+  const focusEnd = focusRange
+    ? Math.max(focusStart, Math.max(0, Math.min(1, focusRange.end)) * graphWidth)
+    : graphWidth;
   const {
     animatedPath,
     animatedFillPath,
@@ -148,7 +174,7 @@ export function ChartPlot({
     resizeObserver.observe(svg);
 
     return () => resizeObserver.disconnect();
-  }, [displayCursor, range, svgRef]);
+  }, [cursorLabel, displayCursor, range, svgRef]);
 
   return (
     <div
@@ -165,7 +191,7 @@ export function ChartPlot({
         viewBox={`0 0 ${VIEWBOX_WIDTH} ${CHART_HEIGHT}`}
         className="absolute inset-0 h-full w-full select-none overflow-visible"
         role="img"
-        aria-label={`${range} chart with an interactive cursor`}
+        aria-label={`${range} chart${interactive ? " with an interactive cursor" : ""}`}
         onDragStart={(event) => event.preventDefault()}
         style={{
           overscrollBehavior: "contain",
@@ -194,6 +220,26 @@ export function ChartPlot({
               height={CHART_HEIGHT}
             />
           </clipPath>
+          {fillRange ? (
+            <clipPath id={`${clipId}-fill-window`}>
+              <rect
+                x={fillStart}
+                y="0"
+                width={fillEnd - fillStart}
+                height={CHART_HEIGHT}
+              />
+            </clipPath>
+          ) : null}
+          {focusRange ? (
+            <clipPath id={`${clipId}-focus-window`}>
+              <rect
+                x={focusStart}
+                y="0"
+                width={focusEnd - focusStart}
+                height={CHART_HEIGHT}
+              />
+            </clipPath>
+          ) : null}
           <marker
             id={`${clipId}-live-endpoint`}
             markerWidth="12"
@@ -212,25 +258,62 @@ export function ChartPlot({
           </marker>
         </defs>
 
-        <motion.path
-          d={animatedFillPath}
-          fill={`url(#${clipId}-fill)`}
-          clipPath={`url(#${clipId}-live)`}
-          style={{ opacity: fillOpacity }}
-        />
+        {focusRange ? (
+          <g clipPath={`url(#${clipId}-fill-window)`}>
+            <motion.path
+              d={animatedFillPath}
+              fill={`url(#${clipId}-fill)`}
+              style={{ opacity: fillOpacity }}
+            />
+          </g>
+        ) : (
+          <g clipPath={fillRange ? `url(#${clipId}-fill-window)` : undefined}>
+            <motion.path
+              d={animatedFillPath}
+              fill={`url(#${clipId}-fill)`}
+              clipPath={`url(#${clipId}-live)`}
+              style={{ opacity: fillOpacity }}
+            />
+          </g>
+        )}
 
-        <motion.path
-          d={animatedPath}
-          fill="none"
-          stroke={lineColor}
-          clipPath={`url(#${clipId}-live)`}
-          markerEnd={`url(#${clipId}-live-endpoint)`}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="3.5"
-        />
+        {focusRange ? (
+          <>
+            <motion.path
+              d={animatedPath}
+              fill="none"
+              stroke={futureStrokeColor}
+              style={{ opacity: futureStrokeOpacity }}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="3.5"
+            />
+            <g clipPath={`url(#${clipId}-focus-window)`}>
+              <motion.path
+                d={animatedPath}
+                fill="none"
+                stroke={lineColor}
+                style={{ opacity: futureFade }}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="3.5"
+              />
+            </g>
+          </>
+        ) : (
+          <motion.path
+            d={animatedPath}
+            fill="none"
+            stroke={lineColor}
+            clipPath={`url(#${clipId}-live)`}
+            markerEnd={`url(#${clipId}-live-endpoint)`}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="3.5"
+          />
+        )}
 
-        {displayCursor ? (
+        {displayCursor && !focusRange ? (
           <motion.path
             d={animatedPath}
             fill="none"
@@ -245,12 +328,16 @@ export function ChartPlot({
 
         {displayCursor ? (
           <>
-            <motion.path
-              d={animatedFillPath}
-              fill={`url(#${clipId}-fill)`}
-              clipPath={`url(#${clipId}-future)`}
-              style={{ opacity: futureFillOpacityWithToggle }}
-            />
+            {!focusRange ? (
+              <g clipPath={fillRange ? `url(#${clipId}-fill-window)` : undefined}>
+                <motion.path
+                  d={animatedFillPath}
+                  fill={`url(#${clipId}-fill)`}
+                  clipPath={`url(#${clipId}-future)`}
+                  style={{ opacity: futureFillOpacityWithToggle }}
+                />
+              </g>
+            ) : null}
             <motion.circle
               cx={animatedGraphWidth}
               cy={animatedEndpointY}
@@ -319,22 +406,24 @@ export function ChartPlot({
           </>
         ) : null}
 
-        <rect
-          x="0"
-          y="0"
-          width={graphWidth}
-          height={CHART_HEIGHT}
-          fill="transparent"
-          className="cursor-ew-resize select-none"
-          style={{ touchAction: "none", userSelect: "none" }}
-          onPointerDown={handlePointerDown}
-          onPointerMove={(event) => {
-            event.preventDefault();
-            if (scrubbing) updateCursor(event);
-          }}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-        />
+        {interactive ? (
+          <rect
+            x="0"
+            y="0"
+            width={graphWidth}
+            height={CHART_HEIGHT}
+            fill="transparent"
+            className="cursor-ew-resize select-none"
+            style={{ touchAction: "none", userSelect: "none" }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={(event) => {
+              event.preventDefault();
+              if (scrubbing) updateCursor(event);
+            }}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+          />
+        ) : null}
       </svg>
 
       <AnimatePresence initial={false}>
@@ -368,7 +457,7 @@ export function ChartPlot({
               }}
             />
             <span className="relative z-10">
-              {getRangeLabel(range, displayCursor.x / graphWidth)}
+              {cursorLabel ?? getRangeLabel(range, displayCursor.x / graphWidth)}
             </span>
           </motion.div>
         ) : null}

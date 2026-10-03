@@ -6,6 +6,7 @@ type PreviewProps = {
   className?: string;
   header?: ReactNode;
   headerClassName?: string;
+  innerClassName?: string;
   footer?: ReactNode;
   footerClassName?: string;
   footnote?: ReactNode;
@@ -21,6 +22,7 @@ export default function PreviewCard({
   className,
   header,
   headerClassName,
+  innerClassName,
   footer,
   footerClassName,
   footnote,
@@ -54,6 +56,7 @@ export default function PreviewCard({
           className={`
     ${full ? "preview-card-inner-full" : "preview-card-inner"}
     ${full && !footer && !header ? (video ? "px-4 py-8" : "px-4 py-16") : ""}
+    ${innerClassName ?? ""}
     ${scrollable ? "h-[28rem] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" : ""}
   `}
           style={
