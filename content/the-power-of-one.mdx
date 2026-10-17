@@ -1,0 +1,117 @@
+export const metadata = {
+  title: "The Power of One",
+  publishedAt: "October 17, 2026",
+  summary:
+    "You only have to be right once, but that result only matters if you survive every attempt that comes before it.",
+};
+
+import {
+  FAIL_FAST_CURVES,
+  LORENZ_CURVES,
+  POWER_LAW_CURVES,
+  PREDICTABILITY_CURVES,
+  SwitcherCurvePreview,
+} from "@/components/blog/previews/power-law-horizons";
+
+
+<section className="mb-16 px-2">
+
+## One result can carry the losses
+
+Imagine investing the same amount in `100` companies. `99` fail and `1` succeeds. If the successful company grows far beyond the amount invested in it, that one result can cover the other `99` and still produce the return that made the portfolio worthwhile.
+
+The arithmetic changes the question. You do not need every attempt to work. You need enough time and resources to make another attempt after the previous one fails. The difficult part is surviving the attempts that produce little before the one that changes the result.
+
+The same shape appears when something new is being built. Most ideas remain small, lose momentum or reveal a constraint that makes them unsuitable. A rare idea continues to matter after more people encounter it, more conditions test it and more time passes. Its value does not come from being the first idea tried. It comes from becoming large enough to carry the cost of the attempts around it.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Pareto measured the imbalance in Italy
+
+In 1896–97, Vilfredo Pareto studied property records for Italy and found that 80% of the land was owned by 20% of the people. The observation became the `80/20 principle` which states that small minorities can produce a disproportionate results.
+
+Pareto was describing a distribution, not a command to force every situation into an exact ratio. The important feature is the imbalance. A small group holds most of the weight, while the larger group contributes much less individually.
+
+That imbalance separates a power law from a normal distribution. In a normal distribution, most outcomes gather near the middle. In a power law, a small number of outcomes rise far above a long tail of smaller ones. The 100-company example follows the second shape, which is why one successful company can compensate for ninety-nine failures.
+
+<SwitcherCurvePreview
+  variants={POWER_LAW_CURVES}
+  tabListLabel="Distribution shape"
+  footnote="A small minority can carry a disproportionate share"
+/>
+
+The bell curve keeps most of its results close together. The power-law curve leaves room for a rare result to become much larger than everything around it.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## A long horizon gives one result time to appear
+
+The power law explains why one result can matter so much. A long horizon determines whether you are still present when that result arrives. Early evidence often looks flat, noisy or indistinguishable from failure, so people who judge the work too soon leave during the part where the eventual return is still hidden.
+
+Edward Lorenz found a physical limit to this problem while studying weather models. He rounded one value before running the model again, so the two forecasts began with nearly identical initial conditions. The atmosphere carried that tiny difference through many interacting movements until the forecasts separated and their later details no longer matched.
+
+<SwitcherCurvePreview
+  variants={LORENZ_CURVES}
+  tabListLabel="Weather run"
+  footnote="The same starting point can lead to different later forecasts"
+/>
+
+Both runs begin at the same point, but the small difference grows with each step. At first, it is too small to matter. As the atmosphere amplifies it, the paths separate until they no longer describe the same future. That is the finite horizon Lorenz exposed.
+
+Better initial conditions can extend the useful range, but they cannot remove the horizon. Around ten days, exact conditions become difficult to predict, with research placing the upper limit near two weeks for this kind of forecast.
+
+Building something new has a similar timing problem. The uncertainty comes from different sources, and the early part can look flat even when the work is moving toward a meaningful result. A long horizon gives that result time to survive different conditions and lets you outlast people who quit during the uncertain section.
+
+<SwitcherCurvePreview
+  variants={PREDICTABILITY_CURVES}
+  tabListLabel="Time horizon"
+  footnote="The later return only appears when the horizon reaches it"
+/>
+
+The short horizon ends while the curve is still noisy and declining, before the later return appears. The long horizon carries through the same uncertainty, reaches the dip and continues until the rising section changes the conclusion. More time does not guarantee a return, but it gives a real one the chance to become visible.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Fail fast to protect the long horizon
+
+Outlasting other people does not mean spending the whole horizon on one untested idea. When each attempt is expensive, `99` failures can close the horizon before the rare success arrives. Failing fast keeps the wrong turns small enough to leave time, money and attention for another attempt.
+
+The fail-fast curve finds an important problem while the cost is still low. A prototype exposes the weak assumption before design and delivery turn it into a large commitment. The late-failure curve delays that test, so the same discovery arrives after the cost has already climbed.
+
+<SwitcherCurvePreview
+  variants={FAIL_FAST_CURVES}
+  tabListLabel="Failure cost"
+  footnote="Cheap failures leave more time for the rare success"
+/>
+
+Failing fast is therefore part of having a long horizon. It does not shorten the time available for the one result that matters. It protects that time by making each wrong attempt affordable enough to survive.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The first result has to travel
+
+Being right once creates a foothold, not a finished outcome. A <span className="whitespace-nowrap"><code>0 to 1</code></span> moment produces something that did not exist before. Moving from that first result to <span className="whitespace-nowrap"><code>1 to n</code></span> means carrying it across more people, constraints and conditions without losing what made it valuable.
+
+Repeating the result is how the rare outcome grows beyond its first setting. The power law explains why a small number of durable outcomes can carry most of the value, the long horizon gives one time to appear and failing fast leaves enough resources to test the next condition.
+
+The first success gives the work somewhere to go. Repetition shows whether it can become larger than the attempt that produced it, which is how one result begins to carry the rest.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Closing thoughts
+
+The power of one is not a promise that every attempt will work. It is a way to understand why a small number of outcomes can carry the value of a much larger set, why the early evidence can be misleading and why the work must survive long enough for the distribution to reveal itself.
+
+Pareto shows the imbalance, Lorenz shows the limit of prediction and failing fast shows how to preserve the time between the first attempt and the result that changes everything.
+
+</section>

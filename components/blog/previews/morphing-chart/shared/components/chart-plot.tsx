@@ -32,6 +32,7 @@ export function ChartPlot({
   cursor,
   onCursorChange,
   onCursorEnd,
+  cursorLabel,
   showFill,
   palette = DEFAULT_CHART_PALETTE,
 }: {
@@ -40,6 +41,7 @@ export function ChartPlot({
   cursor: ChartPoint | null;
   onCursorChange: (point: ChartPoint) => void;
   onCursorEnd: () => void;
+  cursorLabel?: string;
   showFill: boolean;
   palette?: ChartPalette;
 }) {
@@ -148,7 +150,7 @@ export function ChartPlot({
     resizeObserver.observe(svg);
 
     return () => resizeObserver.disconnect();
-  }, [displayCursor, range, svgRef]);
+  }, [cursorLabel, displayCursor, range, svgRef]);
 
   return (
     <div
@@ -368,7 +370,7 @@ export function ChartPlot({
               }}
             />
             <span className="relative z-10">
-              {getRangeLabel(range, displayCursor.x / graphWidth)}
+              {cursorLabel ?? getRangeLabel(range, displayCursor.x / graphWidth)}
             </span>
           </motion.div>
         ) : null}
