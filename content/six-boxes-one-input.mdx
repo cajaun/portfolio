@@ -1,0 +1,246 @@
+export const metadata = {
+  title: "Six Boxes, One Input",
+  publishedAt: "October 2, 2026",
+  summary:
+    "A web implementation of a verification code field with one input, six visible cells, and motion that keeps the state legible.",
+};
+
+import {
+  VerificationCodeAnatomyPreview,
+  VerificationCodeErrorPreview,
+  VerificationCodeIndicatorPreview,
+  VerificationCodeMotionPreview,
+} from "@/components/blog/previews/verification-code";
+
+
+<section className="mb-16 px-2">
+
+## One value, six cells
+
+A verification field looks like six inputs, but it is easier to reason about when it has one value and one active position. The cells are a view of that value. They are not six competing sources of truth.
+
+That distinction gives the component a small, stable model:
+
+- one hidden `input` owns browser focus and keyboard input
+- one array stores the six characters
+- one index tells the interface where the next character belongs
+- six cells render the current state
+
+The browser handles text. The cells make the interaction readable. Once those responsibilities are separate, validation and motion can describe a state change instead of trying to coordinate six inputs.
+
+<VerificationCodeAnatomyPreview />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Give every position an address
+
+The code is one value, but its positions still need individual addresses. An array makes that relationship explicit. The first character lives at index `0`, the last at index `5`, and an empty string means that position has not been filled yet.
+
+```tsx
+const CODE_LENGTH = 6;
+
+function createEmptyCode() {
+  return Array.from({ length: CODE_LENGTH }, () => "");
+}
+
+const [code, setCode] = useState<string[]>(createEmptyCode);
+const [activeIndex, setActiveIndex] = useState(0);
+```
+
+`activeIndex` is deliberately separate from `code`. Selecting an empty cell does not change the value. It only changes where the next character will go. Backspace can clear the selected position and move the selection without disturbing the rest of the array.
+
+The useful consequence is that every cell can be rendered from the same two facts:
+
+```tsx
+<CodeBox
+  value={code[index]}
+  active={activeIndex === index}
+  onPress={() => setActiveIndex(index)}
+/>
+```
+
+The preview footer changes the array between empty, partial, and complete states. The cells keep their addresses while the value changes around them.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Let the browser own the input
+
+The visible cells should not each contain an editable field. One visually hidden input is enough. It keeps keyboard events, focus, and browser-assisted one-time-code entry in the place where the browser expects them, while the cells remain a clear visual representation.
+
+```tsx
+<input
+  ref={inputRef}
+  aria-label="Verification code input"
+  autoComplete="one-time-code"
+  inputMode="numeric"
+  maxLength={1}
+  onChange={(event) => handleChange(event.target.value)}
+  onKeyDown={handleKeyDown}
+  value=""
+  className="absolute h-px w-px overflow-hidden opacity-0"
+/>
+```
+
+The input is controlled with an empty string because the array is the real value. When a character arrives, the change handler writes it to `activeIndex`, then advances the index. A cell click simply focuses the same input and chooses a different address.
+
+```tsx
+function handleChange(value: string) {
+  const digit = value[0];
+
+  if (!digit || !/^[0-9]$/.test(digit)) {
+    return;
+  }
+
+  setCode((previous) => {
+    const next = [...previous];
+    next[activeIndex] = digit;
+    return next;
+  });
+
+  setActiveIndex((index) => Math.min(index + 1, CODE_LENGTH - 1));
+}
+```
+
+This keeps the browser interaction narrow. Focus belongs to the input, value belongs to the array, and the cells only explain what happened.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Move one border through the row
+
+The active outline is not six separate animations. It is one Framer Motion element that moves from the current cell to the next one.
+
+```tsx
+<LayoutGroup id="verification-code">
+  {code.map((value, index) => (
+    <CodeBox
+      key={index}
+      value={value}
+      active={activeIndex === index}
+      onPress={() => setActiveIndex(index)}
+    />
+  ))}
+</LayoutGroup>
+```
+
+The active cell renders the shared indicator:
+
+```tsx
+{active ? (
+  <motion.span
+    layoutId="verification-code-indicator"
+    className="pointer-events-none absolute inset-0 z-10 rounded-xl border-2"
+    transition={{
+      duration: 0.2,
+      ease: [0.26, 0, 0.11, 1],
+    }}
+  />
+) : null}
+```
+
+`layoutId` tells Framer Motion that the indicator is the same object even when React moves it to another cell. Framer Motion measures the rendered boxes, so the border follows the actual row, including the separator and responsive spacing. There is no second set of offsets to keep in sync.
+
+<VerificationCodeIndicatorPreview />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Make the roll two layers
+
+An empty cell and a filled cell are not the same visual state. The placeholder should stay centered and fade away. The entered digit should arrive from below and settle into the same center point.
+
+That is two motion values, not one element replacing another:
+
+```tsx
+const digitY = useMotionValue(value ? 0 : 20);
+const digitOpacity = useMotionValue(value ? 1 : 0);
+const placeholderOpacity = useMotionValue(value ? 0 : 1);
+
+useEffect(() => {
+  const digitAnimation = animate(digitY, value ? 0 : 20, {
+    duration: 0.2,
+    ease: "easeOut",
+  });
+
+  const digitFade = animate(digitOpacity, value ? 1 : 0, {
+    duration: 0.2,
+    ease: "easeOut",
+  });
+
+  const placeholderFade = animate(placeholderOpacity, value ? 0 : 1, {
+    duration: 0.2,
+    ease: "easeOut",
+  });
+
+  return () => {
+    digitAnimation.stop();
+    digitFade.stop();
+    placeholderFade.stop();
+  };
+}, [digitOpacity, digitY, placeholderOpacity, value]);
+```
+
+The placeholder does not roll. It only fades. That small distinction keeps the empty state anchored while the new character travels into place. The footer lets the sequence play one digit at a time, so the border movement and the digit motion can be inspected together.
+
+<VerificationCodeMotionPreview />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Let the boundary report an error
+
+An invalid character does not need a second field or a new layout. The same active boundary can tell the reader that the attempted input was rejected. Framer Motion can derive both the color and the short horizontal shake from one error event.
+
+```tsx
+const wiggleX = useMotionValue(0);
+const colorProgress = useMotionValue(0);
+
+useEffect(() => {
+  const colorAnimation = animate(colorProgress, [1, 1, 0], {
+    duration: 0.91,
+    times: [0, 0.66, 1],
+    ease: "easeInOut",
+  });
+
+  const wiggleAnimation = animate(wiggleX, [-5, 5, -4, 4, 0], {
+    duration: 0.25,
+    ease: "easeInOut",
+  });
+
+  return () => {
+    colorAnimation.stop();
+    wiggleAnimation.stop();
+  };
+}, [colorProgress, wiggleX]);
+```
+
+`useTransform` maps the color progress to the active border color. The field stays in the same layout; only the boundary changes briefly. That makes the error local and leaves the code array untouched.
+
+<VerificationCodeErrorPreview />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Keep the state smaller than the surface
+
+The field looks like a row of controls, but its state is only an array, an index, and a few motion values. That is enough to describe empty, partial, complete, focused, and invalid states without giving every cell its own input logic.
+
+The implementation follows from that model:
+
+1. the hidden `input` receives a character
+2. the array writes it to the active address
+3. the active index advances
+4. the cell renders the new value
+5. Framer Motion rolls the digit in and moves the shared border
+
+Each step has one owner. The browser owns text entry. React owns the value. Framer Motion owns the transition between visual states. The six boxes are the explanation of that state, not six separate systems to maintain.
+
+</section>

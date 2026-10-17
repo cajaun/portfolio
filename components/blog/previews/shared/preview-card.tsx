@@ -9,6 +9,7 @@ type PreviewProps = {
   footer?: ReactNode;
   footerClassName?: string;
   footnote?: ReactNode;
+  innerClassName?: string;
   full?: boolean;
   scrollable?: boolean;
   scrollContainerRef?: RefObject<HTMLDivElement>;
@@ -24,6 +25,7 @@ export default function PreviewCard({
   footer,
   footerClassName,
   footnote,
+  innerClassName,
   full = false,
   scrollable = false,
   scrollContainerRef,
@@ -51,11 +53,18 @@ export default function PreviewCard({
         ) : null}
         <div
           ref={scrollContainerRef}
-          className={`
-    ${full ? "preview-card-inner-full" : "preview-card-inner"}
-    ${full && !footer && !header ? (video ? "px-4 py-8" : "px-4 py-16") : ""}
-    ${scrollable ? "h-[28rem] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" : ""}
-  `}
+          className={cn(
+            full ? "preview-card-inner-full" : "preview-card-inner",
+            full && !footer && !header
+              ? video
+                ? "px-4 py-8"
+                : "px-4 py-16"
+              : "",
+            scrollable
+              ? "h-[28rem] overflow-y-auto overscroll-contain [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+              : "",
+            innerClassName,
+          )}
           style={
             scrollable
               ? {
