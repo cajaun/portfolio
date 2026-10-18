@@ -1,0 +1,156 @@
+export const metadata = {
+  title: "Letting the Page Through",
+  publishedAt: "October 17, 2026",
+  summary:
+    "A walkthrough of a floating header that stays attached while it makes room for the page as you scroll.",
+};
+
+import {
+  HeaderExpansionPreview,
+  HeaderOverviewPreview,
+  HeaderScrollPreview,
+  HeaderSurfaceMorphPreview,
+} from "@/components/blog/previews/adaptive-header";
+
+<section className="mb-16 px-2">
+
+## Anatomy
+
+A header that sits over a moving page has to do two jobs at once. It must stay available while the reader moves through the page, but it cannot keep taking the same amount of room once the reader has moved past the top. Opening the menu adds another constraint: the menu should grow from the row and keep the same border and background, rather than appearing as a second layer that has to be aligned with it.
+
+That gives the component a clear boundary. A sticky wrapper holds the surface at the top, the row remains visible, and the panel expands below it. The scroll position only decides which closed shape the surface uses. Opening the menu does not create a new header, and scrolling does not create a new component.
+
+<HeaderOverviewPreview />
+
+The row begins wide and becomes compact after the page moves. When the menu opens, it keeps the closed shape that brought it there, so opening it after scrolling does not send the header back to its larger top state.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Trigger and state
+
+The first decision is the state the header is in. This header has two closed shapes, `top` and `compact`, and one open shape. Rather than storing a separate value for the width, the row height, and the panel, the component stores one `look` and derives the rest from it.
+
+```tsx
+type HeaderLook = "top" | "compact" | "open";
+type ClosedHeaderLook = Exclude<HeaderLook, "open">;
+
+const open = look === "open";
+const closedLook = open ? closeLook : look;
+const isCompact = closedLook === "compact";
+```
+
+`closeLook` is the important part of this small piece of state. When the menu is open, `look` no longer tells us which closed shape should come back. Keeping that value separately means the component can open from the top or from the compact state and return to the same place when it closes.
+
+The menu button follows that rule instead of inventing another transition of its own.
+
+```tsx
+onClick={() => onLookChange(open ? closeLook : "open")}
+```
+
+That callback gives opening and closing the same boundary. The button changes the state, while the surface decides how the row, panel, border, and background should respond to it.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The panel grows from the row
+
+The menu belongs directly below the row in the same surface. That relationship is easier to preserve when the closed state is represented by a grid row that has no available height, rather than by mounting a separate card and positioning it over the page.
+
+```tsx
+<div
+  className={`invisible grid grid-rows-[0fr] transition-[grid-template-rows,visibility] ${
+    open ? "visible grid-rows-[1fr]" : ""
+  }`}
+>
+  <div className="min-h-0 overflow-hidden">
+    <NavigationPanel />
+  </div>
+</div>
+```
+
+The outer element keeps the panel in the document flow of the header, while the inner wrapper lets its contents collapse without spilling into the closed state. `min-h-0` is what allows the inner grid item to become smaller than its contents while the row is closing. The border, radius, and background remain on the parent surface, so the expanded header reads as the same object with more room inside it.
+
+<HeaderExpansionPreview />
+
+The menu can therefore open without a second card appearing above the page. The row stays where it was, the panel follows it, and the surrounding surface grows around both pieces.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Scroll changes the closed state
+
+The header does not need a separate compact component. The scroll position is enough to choose between the two closed shapes. Once the content has moved past a small threshold, the wide form gives way to the compact form; when the content returns to the top, the wide form comes back.
+
+```tsx
+const updateLook = () => {
+  const nextLook =
+    scrollContainer.scrollTop > 24 ? "compact" : "top";
+
+  stableLookRef.current = nextLook;
+  setLook((current) => {
+    if (current === "open") {
+      return current;
+    }
+
+    return nextLook;
+  });
+};
+```
+
+The open check matters because a menu should not change shape underneath the panel while the reader is using it. The scroll listener still records the latest closed state, but waits to apply that state until the menu closes. That lets the header contract while the page moves without making the open surface jump.
+
+<HeaderScrollPreview />
+
+Moving down passes the threshold and contracts the row; returning to the top restores the wider form, while the panel continues to use the same surface whenever it is open.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The border follows the state
+
+The visual change is not only a change in width. The surface needs to carry its radius, background, blur, and shadow through the same transition, otherwise the row can look as if it has detached from the panel while the state is changing.
+
+```tsx
+<div
+  style={{
+    maxWidth:
+      open || !isCompact ? "100%" : "calc(100% - 4rem)",
+  }}
+  className="transition-[max-width,border-radius,background-color,backdrop-filter,box-shadow]"
+>
+  <div
+    className={`flex items-center transition-[height] ${
+      isCompact ? "h-[54px]" : "h-[60px]"
+    }`}
+  >
+    {row}
+  </div>
+
+  {panel}
+</div>
+```
+
+The row changes height by a small amount, while the outer surface changes width and keeps the visual boundary intact. Those values belong to the same element because they describe one object. If the width lived on one wrapper and the border on another, the compact state would expose a gap during the transition and the expanded state would need a separate radius to hide it.
+
+The same boundary also gives the narrow layout room to change its controls. The desktop row can show its links beside the menu button, while the smaller row can give that space to the menu icon without changing how the panel is attached.
+
+<HeaderSurfaceMorphPreview />
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Closing thoughts
+
+A floating header works when its shape follows the page instead of competing with it. The row gives the interaction a stable starting point, the panel grows from that row, and the scroll position lets the closed surface become smaller after the reader has moved on.
+
+What makes the arrangement useful is that these behaviors do not need separate components or separate layers. One state preserves the relationship between the open and closed forms, one panel boundary keeps the menu attached to the row, and one scroll threshold decides when the header should give more of the page back.
+
+That arrangement leaves the navigation available without making it permanent at full size. The header stays present, the page keeps moving beneath it, and the transition remains understandable because each visual change belongs to the same surface that the reader is already using.
+
+</section>

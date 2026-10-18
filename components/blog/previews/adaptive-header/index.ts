@@ -1,6 +1,7 @@
 export {
   HeaderOverviewPreview,
   HeaderExpansionPreview,
+  HeaderSurfaceMorphPreview,
   HeaderScrollPreview,
   HeaderPreviewCanvas,
 } from "./adaptive-header-preview";

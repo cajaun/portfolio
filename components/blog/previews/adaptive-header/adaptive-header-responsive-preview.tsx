@@ -33,7 +33,7 @@ export default function HeaderMobilePreview() {
             look={look}
             closeLook="top"
             showBackdrop={false}
-            onLookChange={setLook}
+            onLookChangeAction={setLook}
           />
         </div>
       </Stage>

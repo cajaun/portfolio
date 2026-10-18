@@ -3,6 +3,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import PreviewCard from "@/components/blog/previews/shared/preview-card";
+import { AnimatedTabs } from "@/components/ui/tabs/tabs";
+import { FooterRow } from "@/components/blog/previews/morphing-chart/shared/primitives";
 import {
   SkeletonBlock,
   SkeletonLine,
@@ -21,13 +23,21 @@ type HeaderCanvasProps = {
   compactHeader?: boolean;
   flushTop?: boolean;
   showBackdrop?: boolean;
-  onLookChange: (look: HeaderLook) => void;
+  onLookChangeAction: (look: HeaderLook) => void;
 };
 
 const MENU_SKELETONS = ["w-32", "w-36", "w-32", "w-40"];
 
 const EASE_GLIDE = "cubic-bezier(0.32, 0.72, 0, 1)";
 const EASE_QUART = "cubic-bezier(0.23, 1, 0.32, 1)";
+
+const SURFACE_MORPH_STATES = [
+  { id: "wide", name: "Wide", look: "top" },
+  { id: "compact", name: "Compact", look: "compact" },
+  { id: "expanded", name: "Expanded", look: "open" },
+] as const;
+
+type SurfaceMorphState = (typeof SURFACE_MORPH_STATES)[number]["id"];
 
 function BrandMark() {
   return <HeaderSkeleton className="h-5 w-5 rounded-[6px]" />;
@@ -107,7 +117,7 @@ function HeaderSurface({
   mobile = false,
   compactHeader = false,
   closeLook = "compact",
-  onLookChange,
+  onLookChangeAction,
 }: HeaderCanvasProps) {
   const open = look === "open";
   // Opening the panel should preserve the closed state that led to it. In the
@@ -166,7 +176,7 @@ function HeaderSurface({
           ))}
           <button
             type="button"
-            onClick={() => onLookChange(open ? closeLook : "open")}
+            onClick={() => onLookChangeAction(open ? closeLook : "open")}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             aria-controls="nav-panel"
@@ -194,7 +204,7 @@ function HeaderSurface({
 
         <button
           type="button"
-          onClick={() => onLookChange(open ? closeLook : "open")}
+          onClick={() => onLookChangeAction(open ? closeLook : "open")}
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="nav-panel"
@@ -215,7 +225,7 @@ function SkeletonContent({ compact = false }: { compact?: boolean }) {
   return (
     <div
       className={`mx-auto w-full max-w-[34rem] px-4 ${
-        compact ? "min-h-[30rem] pb-16 pt-12" : "min-h-[38rem] pb-24 pt-14"
+        compact ? "min-h-[30rem] pb-24 pt-12" : "min-h-[38rem] pb-24 pt-14"
       }`}
     >
       <div className="mx-auto max-w-[21rem] text-center">
@@ -260,7 +270,7 @@ export function HeaderPreviewCanvas({
   compactHeader = false,
   flushTop = false,
   showBackdrop = true,
-  onLookChange,
+  onLookChangeAction,
 }: HeaderCanvasProps) {
   const open = look === "open";
   const closedLook = open ? closeLook : look;
@@ -282,7 +292,7 @@ export function HeaderPreviewCanvas({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
-            onClick={() => onLookChange(closeLook)}
+            onClick={() => onLookChangeAction(closeLook)}
               className="absolute inset-0 z-10 cursor-default bg-black/20 backdrop-blur-[6px] dark:bg-black/30"
           />
         ) : null}
@@ -302,7 +312,7 @@ export function HeaderPreviewCanvas({
           mobile={mobile}
           closeLook={closeLook}
           compactHeader={compactHeader}
-          onLookChange={onLookChange}
+          onLookChangeAction={onLookChangeAction}
         />
       </div>
       <div className="relative z-0">
@@ -398,7 +408,7 @@ export function HeaderOverviewPreview() {
           look={look}
           closeLook={stableLookRef.current}
           compactHeader
-          onLookChange={changeLook}
+          onLookChangeAction={changeLook}
         />
       </Stage>
     </PreviewCard>
@@ -415,6 +425,7 @@ export function HeaderExpansionPreview() {
   return (
     <PreviewCard
       full
+      innerClassName="!h-[28rem] !overflow-hidden !p-0"
       footer={
         <div className="flex w-full items-center justify-center gap-2">
           <SurfaceButton active={look !== "open"} onClick={() => setLook("top")}>
@@ -433,12 +444,86 @@ export function HeaderExpansionPreview() {
         </div>
       }
     >
-      <Stage className="!pb-0 sm:!pb-0">
+      <Stage className="!py-0 sm:!py-0">
         <HeaderPreviewCanvas
           compact
           look={look}
           closeLook="top"
-          onLookChange={changeLook}
+          onLookChangeAction={changeLook}
+        />
+      </Stage>
+    </PreviewCard>
+  );
+}
+
+function HeaderSurfaceMorphFooter({
+  selected,
+  onSelect,
+}: {
+  selected: SurfaceMorphState;
+  onSelect: (id: SurfaceMorphState) => void;
+}) {
+  return (
+    <FooterRow>
+      <AnimatedTabs
+        tabs={SURFACE_MORPH_STATES}
+        activeTabId={selected}
+        onChange={(id) => onSelect(id as SurfaceMorphState)}
+        scrollable={false}
+        withBottomMargin={false}
+        scrollerClassName="items-center px-0"
+        listClassName="items-center gap-0.5 rounded-full bg-preview-surface-muted p-1 shadow-custom dark:bg-preview-dark-stage"
+        tabClassName="h-7 rounded-full border-0 bg-transparent px-2.5 text-[13px] tracking-[-0.01em] shadow-none dark:bg-transparent"
+        activeContainerClassName="pointer-events-none"
+        activeListClassName="items-center gap-0.5 rounded-full bg-[lab(94.78%_0_0)] p-1 dark:bg-[lab(13.232%_0_0)]"
+        activeTabClassName="h-7 rounded-full border-0 bg-transparent px-2.5 text-[13px] tracking-[-0.01em] shadow-none dark:bg-transparent"
+        tabListLabel="Header surface state"
+      />
+    </FooterRow>
+  );
+}
+
+export function HeaderSurfaceMorphPreview() {
+  const [selected, setSelected] = useState<SurfaceMorphState>("wide");
+  const activeState =
+    SURFACE_MORPH_STATES.find((state) => state.id === selected) ??
+    SURFACE_MORPH_STATES[0];
+
+  const changeLook = (nextLook: HeaderLook) => {
+    if (nextLook === "open") {
+      setSelected("expanded");
+      return;
+    }
+
+    setSelected(nextLook === "compact" ? "compact" : "wide");
+  };
+
+  return (
+    <PreviewCard
+      full
+      innerClassName="!h-[28rem] !overflow-hidden !p-0"
+      footer={
+        <HeaderSurfaceMorphFooter
+          selected={selected}
+          onSelect={setSelected}
+        />
+      }
+      footnote={
+        <div className="mt-4 flex w-full justify-center px-4 text-center">
+          <p className="text-[13px] text-gray-200 dark:text-preview-dark-paragraph">
+            The surface changes as one object
+          </p>
+        </div>
+      }
+    >
+      <Stage className="!py-0 sm:!py-0">
+        <HeaderPreviewCanvas
+          compact
+          flushTop
+          compactHeader
+          look={activeState.look}
+          closeLook="compact"
+          onLookChangeAction={changeLook}
         />
       </Stage>
     </PreviewCard>
@@ -540,7 +625,7 @@ export function HeaderScrollPreview() {
           closeLook={stableLookRef.current}
           compactHeader
           flushTop
-          onLookChange={setScrollLook}
+          onLookChangeAction={setScrollLook}
         />
       </Stage>
     </PreviewCard>
