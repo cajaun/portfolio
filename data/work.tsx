@@ -31,6 +31,11 @@ export const WORK_TABS = [
 
 export const COMPONENT_ITEMS: WorkItem[] = [
   {
+    title: "Adaptive Header",
+    date: "October 17, 2026",
+    href: "/work/adaptive-header",
+  },
+  {
     title: "Morphing Chart",
     date: "September 20, 2026",
     href: "/work/morphing-chart",

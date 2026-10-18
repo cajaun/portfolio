@@ -4,6 +4,7 @@ import { MosaicExamplesPreview } from "@/components/blog/previews/grids";
 import { ActivePostPreview } from "@/components/blog/previews/intersection-observers";
 import { PortalLayerPreview } from "@/components/blog/previews/modals";
 import { MorphingChartPreview } from "@/components/blog/previews/morphing-chart";
+import { HeaderOverviewPreview } from "@/components/blog/previews/adaptive-header";
 import { SITE } from "@/data/site";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -23,6 +24,14 @@ type WorkExample = {
 };
 
 const WORK_EXAMPLES: WorkExample[] = [
+  {
+    slug: "adaptive-header",
+    title: "Adaptive Header",
+    publishedAt: "October 17, 2026",
+    summary:
+      "A responsive header that expands and contracts as the page moves.",
+    Component: HeaderOverviewPreview,
+  },
   {
     slug: "morphing-chart",
     title: "Morphing Chart",

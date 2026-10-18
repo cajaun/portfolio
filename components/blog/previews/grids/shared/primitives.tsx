@@ -129,9 +129,20 @@ export function AnimatedCardSkeleton({
   );
 }
 
-export function Stage({ children }: { children: ReactNode }) {
+export function Stage({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return (
-    <div className="bg-preview-surface-muted px-4 py-4 sm:px-8 sm:py-8 dark:bg-preview-dark-stage">
+    <div
+      className={cn(
+        "bg-preview-surface-muted px-4 py-4 sm:px-8 sm:py-8 dark:bg-preview-dark-stage",
+        className,
+      )}
+    >
       {children}
     </div>
   );

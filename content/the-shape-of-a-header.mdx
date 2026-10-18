@@ -1,0 +1,125 @@
+export const metadata = {
+  title: "The Shape of a Header",
+  publishedAt: "October 17, 2026",
+  summary:
+    "A walkthrough of a floating header that contracts on scroll, opens its navigation panel in place and keeps the same surface across desktop and mobile.",
+};
+
+import {
+  HeaderExpansionPreview,
+  HeaderOverviewPreview,
+  HeaderMobilePreview,
+  HeaderScrollPreview,
+} from "@/components/blog/previews/adaptive-header";
+
+<section className="mb-16 px-2">
+
+## Anatomy
+
+A floating header has to stay available while the page moves underneath it. Four pieces make that possible: the sticky shell, the navigation surface, the row of controls and the panel below it.
+
+The shell keeps the header at the top of the page. The row holds the mark and the controls. The panel belongs to the same navigation surface, so opening it changes one object instead of adding a second layer that has to find its place above the page.
+
+The header also has to change size without losing its position. It starts wide, contracts after the reader scrolls, and grows again when the reader returns to the top. The overview puts those behaviors in one place.
+
+<HeaderOverviewPreview />
+
+Use `Trigger menu` to open the panel from the row. Use `Scroll` to move through the content and see the header contract while it stays attached to the preview.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## One state controls the header
+
+The component has three visible states: `top`, `compact` and `open`. `top` gives the header its largest shape, `compact` applies the contracted shape, and `open` reveals the panel.
+
+The open state also remembers the closed state that came before it. If the reader opens the panel after scrolling, the header stays compact instead of jumping back to its top-of-page size.
+
+```tsx
+const look = open ? "open" : compact ? "compact" : "top";
+```
+
+One value now controls the row height, the width, the background and the panel visibility. That keeps the transitions together when the reader moves from one state to another.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The panel grows from the row
+
+The menu control changes `look` to `open`, and the navigation surface reveals the panel beneath its row.
+
+<HeaderExpansionPreview />
+
+The panel uses a grid row that moves from `0fr` to `1fr`. The inner wrapper can shrink to zero when the panel is closed, then take the height of its contents when it opens.
+
+```tsx
+<div className="invisible grid grid-rows-[0fr] transition-[grid-template-rows,visibility]">
+  <div className="min-h-0 overflow-hidden">
+    {groups}
+  </div>
+</div>
+```
+
+`min-h-0` and `overflow-hidden` keep the closed panel inside the header. The outer navigation element keeps the border, radius and background around both states, so the panel feels attached to the row as it opens.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Scroll changes the shape
+
+The header enters its compact state after the reader moves past 24 pixels. The preview applies that rule to its own scroll container, which lets the skeleton content move while the header stays in place.
+
+<HeaderScrollPreview />
+
+At the top, the row measures 60 pixels and the header uses the available width. After the threshold, the row drops to 54 pixels and the header contracts by 4rem. The `Compact` control takes the preview to the end of its scroll range, where the change is easy to see.
+
+```tsx
+useEffect(() => {
+  const update = () => {
+    setCompact(scrollTop > 24);
+  };
+
+  scrollContainer.addEventListener("scroll", update, { passive: true });
+
+  return () => {
+    scrollContainer.removeEventListener("scroll", update);
+  };
+}, []);
+```
+
+When the reader returns to `Top`, the preview restores the wide header and the first scroll position. The smooth movement does not let intermediate scroll events replace the state the control requested.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Mobile keeps the same interaction
+
+The mobile row has less room, so the links give way to a menu button and the panel items use one column. The header keeps the same panel, backdrop and open state.
+
+<HeaderMobilePreview />
+
+The mobile preview uses the same canvas with the mobile control route enabled:
+
+```tsx
+<HeaderPreviewCanvas mobile />
+```
+
+The two lines in the menu button meet at the center as they form the close icon. The backdrop covers the preview stage, while the navigation surface stays above it so the reader can close the open panel from the control or the surrounding space.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Motion follows the state
+
+The header uses a 600ms transition for its width, radius, blur, shadow and row height. The backdrop fades over 400ms, and the panel uses a 500ms grid transition with a 35ms delay between its groups.
+
+The row and the panel share the same easing curve, which keeps the border and the contents moving together. The menu icon uses a shorter transform, and the chevron turns upward with the panel.
+
+The reduced-motion rules remove the blur, translation and long transitions while preserving the state changes. The header still opens, contracts and returns to its top position without asking the reader to follow decorative movement.
+
+</section>
