@@ -82,7 +82,7 @@ export default function ArticleActions() {
     <div className="flex min-h-9 w-full select-none items-center justify-between gap-2">
       <Link
         aria-label="Home"
-        className="flex size-9 shrink-0 select-none items-center justify-center rounded-full bg-preview-surface-active text-preview-text-muted transition-[color,background-color,border-color,box-shadow,scale] duration-200 ease-out will-change-transform hover:bg-preview-border hover:text-black dark:bg-preview-dark-active dark:text-preview-dark-text-muted dark:hover:bg-preview-dark-active dark:hover:text-white"
+        className="flex size-9 shrink-0 select-none items-center justify-center rounded-full bg-preview-surface-active text-preview-text-muted transition-[color,background-color,border-color,box-shadow,scale] duration-200 ease-out will-change-transform hover:bg-preview-border hover:text-black hover:shadow-custom dark:bg-preview-dark-active dark:text-preview-dark-text-muted dark:hover:bg-preview-dark-border-strong dark:hover:text-white dark:hover:shadow-[0_0_0_1px_#ffffff14]"
         href="/"
       >
         <svg
@@ -103,7 +103,7 @@ export default function ArticleActions() {
 
       <button
         aria-label={copied ? "Link copied" : "Copy link to clipboard"}
-        className="flex size-9 shrink-0 select-none items-center justify-center rounded-full bg-preview-surface-active text-preview-text-muted transition-[color,background-color,border-color,box-shadow,scale] duration-200 ease-out will-change-transform hover:bg-preview-border hover:text-black dark:bg-preview-dark-active dark:text-preview-dark-text-muted dark:hover:bg-preview-dark-active dark:hover:text-white"
+        className="flex size-9 shrink-0 select-none items-center justify-center rounded-full bg-preview-surface-active text-preview-text-muted transition-[color,background-color,border-color,box-shadow,scale] duration-200 ease-out will-change-transform hover:bg-preview-border hover:text-black hover:shadow-custom dark:bg-preview-dark-active dark:text-preview-dark-text-muted dark:hover:bg-preview-dark-border-strong dark:hover:text-white dark:hover:shadow-[0_0_0_1px_#ffffff14]"
         onClick={copyLink}
         type="button"
       >

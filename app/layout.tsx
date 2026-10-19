@@ -32,10 +32,36 @@ const openRunde = localFont({
   ],
 });
 
+const siteOgImage = `${SITE.url}/og?title=${encodeURIComponent(SITE.name)}`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: SITE.name,
   description: SITE.description,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: SITE.url,
+    siteName: SITE.name,
+    title: SITE.name,
+    description: SITE.description,
+    images: [
+      {
+        url: siteOgImage,
+        width: 1200,
+        height: 630,
+        alt: SITE.name,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.name,
+    description: SITE.description,
+    images: [siteOgImage],
+  },
 };
 
 export default function RootLayout({
