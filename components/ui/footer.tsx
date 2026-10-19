@@ -6,11 +6,11 @@ const Footer = () => {
 
   return (
     <footer
-      className="mx-auto mt-auto w-full max-w-screen-sm border-t border-preview-border px-4 dark:border-preview-dark-border animate-slide-down-fade"
+      className="mx-auto mt-auto w-full max-w-screen-sm px-4 animate-slide-down-fade"
       style={{ animationDelay: "450ms" }}
     >
       <div
-        className=" flex items-center justify-between px-0 pt-4 md:px-0"
+        className="mx-2 border-t border-preview-border flex items-center justify-between px-0 pt-4 dark:border-preview-dark-border md:px-0"
         style={{
           paddingBottom: "max(16px, env(safe-area-inset-bottom))",
         }}

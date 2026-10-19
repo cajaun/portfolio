@@ -73,7 +73,7 @@ export default function PreviewCard({
         {footer ? (
           <div
             className={cn(
-              "flex h-[61px] items-center border-t border-preview-border bg-preview-surface-muted px-4 dark:border-preview-dark-border dark:bg-preview-dark-surface",
+              "mx-1 mb-1 flex min-h-12 items-center justify-center self-stretch rounded-xl border border-preview-border bg-[lab(98.956001_0.00003_-0.000012)] px-4 py-3 dark:border-preview-dark-border-strong dark:bg-preview-dark-surface-muted",
               footerClassName,
             )}
           >

@@ -1,5 +1,6 @@
 import Footer from "@/components/ui/footer";
 import Header from "@/components/ui/header";
+import ArticleActions from "@/components/blog/article-actions";
 import { MosaicExamplesPreview } from "@/components/blog/previews/grids";
 import { ActivePostPreview } from "@/components/blog/previews/intersection-observers";
 import { PortalLayerPreview } from "@/components/blog/previews/modals";
@@ -122,6 +123,12 @@ export default async function WorkExamplePage(props: PageProps) {
           className="mb-16 animate-slide-down-fade px-2"
           style={{ animationDelay: "180ms" }}
         >
+          <ArticleActions />
+        </div>
+        <div
+          className="mb-16 animate-slide-down-fade px-2"
+          style={{ animationDelay: "270ms" }}
+        >
           <div className="flex items-center justify-between">
             <h2 className="font-medium">{example.title}</h2>
           </div>
@@ -135,7 +142,7 @@ export default async function WorkExamplePage(props: PageProps) {
 
         <div
           className="animate-slide-down-fade px-2"
-          style={{ animationDelay: "270ms" }}
+          style={{ animationDelay: "360ms" }}
         >
           <ExamplePreview />
         </div>
@@ -144,19 +151,19 @@ export default async function WorkExamplePage(props: PageProps) {
         <section className="mx-auto w-full max-w-screen-sm px-4">
           <div
             className="animate-slide-down-fade px-2 dark:border-preview-dark-border"
-            style={{ animationDelay: "360ms" }}
+            style={{ animationDelay: "450ms" }}
           >
             <div className="relative flex min-h-[5.5rem] pb-4 md:min-h-0 md:flex-row md:justify-between md:gap-10">
               {previousExample ? (
                 <div className="absolute bottom-4 left-0 w-full max-w-[10rem] min-w-0 md:static md:max-w-none md:flex-1 md:min-h-[3.5rem]">
                   <Link
                     href={`/work/${previousExample.slug}`}
-                    className="group block w-full overflow-hidden rounded-xl transition-opacity duration-300 hover:opacity-70"
+                    className="group block w-full rounded-xl transition-opacity duration-300 hover:opacity-70"
                   >
                     <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
                       Previous
                     </p>
-                    <p className="truncate text-sm font-medium text-black dark:text-white">
+                    <p className="text-sm font-medium text-black dark:text-white">
                       {previousExample.title}
                     </p>
                   </Link>
@@ -167,12 +174,12 @@ export default async function WorkExamplePage(props: PageProps) {
                 <div className="absolute bottom-4 right-0 w-full max-w-[10rem] min-w-0 text-right md:static md:ml-auto md:max-w-none md:flex-1 md:min-h-[3.5rem]">
                   <Link
                     href={`/work/${nextExample.slug}`}
-                    className="group block w-full overflow-hidden rounded-xl transition-opacity duration-300 hover:opacity-70"
+                    className="group block w-full rounded-xl transition-opacity duration-300 hover:opacity-70"
                   >
                     <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
                       Next
                     </p>
-                    <p className="truncate text-sm font-medium text-black dark:text-white">
+                    <p className="text-sm font-medium text-black dark:text-white">
                       {nextExample.title}
                     </p>
                   </Link>

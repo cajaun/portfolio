@@ -1,5 +1,7 @@
 import Footer from "@/components/ui/footer";
 import Header from "@/components/ui/header";
+import ArticleActions from "@/components/blog/article-actions";
+import ArticleContent from "@/components/blog/article-content";
 import { getBlogPostSummaries, getBlogPosts, getPost } from "@/data/blog";
 import { SITE } from "@/data/site";
 import type { Metadata } from "next";
@@ -111,6 +113,12 @@ export default async function Blog(props: PageProps) {
           className="mb-16 animate-slide-down-fade px-2"
           style={{ animationDelay: "180ms" }}
         >
+          <ArticleActions />
+        </div>
+        <div
+          className="mb-16 animate-slide-down-fade px-2"
+          style={{ animationDelay: "270ms" }}
+        >
           <div className="flex items-center justify-between">
             <h2 className="font-medium">{post.metadata.title}</h2>
           </div>
@@ -122,12 +130,12 @@ export default async function Blog(props: PageProps) {
           </div>
         </div>
 
-        <article className="blog-content prose dark:prose-invert ">
+        <ArticleContent>
           <PostContent />
-        </article>
+        </ArticleContent>
       </section>
       {hasAdjacentPosts ? (
-        <section className="mx-auto  w-full max-w-screen-sm px-4">
+        <section className="mx-auto w-full max-w-screen-sm px-4">
           <div
             className="animate-slide-down-fade px-2 dark:border-preview-dark-border"
             style={{ animationDelay: "360ms" }}
@@ -137,12 +145,12 @@ export default async function Blog(props: PageProps) {
                 <div className="absolute bottom-4 left-0 w-full max-w-[10rem] min-w-0 md:static md:max-w-none md:flex-1 md:min-h-[3.5rem]">
                   <Link
                     href={`/blog/${previousPost.slug}`}
-                    className="group block w-full overflow-hidden  rounded-xl transition-opacity duration-300 hover:opacity-70"
+                    className="group block w-full rounded-xl transition-opacity duration-300 hover:opacity-70"
                   >
                     <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
                       Previous
                     </p>
-                    <p className="text-sm font-medium text-black dark:text-white truncate">
+                    <p className="text-sm font-medium text-black dark:text-white">
                       {previousPost.title}
                     </p>
                   </Link>
@@ -153,12 +161,12 @@ export default async function Blog(props: PageProps) {
                 <div className="absolute bottom-4 right-0 w-full max-w-[10rem] min-w-0 text-right md:static md:ml-auto md:max-w-none md:flex-1 md:min-h-[3.5rem]">
                   <Link
                     href={`/blog/${nextPost.slug}`}
-                    className="group block w-full  overflow-hidden rounded-xl transition-opacity duration-300 hover:opacity-70"
+                    className="group block w-full rounded-xl transition-opacity duration-300 hover:opacity-70"
                   >
                     <p className="text-sm font-medium text-gray-200 dark:text-gray-100">
                       Next
                     </p>
-                    <p className="text-sm font-medium text-black dark:text-white truncate">
+                    <p className="text-sm font-medium text-black dark:text-white">
                       {nextPost.title}
                     </p>
                   </Link>
