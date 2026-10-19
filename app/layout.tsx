@@ -32,7 +32,9 @@ const openRunde = localFont({
   ],
 });
 
-const siteOgImage = `${SITE.url}/og?title=${encodeURIComponent(SITE.name)}`;
+const siteOgImage = `${SITE.url}/og?${new URLSearchParams({
+  title: SITE.name,
+}).toString()}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
