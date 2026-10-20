@@ -41,6 +41,7 @@ html.dark pre[data-theme*="github-dark"] span {
 .dark .shadow-custom {
   box-shadow: 0 0 0 1px #ffffff14;
 }
+
 .dark .prose pre {
   background-color: lab(5.09437% -0.00000745058 0) !important;
   box-shadow: 0 0 0 1px #ffffff14;

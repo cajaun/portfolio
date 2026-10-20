@@ -1,6 +1,6 @@
 "use client";
 
-import CajaunArt from "@/public/Cajaun_art.png";
+import CajaunAvatar from "@/public/cajaun_minimalist_no_bg.png";
 import Image from "next/image";
 import Link from "next/link";
 import { animate, motion, useMotionValue } from "framer-motion";
@@ -116,14 +116,14 @@ const Header = () => {
             window.addEventListener("pointerup", releaseSelection);
             window.addEventListener("pointercancel", releaseSelection);
           }}
-          className="relative z-10 h-16 w-16 cursor-grab overflow-hidden rounded-full shadow-custom touch-none select-none will-change-transform active:cursor-grabbing"
+          className="relative z-10 h-16 w-16 cursor-grab overflow-hidden rounded-full shadow-custom touch-none select-none will-change-transform active:cursor-grabbing "
         >
           <Image
             alt={`Photo of ${SITE.name}`}
-            src={CajaunArt}
-            className="h-full w-full object-cover pointer-events-none select-none"
+            src={CajaunAvatar}
+            className="h-full w-full scale-[1.1] object-cover pointer-events-none select-none"
             quality={100}
-            sizes="64px"
+            sizes="256px"
             priority
             draggable={false}
           />
