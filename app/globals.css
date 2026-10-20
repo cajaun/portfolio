@@ -38,7 +38,7 @@ html.dark pre[data-theme*="github-dark"] span {
     0px 2px 4px 0px #0000000a;
 }
 
-.dark .shadow-custom {
+html.dark .shadow-custom {
   box-shadow: 0 0 0 1px #ffffff14;
 }
 

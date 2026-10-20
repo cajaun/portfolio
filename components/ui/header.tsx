@@ -4,11 +4,14 @@ import CajaunAvatar from "@/public/cajaun_minimalist_no_bg.png";
 import Image from "next/image";
 import Link from "next/link";
 import { animate, motion, useMotionValue } from "framer-motion";
+import { useTheme } from "next-themes";
 import { useRef, useState } from "react";
 import { SITE } from "@/data/site";
 
 const Header = () => {
   const [isDetached, setIsDetached] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const { resolvedTheme } = useTheme();
   const selectionStylesRef = useRef<{
     bodyUserSelect: string;
     bodyWebkitUserSelect: string;
@@ -17,6 +20,10 @@ const Header = () => {
   } | null>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const dragShadow =
+    resolvedTheme === "dark"
+      ? "0 0 0 1px #ffffff14, 0px 16px 32px rgba(0, 0, 0, 0.45), 0px 4px 12px rgba(0, 0, 0, 0.3)"
+      : "0 0 0 1px #0000000f, 0px 16px 32px rgba(0, 0, 0, 0.12), 0px 4px 12px rgba(0, 0, 0, 0.08)";
 
   const lockTextSelection = () => {
     const body = document.body;
@@ -79,7 +86,7 @@ const Header = () => {
       <div className="relative flex h-16 w-16 items-center justify-center">
         <div
           aria-hidden="true"
-          className={`absolute inset-0 rounded-full border border-dashed border-black/10 bg-black/[0.02] dark:border-white/15 dark:bg-white/[0.03] ${
+          className={`absolute inset-0 rounded-full border border-dashed border-black/10 bg-black/[0.02] transition-opacity duration-200 ease-out dark:border-white/15 dark:bg-white/[0.03] ${
             isDetached ? "opacity-100" : "opacity-0"
           }`}
         />
@@ -88,21 +95,21 @@ const Header = () => {
           drag
           dragMomentum={false}
           dragElastic={0.12}
-          style={{ x, y }}
+          style={{ x, y, boxShadow: isDragging ? dragShadow : undefined }}
           whileDrag={{
             scale: 1.04,
             zIndex: 80,
-            boxShadow:
-              "0px 16px 32px rgba(0, 0, 0, 0.12), 0px 4px 12px rgba(0, 0, 0, 0.08)",
           }}
           onDragStart={() => {
             x.stop();
             y.stop();
             lockTextSelection();
+            setIsDragging(true);
             setIsDetached(true);
           }}
           onDragEnd={() => {
             unlockTextSelection();
+            setIsDragging(false);
             snapBack();
           }}
           onPointerDown={() => {
