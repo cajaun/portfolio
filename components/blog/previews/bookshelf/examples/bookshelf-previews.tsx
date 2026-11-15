@@ -26,7 +26,7 @@ const poseTabs: { id: Pose; name: string }[] = [
 ];
 
 // the whole shelf, with the same pose control the site shows for the book in hand
-export function BookshelfPreview() {
+export function BookshelfPreview({ showFootnote = true }: { showFootnote?: boolean }) {
   const shelf = useRef<BookshelfHandle>(null);
   const [handled, setHandled] = useState<{ id: string; pose: Pose } | null>(null);
 
@@ -43,7 +43,9 @@ export function BookshelfPreview() {
         />
       }
       footnote={
-        <PreviewFootnote>Drag a book to move it. The footer turns the book you last touched</PreviewFootnote>
+        showFootnote ? (
+          <PreviewFootnote>Drag a book to move it. The footer turns the book you last touched</PreviewFootnote>
+        ) : null
       }
     >
       <Stage>
@@ -290,4 +292,9 @@ export function BookshelfSpringsPreview() {
       </Stage>
     </PreviewCard>
   );
+}
+
+// the component page shows the shelf on its own, without the post's footnote
+export function BookshelfComponentPreview() {
+  return <BookshelfPreview showFootnote={false} />;
 }

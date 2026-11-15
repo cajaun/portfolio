@@ -226,7 +226,8 @@ export class ShelfEngine {
   // public api
 
   setRules(rules: Rules) {
-    this.rules = rules;
+    // the case width belongs to the layout the engine was built with
+    this.rules = { ...rules, W: this.opts.W };
     for (const s of this.books.values()) s.stiff = rules.springs === "two";
     this.relayout();
   }

@@ -20,7 +20,7 @@ export const followSpring = {
 
 export function Stage({ children }: { children: ReactNode }) {
   return (
-    <div className="bg-preview-surface-muted px-1 py-4 sm:px-8 sm:py-6 dark:bg-preview-dark-stage">
+    <div className="bg-preview-surface-muted px-1 py-4 sm:py-6 dark:bg-preview-dark-stage">
       {children}
     </div>
   );

@@ -55,6 +55,25 @@ function schedule(job: () => void) {
   window.setTimeout(next, Math.max(0, INTRO_MS - performance.now()));
 }
 
+// desktop shows the same books in a wider case, centred, so each preview reads as a wide strip
+const DESKTOP_EXTRA = 20;
+const WIDE_QUERY = "(min-width: 640px)";
+
+function layoutFor<T extends { spec: RowSpec[]; W: number; rules: Rules }>(opts: T, offset: { current: number }): T {
+  if (!window.matchMedia(WIDE_QUERY).matches) {
+    offset.current = 0;
+    return opts;
+  }
+  const pad = DESKTOP_EXTRA / 2;
+  offset.current = pad;
+  return {
+    ...opts,
+    W: opts.W + DESKTOP_EXTRA,
+    rules: { ...opts.rules, W: opts.W + DESKTOP_EXTRA },
+    spec: opts.spec.map((row) => [{ space: pad }, ...row]),
+  };
+}
+
 function SkeletonLine({ className }: { className: string }) {
   return (
     <div
@@ -125,7 +144,7 @@ export const Bookshelf = forwardRef<
     interactive = true,
     carrying = false,
     poster,
-    maxWidth = 560,
+    maxWidth,
     onHandledChange,
     onModeChange,
   },
@@ -146,8 +165,10 @@ export const Bookshelf = forwardRef<
   const rules = useMemo<Rules>(() => ({ W, ...DEFAULT_RULES, ...overrides }), [W, overrides]);
   const latest = useRef({ spec, W, rules, tap, cycle, initialHandled, interactive, turnDuration });
   latest.current = { spec, W, rules, tap, cycle, initialHandled, interactive, turnDuration };
-  const view = viewSize(spec.length, W);
+  const narrowView = viewSize(spec.length, W);
+  const wideView = viewSize(spec.length, W + DESKTOP_EXTRA);
   const still = POSTERS[poster];
+  const offset = useRef(0);
 
   // builds the engine once, either from the idle queue or straight away when the footer needs it;
   // three.js loads as its own chunk here, so the page itself never waits for it
@@ -162,7 +183,7 @@ export const Bookshelf = forwardRef<
           glRef.current!,
           snapRef.current!,
           cursorRef.current,
-          latest.current,
+          layoutFor(latest.current, offset),
           {
             onHandle: (h) => {
               const key = h ? `${h.id}:${h.pose}` : "";
@@ -212,6 +233,24 @@ export const Bookshelf = forwardRef<
     engine.current?.setRules(rules);
   }, [rules]);
 
+  // crossing the breakpoint swaps the case width, so the shelf is rebuilt for the new layout
+  useEffect(() => {
+    const media = window.matchMedia(WIDE_QUERY);
+    const rebuild = () => {
+      if (!engine.current && !starting.current) return;
+      engine.current?.dispose();
+      engine.current = null;
+      starting.current = null;
+      setReady(false);
+      setPosterGone(false);
+      setMode("shelf");
+      void ensure();
+    };
+    media.addEventListener("change", rebuild);
+    return () => media.removeEventListener("change", rebuild);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // the still stays under the canvas until the canvas has faded in over it
   useEffect(() => {
     if (!ready) return;
@@ -237,17 +276,18 @@ export const Bookshelf = forwardRef<
     open: (id) => withEngine((e) => e.openBook(id)),
     close: () => engine.current?.close(),
     placeByStack: (id, member, where) => withEngine((e) => e.placeByStack(id, member, where)),
-    hop: (id, xs, r) => withEngine((e) => e.hop(id, xs, r)),
+    hop: (id, xs, r) => withEngine((e) => e.hop(id, [xs[0] + offset.current, xs[1] + offset.current], r)),
   }));
 
   return (
     <div className="mx-auto w-full select-none" style={{ maxWidth }}>
-      {/* the height comes from the case size, so the page never jumps when the shelf arrives */}
+      {/* the height comes from the case size for each breakpoint, so the page never jumps when the shelf arrives */}
       <div
         ref={rootRef}
-        className="relative w-full"
+        className="relative w-full [aspect-ratio:var(--shelf-narrow)] sm:[aspect-ratio:var(--shelf-wide)]"
         style={{
-          aspectRatio: `${view.w} / ${view.h}`,
+          ["--shelf-narrow" as string]: `${narrowView.w} / ${narrowView.h}`,
+          ["--shelf-wide" as string]: `${wideView.w} / ${wideView.h}`,
           // a long press picks a book up, so the phone must not select, magnify or highlight anything
           WebkitTapHighlightColor: "transparent",
           WebkitTouchCallout: "none",
@@ -274,14 +314,28 @@ export const Bookshelf = forwardRef<
               alt=""
               aria-hidden="true"
               draggable={false}
-              className="pointer-events-none absolute inset-0 h-full w-full dark:hidden"
+              className="pointer-events-none absolute inset-0 h-full w-full dark:hidden sm:hidden"
             />
             <img
               src={still.dark}
               alt=""
               aria-hidden="true"
               draggable={false}
-              className="pointer-events-none absolute inset-0 hidden h-full w-full dark:block"
+              className="pointer-events-none absolute inset-0 hidden h-full w-full dark:block sm:hidden sm:dark:hidden"
+            />
+            <img
+              src={still.wideLight}
+              alt=""
+              aria-hidden="true"
+              draggable={false}
+              className="pointer-events-none absolute inset-0 hidden h-full w-full sm:block sm:dark:hidden"
+            />
+            <img
+              src={still.wideDark}
+              alt=""
+              aria-hidden="true"
+              draggable={false}
+              className="pointer-events-none absolute inset-0 hidden h-full w-full sm:dark:block"
             />
           </>
         ) : null}
