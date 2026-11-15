@@ -9,7 +9,8 @@ import {
   useState,
 } from "react";
 import type { CSSProperties } from "react";
-import { ShelfEngine, viewSize, type Carry, type Mode } from "../engine/shelf-engine";
+import type { Carry, Mode, ShelfEngine } from "../engine/shelf-engine";
+import { viewSize } from "./view";
 import { POSTERS } from "./posters";
 import { DEFAULT_RULES, type Pose, type RowSpec, type Rules } from "./shelf-model";
 
@@ -148,31 +149,43 @@ export const Bookshelf = forwardRef<
   const view = viewSize(spec.length, W);
   const still = POSTERS[poster];
 
-  // builds the engine once, either from the idle queue or straight away when the footer needs it
+  // builds the engine once, either from the idle queue or straight away when the footer needs it;
+  // three.js loads as its own chunk here, so the page itself never waits for it
+  const starting = useRef<Promise<ShelfEngine | null> | null>(null);
   const ensure = () => {
-    if (engine.current || !alive.current || !rootRef.current) return engine.current;
-    let lastKey = "";
-    engine.current = new ShelfEngine(
-      rootRef.current,
-      glRef.current!,
-      snapRef.current!,
-      cursorRef.current,
-      latest.current,
-      {
-        onHandle: (h) => {
-          const key = h ? `${h.id}:${h.pose}` : "";
-          if (key === lastKey) return;
-          lastKey = key;
-          callbacks.current.onHandledChange?.(h);
-        },
-        onMode: (m) => {
-          setMode(m);
-          callbacks.current.onModeChange?.(m);
-        },
-        onReady: () => setReady(true),
-      },
-    );
-    return engine.current;
+    if (!starting.current)
+      starting.current = import("../engine/shelf-engine").then(async ({ ShelfEngine }) => {
+        if (!alive.current || !rootRef.current) return null;
+        let lastKey = "";
+        const e = new ShelfEngine(
+          rootRef.current,
+          glRef.current!,
+          snapRef.current!,
+          cursorRef.current,
+          latest.current,
+          {
+            onHandle: (h) => {
+              const key = h ? `${h.id}:${h.pose}` : "";
+              if (key === lastKey) return;
+              lastKey = key;
+              callbacks.current.onHandledChange?.(h);
+            },
+            onMode: (m) => {
+              setMode(m);
+              callbacks.current.onModeChange?.(m);
+            },
+            onReady: () => setReady(true),
+          },
+        );
+        engine.current = e;
+        await e.start();
+        return alive.current ? e : null;
+      });
+    return starting.current;
+  };
+  const withEngine = (fn: (e: ShelfEngine) => void) => {
+    if (engine.current) fn(engine.current);
+    else void ensure().then((e) => e && fn(e));
   };
 
   useEffect(() => {
@@ -181,7 +194,7 @@ export const Bookshelf = forwardRef<
       ([entry]) => {
         if (!entry.isIntersecting) return;
         io.disconnect();
-        schedule(ensure);
+        schedule(() => void ensure());
       },
       { rootMargin: "400px 0px" },
     );
@@ -217,14 +230,14 @@ export const Bookshelf = forwardRef<
   }, [mode]);
 
   useImperativeHandle(ref, () => ({
-    setPose: (pose) => ensure()?.setPoseOfHandled(pose),
-    present: (id, pose, r) => ensure()?.present(id, pose, r),
-    turn: (id, r) => ensure()?.turn(id, r),
-    carry: (c, r) => ensure()?.carry(c, r),
-    open: (id) => ensure()?.openBook(id),
+    setPose: (pose) => withEngine((e) => e.setPoseOfHandled(pose)),
+    present: (id, pose, r) => withEngine((e) => e.present(id, pose, r)),
+    turn: (id, r) => withEngine((e) => e.turn(id, r)),
+    carry: (c, r) => withEngine((e) => e.carry(c, r)),
+    open: (id) => withEngine((e) => e.openBook(id)),
     close: () => engine.current?.close(),
-    placeByStack: (id, member, where) => ensure()?.placeByStack(id, member, where),
-    hop: (id, xs, r) => ensure()?.hop(id, xs, r),
+    placeByStack: (id, member, where) => withEngine((e) => e.placeByStack(id, member, where)),
+    hop: (id, xs, r) => withEngine((e) => e.hop(id, xs, r)),
   }));
 
   return (
@@ -235,7 +248,15 @@ export const Bookshelf = forwardRef<
         className="relative w-full"
         style={{ aspectRatio: `${view.w} / ${view.h}` }}
         onPointerDownCapture={() => {
-          if (interactive) ensure();
+          if (interactive) void ensure();
+        }}
+        onClick={(e) => {
+          // a tap on the still before the shelf is live plays once the shelf starts
+          if (!interactive || engine.current) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          const x = e.clientX - r.left;
+          const y = e.clientY - r.top;
+          void ensure().then((eng) => eng?.tapAt(x, y));
         }}
       >
         {!posterGone ? (

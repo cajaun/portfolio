@@ -29,6 +29,9 @@ import {
   type Rules,
 } from "../shared/shelf-model";
 import { PALETTE, bookGeometry, createArt, type BookArt, type Theme } from "./book-art";
+import { PAD, viewSize } from "../shared/view";
+
+export { viewSize };
 import {
   clearZ,
   easeInOut,
@@ -44,7 +47,6 @@ import {
 
 const FOV = 20;
 const FRONT_Z = 1.5; // the camera frames the case's front edge at this depth
-const PAD = { x: 3, top: 3, bottom: 2 }; // cm of stage around the case
 const LONG_PRESS = 380;
 const SLOP = { mouse: 12, touch: 8 };
 const QUICK_DRAG = { ms: 280, px: 26 };
@@ -85,14 +87,6 @@ export interface EngineOptions {
   turnDuration?: number; // seconds for out, turn, in
   cycle: Pose[];
   initialHandled: string | null;
-}
-
-// the stage around the case in cm, shared with the wrapper so the page can reserve the space before any script runs
-export function viewSize(shelves: number, W: number) {
-  return {
-    w: W + CASE.side * 2 + PAD.x * 2,
-    h: caseHeight(shelves) + CASE.board * 2 + PAD.top + PAD.bottom,
-  };
 }
 
 interface Script {
@@ -173,6 +167,8 @@ export class ShelfEngine {
   private moved = false; // the shelf differs from its spec after a carry
   private lastCarried: string | null = null;
   private hopping: { t: number } | null = null;
+  private lastTap = -Infinity;
+  private openedAt = -Infinity;
   private presented = new Map<string, Pose>(); // pose each footer-driven book shows
   private readonly shelves: number;
   private readonly caseH: number;
@@ -198,7 +194,7 @@ export class ShelfEngine {
     r.outputColorSpace = THREE.SRGBColorSpace;
     r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     r.shadowMap.enabled = true;
-    r.shadowMap.type = THREE.PCFSoftShadowMap;
+    r.shadowMap.type = THREE.PCFShadowMap;
     this.renderer = r;
 
     this.buildLights();
@@ -211,6 +207,16 @@ export class ShelfEngine {
     this.relayout(true);
     this.bind();
     this.emitHandle();
+  }
+
+  // compiles the shaders off the main thread where the browser allows it, then draws the first frame
+  async start() {
+    try {
+      await this.renderer.compileAsync(this.scene, this.camera);
+    } catch {
+      // compiling ahead is best effort, the first render compiles anything left
+    }
+    if (this.disposed) return;
     this.render();
     this.warmOtherTheme();
     this.cb.onReady();
@@ -268,6 +274,12 @@ export class ShelfEngine {
 
   openBook(id: string) {
     this.open(id);
+  }
+
+  // a tap at a point inside the canvas, used for a tap that landed before the engine was ready
+  tapAt(x: number, y: number) {
+    if (!this.opts.interactive || this.mode !== "shelf" || this.busy) return;
+    this.tap(this.pick(x, y));
   }
 
   // moves a flat book from the spec next to a stack or onto it, or back where the spec has it
@@ -337,6 +349,8 @@ export class ShelfEngine {
   close() {
     const id = this.heroId;
     if (!id || this.busy || this.mode !== "detail") return;
+    // a touch sends its click a moment after the tap that opened the book, that click must not close it
+    if (performance.now() - this.openedAt < 500) return;
     const s = this.books.get(id)!;
     this.busy = true;
     this.setMode("closing");
@@ -443,7 +457,9 @@ export class ShelfEngine {
     key.position.copy(center).add(new THREE.Vector3(70, 170, 460));
     key.target.position.copy(center);
     key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
+    // phones get a smaller shadow map, the shelf is drawn smaller there and the map costs memory and time
+    const small = Math.min(window.screen.width, window.screen.height) < 600;
+    key.shadow.mapSize.set(small ? 1024 : 2048, small ? 1024 : 2048);
     // soft contact shadows rather than hard blocks on the back wall
     key.shadow.intensity = 0.55;
     const sc = key.shadow.camera;
@@ -790,6 +806,7 @@ export class ShelfEngine {
     if (this.mode !== "shelf" || this.busy || !s || s.offShelf) return;
     s.inHand = true;
     this.heroId = id;
+    this.openedAt = performance.now();
     this.takeSnapshot();
     this.setMode("detail");
     this.setHover(null);
@@ -1071,6 +1088,16 @@ export class ShelfEngine {
     c.addEventListener("pointerup", (e) => this.onUp(e, false), opts);
     c.addEventListener("pointercancel", (e) => this.onUp(e, true), opts);
     c.addEventListener("pointerleave", () => !this.press && this.setHover(null), opts);
+    // some mobile browsers drop pointer events on a canvas, the click that follows a tap still arrives
+    c.addEventListener(
+      "click",
+      (e) => {
+        if (performance.now() - this.lastTap < 500) return;
+        const r = this.canvas.getBoundingClientRect();
+        this.tapAt(e.clientX - r.left, e.clientY - r.top);
+      },
+      opts,
+    );
     // a carried book must not scroll the page under it
     c.addEventListener("touchmove", (e) => this.drag && e.preventDefault(), { ...opts, passive: false });
   }
@@ -1158,6 +1185,8 @@ export class ShelfEngine {
   private onUp(e: PointerEvent, cancelled: boolean) {
     const d = this.press;
     if (!d || d.pointerId !== e.pointerId) return;
+    // the click that follows this pointer up belongs to it, the fallback below must skip it
+    this.lastTap = performance.now();
     if (this.canvas.hasPointerCapture(e.pointerId)) this.canvas.releasePointerCapture(e.pointerId);
     if (d.timer) clearTimeout(d.timer);
     this.press = null;
@@ -1174,6 +1203,7 @@ export class ShelfEngine {
   }
 
   private tap(id: string | null) {
+    this.lastTap = performance.now();
     if (this.opts.tap === "none") return;
     if (!id) {
       this.setHandled(null);

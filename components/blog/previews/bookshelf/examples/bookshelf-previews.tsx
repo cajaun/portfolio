@@ -33,6 +33,7 @@ export function BookshelfPreview() {
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <TabsFooter
           tabs={poseTabs}
@@ -50,7 +51,7 @@ export function BookshelfPreview() {
           ref={shelf}
           spec={anatomySpec}
           W={SHELF_W}
-          initialHandled="b5"
+          initialHandled="b10"
           poster="anatomy"
           onHandledChange={setHandled}
         />
@@ -68,6 +69,7 @@ export function BookshelfCloseUpPreview() {
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <FooterButton active={open} onClick={() => !open && shelf.current?.open("b13")}>
@@ -79,7 +81,7 @@ export function BookshelfCloseUpPreview() {
         </FooterRow>
       }
       footnote={
-        <PreviewFootnote>The detail panel fades in with the blur and out again as the shelf comes back</PreviewFootnote>
+        <PreviewFootnote>Tap a book or use the footer. The detail panel fades in with the blur</PreviewFootnote>
       }
     >
       <Stage>
@@ -88,7 +90,6 @@ export function BookshelfCloseUpPreview() {
           spec={anatomySpec}
           W={SHELF_W}
           poster="anatomy"
-          interactive={false}
           onModeChange={setMode}
         />
       </Stage>
@@ -106,6 +107,7 @@ export function BookshelfGapsPreview() {
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <TabsFooter
           tabs={[
@@ -150,6 +152,7 @@ function StatePreview<T extends string>({
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <TabsFooter
           tabs={tabs.map(({ id, name }) => ({ id, name }))}
@@ -237,6 +240,7 @@ export function BookshelfStackPreview() {
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <TabsFooter
           tabs={[
@@ -266,12 +270,13 @@ export function BookshelfSpringsPreview() {
   const [last, setLast] = useState<"one" | "two" | null>(null);
   const press = (id: "one" | "two") => {
     setLast(id);
-    shelf.current?.hop("b25", [19, 56], { springs: id });
+    shelf.current?.hop("b25", [18, 40], { springs: id });
   };
 
   return (
     <PreviewCard
       full
+      wideMobile
       footer={
         <FooterRow>
           <FooterButton active={last === "one"} onClick={() => press("one")}>
