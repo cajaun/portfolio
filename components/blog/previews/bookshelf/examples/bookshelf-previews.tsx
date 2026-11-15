@@ -136,7 +136,6 @@ function StatePreview<T extends string>({
   tabs,
   label,
   footnote,
-  turnDuration,
 }: {
   spec: Parameters<typeof Bookshelf>[0]["spec"];
   poster: Parameters<typeof Bookshelf>[0]["poster"];
@@ -144,7 +143,6 @@ function StatePreview<T extends string>({
   tabs: { id: T; name: string; pose: Pose; rules: RuleOverrides }[];
   label: string;
   footnote: string;
-  turnDuration?: number;
 }) {
   const shelf = useRef<BookshelfHandle>(null);
   const [selected, setSelected] = useState<T>(tabs[0].id);
@@ -174,7 +172,6 @@ function StatePreview<T extends string>({
           W={SHELF_W}
           poster={poster}
           interactive={false}
-          turnDuration={turnDuration}
         />
       </Stage>
     </PreviewCard>
@@ -222,7 +219,6 @@ export function BookshelfTurnPreview() {
       poster="turn"
       bookId="b56"
       label="Pose"
-      turnDuration={1.1}
       tabs={[
         { id: "spine", name: "Spine out", pose: "spine", rules: {} },
         { id: "face", name: "Face out", pose: "face", rules: {} },

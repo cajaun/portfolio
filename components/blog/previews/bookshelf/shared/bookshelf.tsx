@@ -58,7 +58,7 @@ function schedule(job: () => void) {
 function SkeletonLine({ className }: { className: string }) {
   return (
     <div
-      className={`rounded-full bg-preview-border dark:bg-preview-dark-surface-active ${className}`}
+      className={`rounded-full bg-[#d4d4d4] dark:bg-preview-dark-surface-active ${className}`}
     />
   );
 }
@@ -246,7 +246,15 @@ export const Bookshelf = forwardRef<
       <div
         ref={rootRef}
         className="relative w-full"
-        style={{ aspectRatio: `${view.w} / ${view.h}` }}
+        style={{
+          aspectRatio: `${view.w} / ${view.h}`,
+          // a long press picks a book up, so the phone must not select, magnify or highlight anything
+          WebkitTapHighlightColor: "transparent",
+          WebkitTouchCallout: "none",
+          WebkitUserSelect: "none",
+          userSelect: "none",
+        }}
+        onContextMenu={(e) => e.preventDefault()}
         onPointerDownCapture={() => {
           if (interactive) void ensure();
         }}
