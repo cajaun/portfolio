@@ -1,0 +1,399 @@
+export const metadata = {
+  title: "Turning Things Over",
+  publishedAt: "November 15, 2026",
+  summary:
+    "A guide to building a 3D bookshelf where you can pick a book up, turn it and carry it to another shelf while the other books make room.",
+};
+
+import {
+  BookshelfAnchorPreview,
+  BookshelfCloseUpPreview,
+  BookshelfGapsPreview,
+  BookshelfPreview,
+  BookshelfPushPreview,
+  BookshelfSpringsPreview,
+  BookshelfStackPreview,
+  BookshelfTurnPreview,
+} from "@/components/blog/previews/bookshelf";
+
+<section className="mb-16 px-2">
+
+## Anatomy
+
+A real shelf hands you its rules before you write any code. A book takes up width, and two books can't share the same space. A full shelf can't take another book. I built the book club site, a single bookcase with five shelves and close to three hundred books, by writing those facts down and drawing the scene from them.
+
+You can pick up any book on the site. You can turn it between three poses, and you can carry it along a shelf or up to another one while the books around it move aside.
+
+<BookshelfPreview />
+
+I split the code into two layers. The `domain` folder holds the shelf as plain data, which means rows of entries with a width and a position, plus pure functions that edit those rows and solve where each book sits. It has no DOM and no React. The `engine` folder holds the three.js scene, and on each frame I read the solved layout there and move each mesh toward its target.
+
+The previews in this post run a small copy of that engine with skeleton books. Drag a book to move it, or tap one to take it off the shelf. The footer turns the book you last touched.
+
+With the layers apart, you move a book by editing an array and running a layout pass. The animation code keeps one job, which is carrying each book from its current spot to the spot the layout solved for.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## A shelf is a list
+
+Strip a shelf down to first principles and you get a row of objects, each with a width and a position. I store each shelf as an array of entries. An entry holds a book standing up or a stack of books lying flat, and the hand-made starting arrangement adds spaces between groups.
+
+```ts
+export type Pose = "spine" | "face" | "flat";
+export type StandingPose = Exclude<Pose, "flat">;
+
+export type Entry =
+  | { kind: "book"; id: string; pose: StandingPose; x?: number }
+  | { kind: "stack"; ids: string[]; x?: number }
+  | { kind: "space"; w: number };
+```
+
+I treat a flat book as a stack, even a stack of one. That rule removes a branch from most of the edits. A standing book has one pose and one width, and a stack has a list of ids and the width of its tallest book on its side.
+
+Each book in the catalogue carries its size in centimetres, so the width of an entry follows from its pose.
+
+```ts
+const GAP_SPINE = 0.12;
+const GAP_OTHER = 0.7;
+
+export function entryWidth(e: Entry): number {
+  if (e.kind === "space") return e.w;
+  if (e.kind === "stack")
+    return Math.max(...e.ids.map((id) => BOOK_BY_ID[id].h)) + 0.6;
+  const b = BOOK_BY_ID[e.id];
+  return e.pose === "face" ? b.d : b.t;
+}
+```
+
+I use `gapBetween` to set the space between two neighbours. Two spines touch, as they do on a real shelf. A face-out book or a stack gets 0.7 cm on each side.
+
+<BookshelfGapsPreview />
+
+Switch to even gaps and the row reads as a line of separate objects. With the spines touching, you see the run of books as one block, and the stack stands apart from it. I keep that rule in its own function because I tune the gap more than any other number on the shelf.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## One row, one pass
+
+Two facts constrain a row. Books can't overlap, and the shelf has a fixed width. From those two facts you can deduce what has to happen when one book grows: the extra width comes out of the free gaps first, and once the gaps run out, a book at the end has to leave.
+
+I wrote one function, `resolveRow`, to apply that. Each entry carries the `x` it wants. I sort the entries by their centre and pick one entry to hold still, which tends to be the book you changed. Then I push the overlapping neighbours away from it on both sides.
+
+```ts
+const pinned = (p: Placed) => p.extra || p.e === pin;
+items.sort(
+  (a, b) =>
+    a.x + a.w / 2 - (b.x + b.w / 2) || (pinned(a) ? -1 : pinned(b) ? 1 : 0),
+);
+const p = items.findIndex(pinned);
+
+for (let i = Math.max(1, p + 1); i < n; i++)
+  items[i].x = Math.max(items[i].x, items[i - 1].x + items[i - 1].w + gap(i));
+for (let i = p - 1; i >= 0; i--)
+  items[i].x = Math.min(items[i].x, items[i + 1].x - gap(i + 1) - items[i].w);
+```
+
+The `Math.max` and `Math.min` calls carry the idea. A book moves once its neighbour overlaps it, and a book with room stays put. You see the result on the shelf as the empty gaps fill up before anything at the far end shifts.
+
+Next I fit the row inside the shelf. I count how many entries fit with each gap squeezed. I keep those inside the side panels and mark the rest as hidden.
+
+```ts
+let k = 0;
+for (let i = 0, end = lo; i < m; i++) {
+  end += (i > 0 ? gap(i) : 0) + items[i].w;
+  if (end > hi + 1e-6) break;
+  k = i + 1;
+}
+for (let i = k; i < n; i++) items[i].hidden = true;
+```
+
+The shortcut I avoided moves each book after the changed one by the same amount. It takes fewer lines, and it also moves books that had room to spare, so the whole row slides each time one book grows. On a full shelf, that shortcut pushes the last books off the end while the gaps in the middle stay open.
+
+<BookshelfPushPreview />
+
+I keep hidden books in storage past the right end, in their order. On a phone the shelf narrows and shows fewer books per row, and the data stays the same.
+
+With one function handling the push and the overflow, the rest of the code can ignore overlap. I edit the rows however I like and run the pass again.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Turning in place
+
+I change a book's pose with `changePose`. I swap the pose and move the book's `x` so its centre stays put.
+
+```ts
+const center = ex + entryWidth(e) / 2;
+if (e.kind === "book") {
+  if (pose === "flat")
+    changed = list[loc.index] = { kind: "stack", ids: [id] };
+  else {
+    e.pose = pose;
+    changed = e;
+  }
+  changed.x = center - entryWidth(changed) / 2;
+}
+```
+
+A spine-out book measures about three centimetres across, and face out it measures closer to sixteen. Keep the left edge and the book grows to the right, so one side of the shelf moves and the other side sits still. Keep the centre and pin the changed entry, and you split the push between both sides.
+
+<BookshelfAnchorPreview />
+
+I lay a book flat by turning it into a stack of one. To stand a book up from a larger stack, I take it off and stand it beside the stack, which leaves the stack whole. Each case takes a few lines on the array, and I run the layout pass to find the room.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Out, turn, in
+
+A book is a box with corners. Rotate a box on a packed shelf and its corners sweep through the books beside it and the boards above and below it. I know from the layout where the book ends up, and I still have to get it there without that collision.
+
+I gave each pose change a short path. The book slides out past the front of the shelf and turns in the open, then slides back in.
+
+<BookshelfTurnPreview />
+
+I use `clearZ` to work out how far forward the book has to come. Half the book's diagonal covers any rotation, so the turn clears the shelf front in any direction.
+
+```ts
+export function clearZ(id: string) {
+  const b = BOOK_BY_ID[id];
+  return 1.2 + Math.sqrt(b.h * b.h + b.d * b.d + b.t * b.t) / 2;
+}
+```
+
+I drive the move with one progress value split into three phases. The first quarter pulls the book out. The middle half carries it across and turns it, and the last stretch pushes it in.
+
+```ts
+const PH_OUT = 0.26;
+const PH_IN = 0.72;
+
+const a = new THREE.Vector3(c.from.x, Math.max(c.from.y, c.yc), c.zc);
+const b = new THREE.Vector3(target.x, Math.max(target.y, c.yc), c.zc);
+let turn = 0;
+if (c.t < PH_OUT) s.pos.lerpVectors(c.from, a, ph(c.t, 0, PH_OUT));
+else if (c.t < PH_IN) {
+  turn = ph(c.t, PH_OUT, PH_IN);
+  s.pos.lerpVectors(a, b, turn);
+} else {
+  turn = 1;
+  s.pos.lerpVectors(b, target, ph(c.t, PH_IN, 1));
+}
+s.quat.slerpQuaternions(c.fromQ, s.tQuat, turn);
+```
+
+I use `yc` for height. A standing book that turns flat sweeps its long edge down toward the board, so I lift it by half its largest side before it rotates. A book that moves without turning gets `-Infinity` and goes straight to its spot. A book you drop from your hand already sits in front of the shelf, so I start its move at `PH_OUT` and skip the pull.
+
+I defined the path by the places the book has to avoid. Once the book clears the shelf, any path between the two slots works.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Picking a book up
+
+I start a drag with `liftOut`. I take the book out of its row and keep a note of its old place, so I can put it back if the drag turns out to be a click.
+
+```ts
+export function liftOut(rows: Rows, id: string) {
+  const loc = locate(rows, id);
+  const list = rows[loc.shelf];
+  const e = list[loc.index] as ItemEntry;
+  let entry: ItemEntry;
+  if (e.kind === "stack") {
+    e.ids.splice(loc.k, 1);
+    entry = { kind: "stack", ids: [id], x: e.x };
+    if (e.ids.length === 0) list.splice(loc.index, 1);
+  } else {
+    entry = list.splice(loc.index, 1)[0] as ItemEntry;
+  }
+}
+```
+
+The book stays out of the arrangement while you hold it. On the next layout pass I close the gap it left, and you feel the lift as a physical one.
+
+The harder part comes before the lift. A tap and a drag start with the same pointer down event, so I sort them with three thresholds.
+
+```ts
+const LONG_PRESS = 380;
+const SLOP = { mouse: 12, touch: 8 };
+const QUICK_DRAG = { ms: 280, px: 26 };
+```
+
+With a mouse, moving past the slop on a book starts a drag. On touch, the same movement scrolls the page, and you pick a book up with a long press. A swipe that started on a book would grab it otherwise, and on a full shelf most swipes start on a book.
+
+`QUICK_DRAG` covers the last case. A drag that ends fast and close to its start came from a click with a shaky hand, so I put the book back with `putBack` and treat the gesture as a tap.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Where it lands
+
+On each pointer move I ask where the book would go if you let go at that moment. I pick the shelf whose compartment centre sits closest to the book, and I centre the book under the pointer. A flat book held over the middle of a stack joins that stack.
+
+I treat the inner part of a stack as its middle. `stackUnder` trims 22% off each side of the stack and checks whether the carried book's centre falls inside what remains.
+
+```ts
+for (const sp of spans) {
+  if (sp.kind !== "stack" || sp.hidden) continue;
+  const inset = (sp.x1 - sp.x0) * 0.22;
+  if (worldX > sp.x0 + inset && worldX < sp.x1 - inset) found = sp.index;
+}
+```
+
+<BookshelfStackPreview />
+
+Set the flat book down past the edge of the stack and it keeps a spot of its own, with its neighbours making room. Set it over the middle and it lands on top, and the stack grows by one book. The trimmed edges give you room to place a book beside a stack without it climbing on by accident.
+
+```ts
+const stack =
+  dr.entry.kind === "stack" ? stackUnder(rows, shelf, bx) : undefined;
+let x = rowX(bx) - entryWidth(dr.entry) / 2;
+if (stack === undefined) {
+  const spot = findShelf(rows, dr.entry, shelf, x);
+  if (spot) ({ shelf, x } = spot);
+}
+```
+
+I wrote `findShelf` on top of `resolveRow`. I run the pass with the carried book added and check whether any other book went into storage.
+
+```ts
+export function fitsAt(row: Entry[], entry: Entry, x: number) {
+  const before = resolveRow(row).filter((p) => p.hidden).length;
+  const after = resolveRow(row, { entry, x });
+  return (
+    !after.some((p) => p.hidden && p.extra) &&
+    after.filter((p) => p.hidden && !p.extra).length <= before
+  );
+}
+```
+
+If the spot under the pointer fits, I use it. If it fails, I try the other gaps on that shelf, nearest first. If the shelf has no room, I try the shelves below it and then the shelves above.
+
+I pass the carried book into the layout as `extra`. I pin it like a changed book, so its neighbours part before you let go. I write no target for it, because the book in your hand follows the pointer.
+
+The book tilts with the motion. I smooth its horizontal speed into a small roll and lean it back toward you while you hold it, so it reads as lifted off the shelf.
+
+```ts
+dr.vx = THREE.MathUtils.lerp(dr.vx, p.x - dr.lastX, 0.35);
+
+const tilt =
+  THREE.MathUtils.clamp(-dr.vx * 0.09, -0.45, 0.45) +
+  (pose === "flat" ? 0 : -0.12);
+```
+
+Near the top or bottom of the screen, a carried book scrolls the case, so you can move a book from the top shelf to the bottom one in one drag.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Taking a book off the shelf
+
+Tap a book and it flies out to a close-up. The book turns three quarters so you see the cover and a sliver of spine, and it floats above a short detail panel with the shelf blurred behind it.
+
+<BookshelfCloseUpPreview />
+
+I reuse the tween from the turns for this flight. It follows a curve with a straight pull toward you at the start, and I size the target from the space the detail view leaves, so a tall book and a short one both fill that space.
+
+```ts
+const flat = this.d.poseOf(id) === "flat";
+hero.tween = {
+  ...this.from(hero),
+  to: () => this.target("detail", id),
+  dur: this.dur(0.72, 0.25),
+  ease: easeOut,
+  lw: [0, 1],
+  pullStart: flat ? 16 : 22,
+  pullEnd: 0,
+  done: () => this.sharpen(hero),
+};
+```
+
+I made `to` a function and read it on each frame. If you resize the window mid-flight, the book still reaches the right place.
+
+I draw the close-up on its own canvas above the shelf, which lets me blur the shelf and keep the book sharp. That choice leaves one hard moment. On the way back, the book has to move from the close-up canvas to the shelf canvas, and I want the switch to stay hidden.
+
+```ts
+const HANDOFF = 0.72;
+```
+
+I run the return flight on the close-up canvas for the first 72% while the shelf comes back into focus. At that point I hand the same tween, at the same progress, to the shelf copy of the book. Both copies follow one curve, so I make the switch mid-motion, where your eye can't catch it.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Two springs
+
+Outside the turns and the flights, I move each book toward its target with a spring. I use one setting for the book in your hand and a second one for the books on the shelf.
+
+```ts
+function stepSpring(s: BookState, dt: number, pull: THREE.Vector3) {
+  const k = s.follow ? 900 : 190;
+  const c = s.follow ? 2 * Math.sqrt(k) : 2 * Math.sqrt(k) * 0.78;
+  const n = Math.max(1, Math.ceil(dt * 240));
+  const h = dt / n;
+  for (let i = 0; i < n; i++) {
+    s.vel.x += ((pull.x - s.pos.x) * k - s.vel.x * c) * h;
+    s.vel.y += ((pull.y - s.pos.y) * k - s.vel.y * c) * h;
+    s.vel.z += ((pull.z - s.pos.z) * k - s.vel.z * c) * h;
+    s.pos.addScaledVector(s.vel, h);
+  }
+}
+```
+
+The book in your hand gets a stiff spring at critical damping. It keeps pace with the pointer and stops without overshoot, the way an object in your hand behaves. The books on the shelf get a softer spring at 78% of critical damping, so a pushed neighbour settles with a small give.
+
+<BookshelfSpringsPreview />
+
+With one spring, the carried book drifts behind its target and wobbles when it arrives. I also step the spring in fixed slices of 1/240 of a second. A spring this stiff can blow up on a slow frame if you step it once per frame, and with the slices you get the same motion on a slow phone and a fast laptop.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Keeping the push
+
+The layout pass computes positions and stops there. If I threw those positions away, I would start the next pass from the old wishes, and a book you pushed aside would spring back the moment you changed anything else.
+
+I call `persistPositions` after each drop and each pose change to write the solved positions back into the rows.
+
+```ts
+export function persistPositions(rows: Rows, placed: Placed[][]) {
+  placed.forEach((row, r) => {
+    const vis = row.filter((p) => !p.extra && !p.hidden);
+    const last = vis[vis.length - 1];
+    let tail = last ? rowX(last.x + last.w) : 0;
+    for (const p of row) {
+      if (p.extra) continue;
+      const e = p.e as ItemEntry;
+      if (p.hidden) e.x = Math.max(e.x ?? 0, (tail += 1));
+      else e.x = rowX(p.x);
+    }
+    sortByX(rows[r]);
+  });
+}
+```
+
+On a drop I edit the rows and solve the layout with the dropped entry pinned. Then I keep the result, and you find the shelf the way you left it.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Closing thoughts
+
+The bookcase looks like a 3D project, and the rendering took real work. I got it to feel right by keeping the shelf as a list and laying it out with one function.
+
+Each interaction follows one route. I edit the rows and run `resolveRow` with the changed entry pinned, and the books move toward their new targets. Turning a book goes through that route, and so does dropping one. The gap that opens for a carried book and the full-shelf check reuse the same function, with no second idea of free space to keep in sync.
+
+Once you describe a shelf as data, you can answer the hard questions about where a book goes with plain code. Then you give the 3D layer a smaller job, which is moving each book to the answer.
+
+</section>

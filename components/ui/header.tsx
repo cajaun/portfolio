@@ -7,6 +7,7 @@ import { animate, motion, useMotionValue } from "framer-motion";
 import { useTheme } from "next-themes";
 import { useRef, useState } from "react";
 import { SITE } from "@/data/site";
+import { getAvatarDragShadow } from "@/components/ui/theme-shadows";
 
 const Header = () => {
   const [isDetached, setIsDetached] = useState(false);
@@ -20,10 +21,7 @@ const Header = () => {
   } | null>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const dragShadow =
-    resolvedTheme === "dark"
-      ? "0 0 0 1px #ffffff14, 0px 16px 32px rgba(0, 0, 0, 0.45), 0px 4px 12px rgba(0, 0, 0, 0.3)"
-      : "0 0 0 1px #0000000f, 0px 16px 32px rgba(0, 0, 0, 0.12), 0px 4px 12px rgba(0, 0, 0, 0.08)";
+  const dragShadow = getAvatarDragShadow(resolvedTheme);
 
   const lockTextSelection = () => {
     const body = document.body;

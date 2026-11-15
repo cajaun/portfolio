@@ -6,6 +6,7 @@ import { ActivePostPreview } from "@/components/blog/previews/intersection-obser
 import { PortalLayerPreview } from "@/components/blog/previews/modals";
 import { MorphingChartPreview } from "@/components/blog/previews/morphing-chart";
 import { HeaderOverviewPreview } from "@/components/blog/previews/adaptive-header";
+import { BookshelfPreview } from "@/components/blog/previews/bookshelf";
 import { SITE } from "@/data/site";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -25,6 +26,14 @@ type WorkExample = {
 };
 
 const WORK_EXAMPLES: WorkExample[] = [
+  {
+    slug: "bookshelf",
+    title: "3D Bookshelf",
+    publishedAt: "November 15, 2026",
+    summary:
+      "A 3D bookcase where you can pick a book up, turn it and carry it to another shelf while the other books make room.",
+    Component: BookshelfPreview,
+  },
   {
     slug: "adaptive-header",
     title: "Adaptive Header",
@@ -120,7 +129,7 @@ export default async function WorkExamplePage(props: PageProps) {
       <section className="mx-auto mb-14 flex w-full max-w-screen-sm flex-1 flex-col px-4 pb-8 pt-20 dark:text-white">
         <Header />
         <div
-          className="mb-16 animate-slide-down-fade px-2"
+          className="sticky top-4 z-30 mb-16 animate-slide-down-fade px-2"
           style={{ animationDelay: "180ms" }}
         >
           <ArticleActions />
