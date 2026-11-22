@@ -1,13 +1,17 @@
 import ThemeToggleButton from "@/components/ui/theme-toggle-button";
 import { SITE } from "@/data/site";
 
-const Footer = () => {
+const Footer = ({
+  animationDelay = "450ms",
+}: {
+  animationDelay?: string;
+}) => {
   const year = new Date().getFullYear();
 
   return (
     <footer
       className="mx-auto mt-auto w-full max-w-screen-sm px-4 animate-slide-down-fade"
-      style={{ animationDelay: "450ms" }}
+      style={{ animationDelay }}
     >
       <div
         className="mx-2 border-t border-preview-border flex items-center justify-between px-0 pt-4 dark:border-preview-dark-border md:px-0"

@@ -12,9 +12,18 @@ export default function ArticleContent({ children }: { children: ReactNode }) {
       return;
     }
 
-    Array.from(article.children).forEach((child, index) => {
+    const children = Array.from(article.children);
+
+    children.forEach((child, index) => {
       (child as HTMLElement).style.setProperty("--i", String(index));
     });
+
+    const root = document.documentElement;
+    root.style.setProperty("--article-count", String(children.length));
+
+    return () => {
+      root.style.removeProperty("--article-count");
+    };
   }, [children]);
 
   return (

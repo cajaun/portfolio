@@ -1,0 +1,97 @@
+export const metadata = {
+  title: "Someone in the Room",
+  publishedAt: "November 21, 2026",
+  summary:
+    "A chatbot that passes as human shows it can imitate conversation, but the ability to generalize offers stronger evidence of understanding.",
+};
+
+import { Cite, References } from "@/components/blog/references";
+
+<section className="mb-16 px-2">
+
+## Passing as a person
+
+In 2026, researchers reported that GPT-4.5 convinced human judges it was a person 73% of the time during five-minute conversations. Participants exchanged messages with both a human and an AI system before deciding which was human (Jones & Bergen, 2026).<Cite id="jones-bergen" n={1} /> The result resembles an experiment Alan Turing proposed more than 75 years ago. He believed that a machine's ability to imitate human conversation could help us judge its intelligence. Modern chatbots have made that possibility a reality, yet I remain unconvinced that passing his test establishes genuine understanding. Current AI systems can produce convincing answers across many subjects, but they still struggle to apply knowledge in unfamiliar situations. I believe the ability to generalize, rather than imitate human conversation, offers stronger evidence of understanding.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The imitation game
+
+Turing (1950)<Cite id="turing" n={2} /> proposed the imitation game to avoid the difficulty of defining intelligence. A human would communicate with a machine and another person through text, then attempt to distinguish between them. His approach makes sense because we judge human intelligence through behavior. We listen to explanations, ask questions and evaluate how someone responds. A machine that performs well under similar conditions deserves recognition for its abilities. However, successful conversation tells us little about how the machine arrives at its answers. Large language models learn from extensive training data and use what they have learned to produce responses. They can solve some unfamiliar problems, but their performance varies when the problems change. A convincing response therefore gives us evidence of a machine's capabilities without proving that it understands the subject. John Searle challenged this same assumption decades before modern chatbots existed.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The Chinese room
+
+Searle (1980)<Cite id="searle" n={3} /> imagined a person inside a room who understands no Chinese. People outside submit questions written in Chinese, while the person follows a rulebook to produce appropriate answers. Those receiving the responses might believe they are communicating with someone who understands Chinese. Yet the person inside has no understanding of the language. Searle argued that computers could follow instructions and produce convincing answers without understanding their meaning. I agree with his concern. Correct answers alone cannot establish whether a system understands what it is doing. However, critics challenged his reasoning through the Systems Reply. They argued that the complete room might possess understanding even if the person operating it does not. Searle responded that the operator could memorize every instruction and still lack understanding. I find this response unconvincing because the operator's experience cannot settle whether the complete system possesses that ability. Cole (2024)<Cite id="cole" n={4} /> describes a related objection, the Virtual Mind Reply, which suggests that running the memorized rules could produce a separate mind the operator has no access to. We should judge the system's capabilities without assuming that its individual parts must share them. Searle raises a valid concern about imitation, but his argument does not establish that computers can never understand.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## Applying what it knows
+
+My main concern with current AI is its ability to generalize, or apply existing knowledge to unfamiliar situations. Humans can transfer what they learn from one setting to another, often with limited experience. AI systems also generalize, but their performance remains inconsistent across unfamiliar tasks. Hupkes et al. (2023)<Cite id="hupkes" n={5} /> reviewed research on generalization in language models and examined how researchers evaluate their ability to transfer knowledge. They found a growing number of studies that claim to test generalization without showing how the test data differ from the training data, partly because modern training sets are too large to analyze. If researchers cannot always confirm that a problem is new to a model, a judge in a five-minute conversation has even less chance. A chatbot might sustain a convincing conversation while struggling with problems that require it to apply knowledge beyond familiar patterns. Jones and Bergen's (2026)<Cite id="jones-bergen" n={1} first={false} /> experiment also raises questions about what the test measures. GPT-4.5 achieved its 73% success rate when researchers instructed it to adopt a humanlike persona. Without that instruction, judges selected it as human only 36% of the time. The difference suggests that conversational style influenced the judges' decisions. GPT-4.5's success in passing as human tells us more about its ability to imitate conversation than its understanding of the subjects discussed. I would place greater weight on whether an AI can learn something, apply it in unfamiliar circumstances and respond when its previous knowledge proves insufficient.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The cost of scale
+
+I also question whether increasing the size of current AI models offers an efficient path towards human-level intelligence. Training large models demands considerable computing power and energy. Although these systems can perform new tasks without complete retraining, improving their capabilities and adapting them to new demands can require substantial resources. Humans often learn from limited experience and transfer that knowledge across different situations. I believe AI researchers need to improve learning efficiency alongside generalization if they want machines to approach that level of adaptability. There are physical limits to consider. The second law of thermodynamics constrains physical processes, while research on information processing confirms that some computational operations have unavoidable energy costs (Bérut et al., 2012).<Cite id="berut" n={6} /> These limits do not make human-level AI impossible. They do, however, give us reason to question whether increasing computing power alone offers a sustainable solution. The same concern applies to predictions that AI will replace highly skilled workers. Performing individual tasks does not demonstrate the ability to handle an entire profession, particularly when that work demands judgment under changing conditions.
+
+</section>
+
+<section className="mb-16 px-2">
+
+## The same test for both
+
+Critics might argue that humans also struggle with unfamiliar problems, so requiring machines to demonstrate strong generalization imposes an unfair standard. I agree that human intelligence is imperfect. However, I would apply the same test to both. A supporter of Searle might also point out that generalization is still a form of behavior, so my test could be fooled in the same way as Turing's. I accept that my test is behavioral, since behavior is the only evidence we have about any mind. The difference is that a short conversation stays close to familiar material, while a generalization test pushes a system into situations its designers could not list in advance. The ability to transfer knowledge and adapt when circumstances change offers stronger evidence of understanding than success in a short conversation. Future AI systems may achieve these abilities with greater efficiency. Improvements in how machines learn could address limitations that current models face, and I see no reason to rule out that possibility. Turing gave us a useful way to assess machine behavior, while Searle questioned whether that behavior demonstrates understanding. I agree with Turing that intelligent behavior deserves recognition and with Searle that successful imitation leaves questions unanswered. I would be more convinced by an AI that learns efficiently and applies knowledge across unfamiliar situations than by one that persuades me it is human. Passing the Turing Test is an achievement, but I do not believe it establishes genuine understanding.
+
+</section>
+
+<References
+  items={[
+    {
+      id: "jones-bergen",
+      title: "Large Language Models Pass the Turing Test",
+      author: "Cameron R. Jones and Benjamin K. Bergen",
+      href: "https://arxiv.org/abs/2503.23674",
+    },
+    {
+      id: "turing",
+      title: "Computing Machinery and Intelligence",
+      author: "Alan M. Turing",
+      href: "https://doi.org/10.1093/mind/LIX.236.433",
+    },
+    {
+      id: "searle",
+      title: "Minds, Brains, and Programs",
+      author: "John R. Searle",
+      href: "https://doi.org/10.1017/S0140525X00005756",
+    },
+    {
+      id: "cole",
+      title: "The Chinese Room Argument",
+      author: "David Cole",
+      href: "https://plato.stanford.edu/entries/chinese-room/",
+    },
+    {
+      id: "hupkes",
+      title: "A Taxonomy and Review of Generalization Research in NLP",
+      author: "Dieuwke Hupkes et al.",
+      href: "https://doi.org/10.1038/s42256-023-00729-y",
+    },
+    {
+      id: "berut",
+      title: "Experimental Verification of Landauer’s Principle Linking Information and Thermodynamics",
+      author: "Antoine Bérut et al.",
+      href: "https://doi.org/10.1038/nature10872",
+    },
+  ]}
+/>
